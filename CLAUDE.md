@@ -38,10 +38,10 @@
 
 제외(2차 이후): 만보기, 영수증 OCR, 오퍼월 SDK 실연동(지면만 자리 확보), 추천인 영구 수익(Upside형 — 2차 우선 검토).
 
-## 기술 방향 (제안, 첫 세션에서 확정)
-- Next.js 15 + React 19 + Tailwind 4 (기존 `yusangjeon/catchreward`와 동일 스택 → UI 자산 재사용 가능)
+## 기술 방향 (2026-10-24 확정)
+- Next.js 15.5 + React 19 + Tailwind 4 + TypeScript, pnpm (기존 `yusangjeon/catchreward`와 동일 스택 → UI 자산 재사용 가능)
 - **반응형 모바일 웹** (catchreward는 420×912 절대좌표 픽셀복제라 반응형 아님 — 구조만 참고, 좌표 복사 금지)
-- DB: Supabase(Postgres) 또는 Vercel Postgres — 유저·퀴즈응답·배지·스탬프·포인트원장·룰렛로그
+- DB: Supabase(Postgres) — 스키마 `supabase/migrations/0001_init.sql`. env 없으면 인메모리 저장소(`lib/db/memory.ts`)로 동작. 저장소는 `Repo` 인터페이스(`lib/db/repo.ts`) 뒤에 숨기고 비즈니스 규칙은 `lib/quiz/service.ts`에만 둔다.
 - 배포: Vercel
 - 포인트는 **원장(ledger) 테이블**로 적립/차감 이벤트를 쌓고 잔액은 집계. 룰렛·보상 확률은 서버에서만 계산.
 
@@ -50,4 +50,8 @@
 - `yusangjeon/shopping-reward` — 쇼핑 리워드 플랫폼 기획 리포(초기 상태).
 
 ## 현재 상태
-- 2026-10-25: 레포 생성, 인수인계 문서 작성. 코드 없음. 다음 단계 = 스택 확정 → 프로젝트 스캐폴드 → DB 스키마 → 퀴즈 화면.
+- 2026-10-25: 레포 생성, 인수인계 문서 작성.
+- 2026-10-24(첫 코드 세션): 스택 확정, 스캐폴드, DB 스키마(14테이블+원장 뷰+태그 RPC), **취향 퀴즈 MVP 동작**.
+  - 동작: 익명 쿠키 유저 → 일 5문제(2/4지선다) → 문항당 10P 원장 적립 → 태그 누적 → 배지(3회) → 5문제 완료 시 스탬프 1. 결과 화면에 선택 분포(%) 표시.
+  - 검증: `pnpm typecheck` · `pnpm lint` · `pnpm build` 통과, API 스모크(한도·중복·잘못된 선택지·분포) 통과. Supabase 어댑터는 **실제 프로젝트 미연결 상태**(코드만 있음).
+  - 다음 단계: ① Supabase 프로젝트 연결 + 스모크 ② 룰렛(확률 테이블 → 서버 추첨, 스탬프 10개 소비) ③ 관리자 최소(퀴즈·미션·확률·배지별 유저 수) ④ 포인트 교환 요청 ⑤ Vercel 배포.

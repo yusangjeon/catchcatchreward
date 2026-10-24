@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #ff6b35;
+  --color-brand-dark: #e5551f;
+  --color-brand-soft: #fff1ea;
+  --color-ink: #1b1b1f;
+  --color-ink-muted: #6b6b76;
+  --color-surface: #ffffff;
+  --color-bg: #f6f6f8;
+  --color-line: #e8e8ee;
+  --color-point: #2f7cf6;
+  --color-stamp: #f2b705;
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+    "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 모바일 터치 영역 최소 44px */
+button {
+  min-height: 44px;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.animate-pop {
+  animation: pop 180ms ease-out;
+}
