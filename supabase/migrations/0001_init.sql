@@ -16,21 +16,37 @@ create table if not exists profiles (
 );
 
 -- ───────────────────────────── 퀴즈 ─────────────────────────────
+-- 마이비식 구조: 퀴즈 세트(카드 1장) 안에 문항 여러 개. 세트 완료 시 보상.
+create table if not exists quiz_sets (
+  id                uuid primary key default gen_random_uuid(),
+  title             text not null,
+  image_url         text not null default '',
+  reward_points     integer not null default 100,   -- 세트 완료 보상 B포인트
+  capacity          integer not null default 1000,  -- "N명 가능"
+  base_participants integer not null default 0,     -- 표시용 기본 참여 수(실 완료 수와 합산)
+  today_only        boolean not null default false, -- "오늘만" 배지
+  active            boolean not null default true,
+  sort              integer not null default 0,
+  created_at        timestamptz not null default now()
+);
+
 create table if not exists quizzes (
   id          uuid primary key default gen_random_uuid(),
+  set_id      uuid not null references quiz_sets(id) on delete cascade,
   question    text not null,
   kind        smallint not null check (kind in (2, 4)),   -- 2지선다 / 4지선다
   active      boolean not null default true,
   sort        integer not null default 0,
   created_at  timestamptz not null default now()
 );
+create index if not exists quizzes_set_idx on quizzes(set_id);
 
 create table if not exists quiz_options (
   id          uuid primary key default gen_random_uuid(),
   quiz_id     uuid not null references quizzes(id) on delete cascade,
   label       text not null,
-  emoji       text,
-  tags        text[] not null default '{}',   -- 선택 시 누적되는 취향 태그 (예: {spicy, late_night})
+  image_url   text,                          -- 이미지형 선택지(2지선다 카드)
+  tags        text[] not null default '{}',  -- 선택 시 누적되는 취향 태그 (예: {spicy, late_night})
   sort        integer not null default 0
 );
 create index if not exists quiz_options_quiz_idx on quiz_options(quiz_id);
@@ -40,12 +56,22 @@ create table if not exists quiz_responses (
   user_id     uuid not null references profiles(id) on delete cascade,
   quiz_id     uuid not null references quizzes(id) on delete cascade,
   option_id   uuid not null references quiz_options(id) on delete cascade,
-  day_key     date not null,                  -- KST 기준 응답일 (일일 한도 집계 키)
+  day_key     date not null,                 -- KST 기준 응답일
   answered_at timestamptz not null default now(),
-  unique (user_id, quiz_id)                   -- 같은 퀴즈는 1회만
+  unique (user_id, quiz_id)                  -- 같은 문항은 1회만
 );
 create index if not exists quiz_responses_user_day_idx on quiz_responses(user_id, day_key);
 create index if not exists quiz_responses_option_idx on quiz_responses(option_id);
+
+create table if not exists set_completions (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references profiles(id) on delete cascade,
+  set_id       uuid not null references quiz_sets(id) on delete cascade,
+  day_key      date not null,
+  completed_at timestamptz not null default now(),
+  unique (user_id, set_id)                   -- 세트당 1회
+);
+create index if not exists set_completions_set_idx on set_completions(set_id);
 
 -- ───────────────────────────── 취향 태그 · 배지 ─────────────────────────────
 create table if not exists user_tag_scores (
@@ -134,7 +160,7 @@ create table if not exists roulette_spins (
 
 -- ───────────────────────────── 포인트 원장 · 교환 ─────────────────────────────
 do $$ begin
-  create type ledger_reason as enum ('quiz_answer', 'mission', 'roulette', 'redeem', 'admin_adjust', 'referral');
+  create type ledger_reason as enum ('quiz_answer', 'quiz_bonus', 'mission', 'roulette', 'redeem', 'admin_adjust', 'referral');
 exception when duplicate_object then null; end $$;
 
 create table if not exists point_ledger (
@@ -182,9 +208,18 @@ begin
   return query select s.tag, s.score from user_tag_scores s where s.user_id = p_user;
 end $$;
 
+-- 세트별 완료 수 (참여자 수 표시용)
+create or replace function count_set_completions()
+returns table (set_id uuid, cnt bigint)
+language sql security definer as $$
+  select set_id, count(*) from set_completions group by set_id;
+$$;
+
 -- ───────────────────────────── RLS ─────────────────────────────
 alter table profiles            enable row level security;
+alter table quiz_sets           enable row level security;
 alter table quizzes             enable row level security;
+alter table set_completions     enable row level security;
 alter table quiz_options        enable row level security;
 alter table quiz_responses      enable row level security;
 alter table user_tag_scores     enable row level security;

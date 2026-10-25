@@ -1,148 +1,159 @@
 import "server-only";
 import { getRepo } from "@/lib/db";
 import { kstDayKey } from "@/lib/time";
-import type { AnswerResult, Badge, PublicQuiz, Quiz, TodayQuizPayload } from "@/lib/types";
+import type { Badge, HomePayload, Persona, PublicQuestion, Quiz, QuizSet, SetCard, SetPayload, SubmitResult, Wallet } from "@/lib/types";
 
-/** 퀴즈 1문항 응답 포인트. 운영값은 추후 DB(settings)로 이동 */
-export const POINTS_PER_ANSWER = 10;
-/** 일일 퀴즈 세트 크기 = 스탬프 1개 조건 */
-export const DAILY_LIMIT = Math.max(1, Number(process.env.QUIZ_DAILY_LIMIT ?? 5) || 5);
+/** 세트 완료 시 랜덤 보너스 후보(가중치 = 등장 횟수). 운영값은 추후 DB로. */
+const RANDOM_BONUS = [0, 0, 0, 10, 10, 20, 30];
 
 export class QuizError extends Error {
   constructor(
-    public code: "LIMIT_REACHED" | "ALREADY_ANSWERED" | "NOT_FOUND" | "BAD_OPTION",
+    public code: "NOT_FOUND" | "ALREADY_DONE" | "INCOMPLETE" | "BAD_OPTION",
     message: string,
   ) {
     super(message);
   }
 }
 
-function toPublic(q: Quiz): PublicQuiz {
-  return {
-    id: q.id,
-    question: q.question,
-    kind: q.kind,
-    options: q.options.map((o) => ({ id: o.id, label: o.label, emoji: o.emoji })),
-  };
+// ───────── 페르소나(취향 태그 → 라벨 + 의사 MBTI) ─────────
+const PERSONA_TITLES: [tag: string, title: string, emojis: string][] = [
+  ["spicy", "불꽃 미식가", "🌶️🔥👅"],
+  ["cafe", "미학적인 스타일리스트", "🤔🖼️👇"],
+  ["value", "계산 빠른 실속파", "🧮💸👍"],
+  ["fitness", "독립적인 실용주의자", "💪⌚🏃"],
+  ["home", "포근한 집콕러", "🛋️📺🌙"],
+  ["late_night", "밤을 지배하는 올빼미", "🦉🍜🌃"],
+  ["music", "플레이리스트 큐레이터", "🎧🎵✨"],
+  ["game", "전략가 게이머", "🎮🧠⚔️"],
+];
+
+function persona(scores: Record<string, number>): Persona {
+  const top = PERSONA_TITLES.map(([tag, title, emojis]) => ({ tag, title, emojis, s: scores[tag] ?? 0 }))
+    .sort((a, b) => b.s - a.s)[0];
+  const g = (a: string, b: string, A: string, B: string) => ((scores[a] ?? 0) >= (scores[b] ?? 0) ? A : B);
+  const total = Object.values(scores).reduce((x, y) => x + y, 0);
+  if (total === 0) return { title: "탐험을 시작한 뉴비", code: "????", emojis: "🔍✨👋" };
+  const code = g("outdoor", "home", "E", "I") + g("challenge", "value", "N", "S") + g("tech", "cafe", "T", "F") + g("saving", "rest", "J", "P");
+  return { title: top.title, code, emojis: top.emojis };
 }
 
-async function wallet(userId: string) {
+// ───────── 공용 조립 ─────────
+async function wallet(userId: string): Promise<Wallet> {
   const repo = getRepo();
   const [balance, stamps] = await Promise.all([repo.getBalance(userId), repo.countUnconsumedStamps(userId)]);
   return { balance, stamps };
 }
 
-async function earnedBadges(userId: string): Promise<(Badge & { earnedAt: string })[]> {
-  const repo = getRepo();
-  const [all, mine] = await Promise.all([repo.listBadges(), repo.listUserBadges(userId)]);
-  const byCode = new Map(all.map((b) => [b.code, b]));
-  return mine
-    .map((ub) => {
-      const b = byCode.get(ub.badgeCode);
-      return b ? { ...b, earnedAt: ub.earnedAt } : null;
-    })
-    .filter((x): x is Badge & { earnedAt: string } => x !== null);
-}
-
-/** 아직 답하지 않은 활성 퀴즈 중 첫 번째 */
-async function nextQuiz(userId: string, answeredQuizIds: Set<string>): Promise<Quiz | null> {
-  const quizzes = await getRepo().listActiveQuizzes();
-  return quizzes.find((q) => !answeredQuizIds.has(q.id)) ?? null;
-}
-
-export async function getToday(userId: string): Promise<TodayQuizPayload> {
-  const repo = getRepo();
-  const dayKey = kstDayKey();
-  const responses = await repo.listResponses(userId);
-  const answeredToday = responses.filter((r) => r.dayKey === dayKey).length;
-  const remaining = Math.max(0, DAILY_LIMIT - answeredToday);
-  const answeredIds = new Set(responses.map((r) => r.quizId));
-  const [next, w, badges] = await Promise.all([
-    remaining > 0 ? nextQuiz(userId, answeredIds) : Promise.resolve(null),
-    wallet(userId),
-    earnedBadges(userId),
-  ]);
+function toCard(s: QuizSet, counts: Record<string, number>, doneIds: Set<string>): SetCard {
   return {
-    dayKey,
-    limit: DAILY_LIMIT,
-    answeredToday,
-    remaining,
-    next: next ? toPublic(next) : null,
-    wallet: w,
-    badges,
+    id: s.id,
+    title: s.title,
+    imageUrl: s.imageUrl,
+    rewardPoints: s.rewardPoints,
+    capacity: s.capacity,
+    participants: s.baseParticipants + (counts[s.id] ?? 0),
+    todayOnly: s.todayOnly,
+    done: doneIds.has(s.id),
   };
 }
 
-export async function answer(userId: string, quizId: string, optionId: string): Promise<AnswerResult> {
+async function setCards(userId: string): Promise<SetCard[]> {
+  const repo = getRepo();
+  const [sets, counts, done] = await Promise.all([repo.listActiveSets(), repo.countCompletionsBySet(), repo.listCompletions(userId)]);
+  const doneIds = new Set(done.map((d) => d.setId));
+  return sets.map((s) => toCard(s, counts, doneIds));
+}
+
+async function earnedBadges(userId: string) {
+  const repo = getRepo();
+  const [all, mine] = await Promise.all([repo.listBadges(), repo.listUserBadges(userId)]);
+  const byCode = new Map(all.map((b) => [b.code, b]));
+  return mine.flatMap((ub) => {
+    const b = byCode.get(ub.badgeCode);
+    return b ? [{ ...b, earnedAt: ub.earnedAt }] : [];
+  });
+}
+
+function toPublic(q: Quiz): PublicQuestion {
+  return { id: q.id, question: q.question, kind: q.kind, options: q.options.map((o) => ({ id: o.id, label: o.label, imageUrl: o.imageUrl })) };
+}
+
+// ───────── 조회 ─────────
+export async function getHome(userId: string): Promise<HomePayload> {
+  const repo = getRepo();
+  const [sets, w, badges, scores] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId)]);
+  return { wallet: w, honey: sets.filter((s) => !s.done).length, persona: persona(scores), badges, sets };
+}
+
+export async function getSetPayload(userId: string, setId: string): Promise<SetPayload> {
+  const repo = getRepo();
+  const set = await repo.getSet(setId);
+  if (!set || !set.active) throw new QuizError("NOT_FOUND", "퀴즈를 찾을 수 없어요");
+  const [quizzes, counts, done, scores] = await Promise.all([
+    repo.listQuizzesBySet(setId), repo.countCompletionsBySet(), repo.listCompletions(userId), repo.getTagScores(userId),
+  ]);
+  const doneIds = new Set(done.map((d) => d.setId));
+  return { set: toCard(set, counts, doneIds), persona: persona(scores), questions: quizzes.map(toPublic) };
+}
+
+// ───────── 제출 ─────────
+export async function submitSet(userId: string, setId: string, answers: { quizId: string; optionId: string }[]): Promise<SubmitResult> {
   const repo = getRepo();
   const dayKey = kstDayKey();
 
-  const quiz = await repo.getQuiz(quizId);
-  if (!quiz || !quiz.active) throw new QuizError("NOT_FOUND", "퀴즈를 찾을 수 없어요");
-  const option = quiz.options.find((o) => o.id === optionId);
-  if (!option) throw new QuizError("BAD_OPTION", "선택지가 올바르지 않아요");
+  const set = await repo.getSet(setId);
+  if (!set || !set.active) throw new QuizError("NOT_FOUND", "퀴즈를 찾을 수 없어요");
+  const done = await repo.listCompletions(userId);
+  if (done.some((d) => d.setId === setId)) throw new QuizError("ALREADY_DONE", "이미 참여한 퀴즈예요");
 
-  const responses = await repo.listResponses(userId);
-  if (responses.some((r) => r.quizId === quizId)) throw new QuizError("ALREADY_ANSWERED", "이미 답한 퀴즈예요");
-  const answeredBefore = responses.filter((r) => r.dayKey === dayKey).length;
-  if (answeredBefore >= DAILY_LIMIT) throw new QuizError("LIMIT_REACHED", "오늘 퀴즈를 모두 풀었어요");
+  const quizzes = await repo.listQuizzesBySet(setId);
+  const byQuiz = new Map(answers.map((a) => [a.quizId, a.optionId]));
+  const tags: string[] = [];
+  for (const q of quizzes) {
+    const optionId = byQuiz.get(q.id);
+    if (!optionId) throw new QuizError("INCOMPLETE", "모든 질문에 답해 주세요");
+    const opt = q.options.find((o) => o.id === optionId);
+    if (!opt) throw new QuizError("BAD_OPTION", "선택지가 올바르지 않아요");
+    tags.push(...opt.tags);
+  }
 
-  // 1) 응답 저장
-  const saved = await repo.saveResponse({ userId, quizId, optionId, dayKey });
+  // 1) 응답 저장 (이미 답한 문항은 건너뜀)
+  const prev = new Set((await repo.listResponses(userId)).map((r) => r.quizId));
+  for (const q of quizzes) {
+    if (prev.has(q.id)) continue;
+    await repo.saveResponse({ userId, quizId: q.id, optionId: byQuiz.get(q.id)!, dayKey });
+  }
 
-  // 2) 포인트 적립 (원장)
-  await repo.addLedger({
-    userId,
-    delta: POINTS_PER_ANSWER,
-    reason: "quiz_answer",
-    refType: "quiz_response",
-    refId: saved.id,
-  });
+  // 2) 세트 완료 기록 + 보상 원장
+  const completion = await repo.saveCompletion({ userId, setId, dayKey });
+  await repo.addLedger({ userId, delta: set.rewardPoints, reason: "quiz_answer", refType: "set_completion", refId: completion.id });
+  const bonus = RANDOM_BONUS[Math.floor(Math.random() * RANDOM_BONUS.length)];
+  if (bonus > 0) {
+    await repo.addLedger({ userId, delta: bonus, reason: "quiz_bonus", refType: "set_completion", refId: completion.id, memo: "random_bonus" });
+  }
 
   // 3) 태그 누적 → 배지 판정
-  const scores = await repo.incrementTagScores(userId, option.tags);
+  const scores = await repo.incrementTagScores(userId, tags);
   const [allBadges, mine] = await Promise.all([repo.listBadges(), repo.listUserBadges(userId)]);
   const owned = new Set(mine.map((b) => b.badgeCode));
   const newBadges: Badge[] = [];
   for (const b of allBadges) {
-    if (owned.has(b.code)) continue;
-    if ((scores[b.rule.tag] ?? 0) >= b.rule.min) {
+    if (!owned.has(b.code) && (scores[b.rule.tag] ?? 0) >= b.rule.min) {
       await repo.awardBadge(userId, b.code);
       newBadges.push(b);
     }
   }
 
-  // 4) 일일 세트 완료 → 스탬프
-  const answeredToday = answeredBefore + 1;
-  let stampEarned = false;
-  if (answeredToday === DAILY_LIMIT) {
-    await repo.addStamp({ userId, sourceType: "mission", sourceId: undefined });
-    stampEarned = true;
-  }
+  // 4) 스탬프 (룰렛 재료) — 세트 1개 = 스탬프 1개
+  await repo.addStamp({ userId, sourceType: "quiz_set", sourceId: completion.id });
 
-  // 5) 선택 분포 (자기 응답 포함)
-  const counts = await repo.countResponsesByOption(quizId);
-  const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
-  const distribution = quiz.options.map((o) => ({
-    optionId: o.id,
-    label: o.label,
-    percent: Math.round(((counts[o.id] ?? 0) / total) * 100),
-  }));
-
-  const remaining = Math.max(0, DAILY_LIMIT - answeredToday);
-  const answeredIds = new Set([...responses.map((r) => r.quizId), quizId]);
-  const next = remaining > 0 ? await nextQuiz(userId, answeredIds) : null;
-
+  const cards = await setCards(userId);
   return {
     ok: true,
-    pointsEarned: POINTS_PER_ANSWER,
-    distribution,
-    pickedOptionId: optionId,
-    newBadges,
-    stampEarned,
-    answeredToday,
-    remaining,
+    points: set.rewardPoints,
+    bonus,
     wallet: await wallet(userId),
-    next: next ? toPublic(next) : null,
+    newBadges,
+    recommended: cards.filter((c) => !c.done).slice(0, 4),
   };
 }

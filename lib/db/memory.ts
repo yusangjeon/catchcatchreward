@@ -1,13 +1,15 @@
 import { randomUUID } from "node:crypto";
 import type { Repo } from "./repo";
-import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, Stamp, UserBadge } from "@/lib/types";
-import { SEED_BADGES, SEED_QUIZZES } from "@/lib/quiz/seed";
+import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, SetCompletion, Stamp, UserBadge } from "@/lib/types";
+import { SEED_BADGES, SEED_QUIZZES, SEED_SETS } from "@/lib/quiz/seed";
 
 interface Store {
-  profiles: Map<string, Profile>; // key: anonKey
+  profiles: Map<string, Profile>;
+  sets: QuizSet[];
   quizzes: Quiz[];
   responses: QuizResponse[];
-  tagScores: Map<string, Map<string, number>>; // userId -> tag -> score
+  completions: SetCompletion[];
+  tagScores: Map<string, Map<string, number>>;
   badges: Badge[];
   userBadges: Map<string, UserBadge[]>;
   ledger: LedgerEntry[];
@@ -21,8 +23,10 @@ function store(): Store {
   if (!g.__ccrStore) {
     g.__ccrStore = {
       profiles: new Map(),
+      sets: structuredClone(SEED_SETS),
       quizzes: structuredClone(SEED_QUIZZES),
       responses: [],
+      completions: [],
       tagScores: new Map(),
       badges: structuredClone(SEED_BADGES),
       userBadges: new Map(),
@@ -46,32 +50,36 @@ export const memoryRepo: Repo = {
     return p;
   },
 
-  async listActiveQuizzes() {
-    return store()
-      .quizzes.filter((q) => q.active)
-      .sort((a, b) => a.sort - b.sort);
+  async listActiveSets() {
+    return store().sets.filter((s) => s.active).sort((a, b) => a.sort - b.sort);
   },
-
-  async getQuiz(quizId) {
-    return store().quizzes.find((q) => q.id === quizId) ?? null;
+  async getSet(setId) {
+    return store().sets.find((s) => s.id === setId) ?? null;
+  },
+  async listQuizzesBySet(setId) {
+    return store().quizzes.filter((q) => q.setId === setId && q.active).sort((a, b) => a.sort - b.sort);
   },
 
   async listResponses(userId) {
     return store().responses.filter((r) => r.userId === userId);
   },
-
   async saveResponse(input) {
     const r: QuizResponse = { ...input, id: randomUUID(), answeredAt: now() };
     store().responses.push(r);
     return r;
   },
 
-  async countResponsesByOption(quizId) {
+  async listCompletions(userId) {
+    return store().completions.filter((c) => c.userId === userId);
+  },
+  async saveCompletion(input) {
+    const c: SetCompletion = { ...input, id: randomUUID(), completedAt: now() };
+    store().completions.push(c);
+    return c;
+  },
+  async countCompletionsBySet() {
     const out: Record<string, number> = {};
-    for (const r of store().responses) {
-      if (r.quizId !== quizId) continue;
-      out[r.optionId] = (out[r.optionId] ?? 0) + 1;
-    }
+    for (const c of store().completions) out[c.setId] = (out[c.setId] ?? 0) + 1;
     return out;
   },
 
@@ -85,15 +93,16 @@ export const memoryRepo: Repo = {
     for (const t of tags) m.set(t, (m.get(t) ?? 0) + 1);
     return Object.fromEntries(m);
   },
+  async getTagScores(userId) {
+    return Object.fromEntries(store().tagScores.get(userId) ?? new Map());
+  },
 
   async listBadges() {
     return store().badges;
   },
-
   async listUserBadges(userId) {
     return store().userBadges.get(userId) ?? [];
   },
-
   async awardBadge(userId, badgeCode) {
     const s = store();
     const list = s.userBadges.get(userId) ?? [];
@@ -107,11 +116,8 @@ export const memoryRepo: Repo = {
     store().ledger.push(e);
     return e;
   },
-
   async getBalance(userId) {
-    return store()
-      .ledger.filter((e) => e.userId === userId)
-      .reduce((sum, e) => sum + e.delta, 0);
+    return store().ledger.filter((e) => e.userId === userId).reduce((sum, e) => sum + e.delta, 0);
   },
 
   async addStamp(input) {
@@ -119,7 +125,6 @@ export const memoryRepo: Repo = {
     store().stamps.push(st);
     return st;
   },
-
   async countUnconsumedStamps(userId) {
     return store().stamps.filter((s) => s.userId === userId && !s.consumedBy).length;
   },

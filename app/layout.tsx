@@ -4,7 +4,7 @@ import { Shell } from "@/components/Shell";
 
 export const metadata: Metadata = {
   title: "캐치캐치리워드",
-  description: "취향 퀴즈 풀고 포인트 받고, 스탬프 모아 룰렛 돌리기",
+  description: "쉽고 간편하게 즐기는 퀴즈형 앱테크",
   applicationName: "캐치캐치리워드",
   appleWebApp: { capable: true, title: "캐치캐치리워드", statusBarStyle: "default" },
 };
@@ -13,7 +13,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#ff6b35",
+  themeColor: "#427dff",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
