@@ -11,20 +11,22 @@ function parts(endsAt: string, now: number) {
 }
 
 /** 벤핏허브 상단 "2 일 0 9 시간 2 3 분 남았어요" 칩 카운트다운. 1분 간격 갱신 */
-export function Countdown({ endsAt }: { endsAt: string }) {
+/** variant adjoe: 게임적립 브릿지(높이 75, 칩 27, 배경 white/5, 일 칩 white/10·숫자 칩 white/15) */
+export function Countdown({ endsAt, variant = "benefit" }: { endsAt: string; variant?: "benefit" | "adjoe" }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 15_000);
     return () => clearInterval(id);
   }, []);
   const { d, h, m } = parts(endsAt, now);
-  const chip = "flex h-[26px] items-center justify-center rounded-[6px] bg-white/20 text-[16px] font-semibold tabular-nums text-white";
+  const adjoe = variant === "adjoe";
+  const chip = `flex ${adjoe ? "h-[27px]" : "h-[26px]"} items-center justify-center rounded-[6px] ${adjoe ? "bg-white/15" : "bg-white/20"} text-[16px] font-semibold tabular-nums text-white`;
   const unit = "text-[18px] font-semibold leading-[18px] text-white";
   return (
-    <div className="flex h-[74px] items-center justify-center gap-[6px] bg-white/[0.08] py-6">
+    <div className={`flex ${adjoe ? "h-[75px] bg-white/5" : "h-[74px] bg-white/[0.08]"} items-center justify-center gap-[6px] py-6`}>
       <div className="flex items-center gap-[6px]">
         <div className="flex items-center gap-[3px]">
-          <span className={`${chip} px-2`}>{d}</span>
+          <span className={`${chip} px-2 ${adjoe ? "!bg-white/10" : ""}`}>{d}</span>
           <span className={unit}>일</span>
         </div>
         <div className="flex items-center gap-[3px]">

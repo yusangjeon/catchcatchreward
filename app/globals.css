@@ -143,3 +143,7 @@ body {
 .myb-modal-in { animation: myb-modal-in 0.3s ease-out both; }
 @keyframes myb-fade-in { from { opacity: 0; } to { opacity: 1; } }
 .myb-fade-in { animation: myb-fade-in 0.3s ease-out both; }
+
+/* survey.myb.im 캐러셀 도트 8px gap 12 */
+.survey-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ced5e0; }
+.survey-dot-on { background: #427cff; }

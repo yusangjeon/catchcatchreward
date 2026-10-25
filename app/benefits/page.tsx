@@ -79,17 +79,17 @@ export default function BenefitsPage() {
             {data ? data.games.map((g) => <GameCard key={g.id} g={g} />) : [0, 1, 2].map((i) => <div key={i} className="myb-skeleton h-[220px] w-[150px] shrink-0 rounded-2xl" />)}
           </div>
 
-          <button type="button" className="my-4 flex h-[58px] w-full items-center justify-center gap-2 text-[16px] font-medium tracking-[-0.16px] text-[#33363f]">
+          <Link href="/game" className="my-4 flex h-[58px] w-full items-center justify-center gap-2 text-[16px] font-medium tracking-[-0.16px] text-[#33363f]">
             더 많은 게임 보기
             <svg width={24} height={24} viewBox="0 0 24 24" fill="none" aria-hidden><path d="m9.5 6 6 6-6 6" stroke="#33363f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </button>
+          </Link>
         </section>
 
         {/* 지금 가장 Hot한 설문 */}
         <section className="flex flex-col">
           <div className="flex items-center justify-between px-5 pb-4">
             <h2 className="text-[20px] font-medium leading-[23px]">지금 가장 Hot한 설문 🔥</h2>
-            <img src="/myb/bh/ic_arrow_section_title.webp" width={24} height={24} alt="더보기" className="h-6 w-6" />
+            <Link href="/survey" aria-label="설문 보상"><img src="/myb/bh/ic_arrow_section_title.webp" width={24} height={24} alt="더보기" className="h-6 w-6" /></Link>
           </div>
           <div className="mx-6 mb-8 flex flex-col gap-5 rounded-[20px] bg-white px-5 pb-6 pt-5">
             {data ? data.surveys.map((s, i) => <SurveyRow key={s.id} s={s} rank={i + 1} />) : [0, 1, 2, 3, 4].map((i) => <div key={i} className="myb-skeleton h-12 rounded-lg" />)}
@@ -125,13 +125,13 @@ export default function BenefitsPage() {
 
 function HeroGame({ g }: { g: BenefitGame }) {
   return (
-    <button type="button" className="myb-press flex w-full flex-col items-center gap-3">
+    <Link href={`/game/${g.id}`} className="myb-press flex w-full flex-col items-center gap-3">
       <img src={g.icon} width={141} height={141} alt="" className="myb-pop-in h-[141px] w-[141px] rounded-2xl bg-[#f1f3f8] object-cover" style={{ boxShadow: CARD_SHADOW }} />
       <div className="flex w-full flex-col items-center gap-1">
         <p className="w-full truncate text-center text-[16px] font-semibold leading-[21.6px] tracking-[-0.16px] text-white">{g.title}</p>
         <p className="text-[14px] font-medium leading-[18.9px] tracking-[-0.14px] text-[#dee2e9]">{g.missionText}</p>
       </div>
-    </button>
+    </Link>
   );
 }
 
@@ -147,8 +147,8 @@ function HeroSkeleton() {
 
 function GameCard({ g }: { g: BenefitGame }) {
   return (
-    <button
-      type="button"
+    <Link
+      href={`/game/${g.id}`}
       className="myb-press flex h-[220px] w-[150px] shrink-0 flex-col items-center justify-between overflow-hidden rounded-2xl border border-[#f1f3f8] bg-white px-4 pb-4 pt-5 text-left"
       style={{ boxShadow: CARD_SHADOW }}
     >
@@ -162,7 +162,7 @@ function GameCard({ g }: { g: BenefitGame }) {
       <div className="flex h-9 w-full items-center justify-center gap-[1px] rounded-[10px] bg-[#427cff] p-[10px] text-[14px] font-bold leading-[16.1px] text-white">
         <span className="flex items-center gap-[3px]"><PSvg size={14} />{fmt(g.missionPoint)}</span>+{fmt(g.bonusPoint)}
       </div>
-    </button>
+    </Link>
   );
 }
 
@@ -170,7 +170,7 @@ const MEDALS = ["/myb/bh/ic_beginner_medal_01.webp", "/myb/bh/ic_beginner_medal_
 
 function SurveyRow({ s, rank }: { s: BenefitSurvey; rank: number }) {
   return (
-    <button type="button" className="flex h-12 w-full items-center gap-[14px] text-left">
+    <Link href="/survey" className="flex h-12 w-full items-center gap-[14px] text-left">
       <div className="flex min-w-0 flex-1 items-center gap-[10px]">
         <div className="flex h-[34px] w-[34px] shrink-0 items-center justify-center">
           {rank <= 3 ? (
@@ -194,6 +194,6 @@ function SurveyRow({ s, rank }: { s: BenefitSurvey; rank: number }) {
       <span className="flex h-[26px] shrink-0 items-center justify-center gap-[3px] rounded-full bg-[#427cff] py-[5px] pl-2 pr-[9px] text-[14px] font-semibold leading-[16.1px] text-white">
         <PSvg size={15} />{fmt(s.reward)}
       </span>
-    </button>
+    </Link>
   );
 }
