@@ -5,6 +5,8 @@ import type {
   Quiz,
   QuizResponse,
   QuizSet,
+  RoulettePrize,
+  RouletteSpin,
   SetCompletion,
   Stamp,
   UserBadge,
@@ -41,4 +43,12 @@ export interface Repo {
 
   addStamp(input: Omit<Stamp, "id" | "createdAt" | "consumedBy">): Promise<Stamp>;
   countUnconsumedStamps(userId: string): Promise<number>;
+  /** 같은 출처(sourceType+sourceId)의 스탬프가 이미 있는지 — 출석체크 1일 1회 등 */
+  hasStamp(userId: string, sourceType: string, sourceId: string): Promise<boolean>;
+  /** 미사용 스탬프 n개를 spinId 로 소비. 실제 소비한 개수 반환(부족하면 0, 소비 안 함) */
+  consumeStamps(userId: string, n: number, spinId: string): Promise<number>;
+
+  listPrizes(): Promise<RoulettePrize[]>;
+  saveSpin(input: RouletteSpin): Promise<RouletteSpin>;
+  listSpins(userId: string): Promise<RouletteSpin[]>;
 }

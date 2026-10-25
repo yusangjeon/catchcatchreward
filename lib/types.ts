@@ -77,10 +77,30 @@ export interface LedgerEntry {
 export interface Stamp {
   id: string;
   userId: string;
-  sourceType: string;
+  sourceType: string; // quiz_set | attendance | mission | admin
   sourceId?: string;
   createdAt: string;
-  consumedBy?: string;
+  consumedBy?: string; // roulette_spins.id
+}
+
+export type PrizeKind = "points" | "gifticon" | "none";
+
+export interface RoulettePrize {
+  id: string;
+  name: string;
+  kind: PrizeKind;
+  value: number; // points: 포인트 / gifticon: 액면가(원) / none: 0
+  weight: number; // 확률 가중치(서버 전용)
+  active: boolean;
+  sort: number;
+}
+
+export interface RouletteSpin {
+  id: string;
+  userId: string;
+  prizeId: string;
+  roll: number;
+  spunAt: string;
 }
 
 export interface Profile {
@@ -121,6 +141,7 @@ export interface HomePayload {
   badges: (Badge & { earnedAt: string })[];
   sets: SetCard[];
   rushEndsAt: string; // 비포인트 러쉬 주차 종료(ISO)
+  attendedToday: boolean; // 오늘 출석체크 완료 여부(KST)
 }
 
 export interface PublicQuestion {

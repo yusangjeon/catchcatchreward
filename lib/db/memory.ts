@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import type { Repo } from "./repo";
-import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, SetCompletion, Stamp, UserBadge } from "@/lib/types";
+import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, RoulettePrize, RouletteSpin, SetCompletion, Stamp, UserBadge } from "@/lib/types";
 import { SEED_BADGES, SEED_QUIZZES, SEED_SETS } from "@/lib/quiz/seed";
+import { SEED_PRIZES } from "@/lib/roulette/seed";
 
 interface Store {
   profiles: Map<string, Profile>;
@@ -14,6 +15,8 @@ interface Store {
   userBadges: Map<string, UserBadge[]>;
   ledger: LedgerEntry[];
   stamps: Stamp[];
+  prizes: RoulettePrize[];
+  spins: RouletteSpin[];
 }
 
 // dev 서버 HMR 때 모듈이 재평가돼도 데이터가 유지되도록 globalThis 에 붙인다.
@@ -32,6 +35,8 @@ function store(): Store {
       userBadges: new Map(),
       ledger: [],
       stamps: [],
+      prizes: structuredClone(SEED_PRIZES),
+      spins: [],
     };
   }
   return g.__ccrStore;
@@ -127,5 +132,25 @@ export const memoryRepo: Repo = {
   },
   async countUnconsumedStamps(userId) {
     return store().stamps.filter((s) => s.userId === userId && !s.consumedBy).length;
+  },
+  async hasStamp(userId, sourceType, sourceId) {
+    return store().stamps.some((s) => s.userId === userId && s.sourceType === sourceType && s.sourceId === sourceId);
+  },
+  async consumeStamps(userId, n, spinId) {
+    const free = store().stamps.filter((s) => s.userId === userId && !s.consumedBy).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    if (free.length < n) return 0;
+    free.slice(0, n).forEach((s) => (s.consumedBy = spinId));
+    return n;
+  },
+
+  async listPrizes() {
+    return store().prizes.filter((p) => p.active).sort((a, b) => a.sort - b.sort);
+  },
+  async saveSpin(input) {
+    store().spins.push(input);
+    return input;
+  },
+  async listSpins(userId) {
+    return store().spins.filter((s) => s.userId === userId).sort((a, b) => b.spunAt.localeCompare(a.spunAt));
   },
 };

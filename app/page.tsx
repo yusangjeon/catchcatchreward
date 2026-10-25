@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useHome } from "@/hooks/useHome";
+import { useHome, fmt } from "@/hooks/useHome";
+import { useToast } from "@/components/motion/Toast";
 import { BellIcon, ChevronRight, GiftIcon, PCoin } from "@/components/icons";
 import { SetCard } from "@/components/SetCard";
 import { Banners } from "@/components/motion/Banners";
@@ -20,8 +21,19 @@ const QUICK = [
 ];
 
 export default function HomePage() {
-  const { data, error } = useHome();
+  const { data, error, reload } = useHome();
+  const { show } = useToast();
   const sets = data?.sets ?? [];
+
+  /** 출석체크: 1일 1회 10P + 스탬프 1 (마이비 러쉬 스탬프 미션과 동일 보상) */
+  async function attend() {
+    const res = await fetch("/api/attendance", { method: "POST" });
+    const j = await res.json();
+    if (!res.ok) return show("출석체크에 실패했어요", "info");
+    if (j.already) show("오늘은 이미 출석했어요", "info");
+    else show(`출석 완료! ${fmt(j.points)}P와 스탬프 1개를 받았어요`);
+    await reload();
+  }
 
   return (
     <div className="bg-white">
@@ -51,10 +63,10 @@ export default function HomePage() {
           <img src="/myb/bh/ic_bpointrush.webp" alt="비포인트 러쉬" height={22} className="h-[22px] w-auto" draggable={false} />
           <span className="ml-1 text-[12px] font-semibold">{data ? `${Math.max(1, Math.ceil((new Date(data.rushEndsAt).getTime() - Date.now()) / 86400_000))}일 남음` : "—"}</span>
         </p>
-        <button type="button" className="relative flex h-[26px] items-center gap-0.5 rounded-lg bg-gradient-to-r from-[#8e5cf0] to-[#b56cf3] px-2.5 text-[11px] font-bold text-white">
+        <Link href="/roulette" className="relative flex h-[26px] items-center gap-0.5 rounded-lg bg-gradient-to-r from-[#8e5cf0] to-[#b56cf3] px-2.5 text-[11px] font-bold text-white">
           무료 룰렛 돌리기 <ChevronRight size={12} />
-          <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />
-        </button>
+          {data && data.wallet.stamps >= 10 && <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />}
+        </Link>
       </div>
 
       {/* 오늘의 루틴 */}
@@ -103,7 +115,8 @@ export default function HomePage() {
         <div className="mx-5 mt-2 border-t border-[#e3e7ee]" />
         <ul className="mt-[14px] grid grid-cols-4 px-3">
           {QUICK.map((qk) => (
-            <li key={qk.label} className="relative flex flex-col items-center gap-1">
+            <li key={qk.label} className="relative flex flex-col items-center gap-1" onClick={qk.label === "출석체크" ? () => void attend() : undefined} role={qk.label === "출석체크" ? "button" : undefined}>
+              {qk.label === "출석체크" && data?.attendedToday && <span className="absolute -top-1 right-3 flex h-4 w-4 items-center justify-center rounded-full bg-myb text-[10px] text-white">✓</span>}
               {qk.tip && (
                 <span className="absolute -top-6 whitespace-nowrap rounded-full bg-[#ff8a3d] px-2.5 py-1 text-[11px] font-bold text-white after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-[#ff8a3d]">
                   {qk.tip}

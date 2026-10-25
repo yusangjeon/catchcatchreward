@@ -83,7 +83,8 @@ function toPublic(q: Quiz): PublicQuestion {
 export async function getHome(userId: string): Promise<HomePayload> {
   const repo = getRepo();
   const [sets, w, badges, scores] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId)]);
-  return { wallet: w, honey: sets.filter((s) => !s.done).length, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt() };
+  const attendedToday = await repo.hasStamp(userId, "attendance", kstDayKey());
+  return { wallet: w, honey: sets.filter((s) => !s.done).length, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday };
 }
 
 export async function getSetPayload(userId: string, setId: string): Promise<SetPayload> {

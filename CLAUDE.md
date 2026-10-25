@@ -80,4 +80,12 @@
   - 혜택 탭 연결: 히어로/게임 카드 → `/game/[id]`, 더 많은 게임 → `/game`, Hot 설문 → `/survey`, 초간단적립 → `/cpq`, 쇼핑적립 → `/shop`.
   - QA: 원본 DOM 좌표 대조 game 11·detail 6·cpq 8·survey 16 = 41요소 전부 ±2px(수정: 기초 설문 카드 flex-basis, 시간 칩 24/23, 상단 블록 110, cpq 문구 공백(flex 텍스트 노드), 게임왕 화살표 방향, 안내문 break-keep) / 콘솔 에러 0 / 404 처리.
   - 주의: 셸 cwd 가 간헐적으로 이전 호출 디렉터리로 리셋됨 → 파일 쓰기는 **절대 경로** 사용.
-  - 다음 단계: ① 네이티브 화면(홈·지갑·퀴즈·탭바) 실기기 캡처로 재보정 ② Supabase 연결 ③ 룰렛(스탬프 10개 소비) ④ 관리자 ⑤ Vercel 배포 ⑥ 비포인트 러쉬/룰렛·bplay·월간미션 웹뷰(추가 mock 필요).
+- 2026-10-25(7차): **룰렛(MVP ④) + 출석체크 미션.** `/roulette`(풀스크린), `lib/roulette/`.
+  - 규칙: 스탬프 10개 = 1회. 서버가 `randomInt` 로 가중치 추첨 → 스탬프 10개 `consumed_by=spinId` 소비 → `roulette_spins` 기록 → 포인트는 원장 `roulette` 적립. 기프티콘은 당첨 기록만(1차 수동 발송). 클라이언트는 결과 인덱스로 휠 정지 연출만(5바퀴+조각 중앙, 4.2s cubic-bezier(0.17,0.67,0.12,1)).
+  - 경품 시드 `lib/roulette/seed.ts` = `supabase/seed.sql` (50P 50% · 100P 30% · 300P 12% · 1,000P 5% · 편의점 5천원 2% · 꽝 1%, 기대값 ≈241원). 200회 추첨 분포 51/28/12.5/4/2.5/2 로 가중치 일치 확인.
+  - 출석체크(`POST /api/attendance`): KST 1일 1회, 10P + 스탬프 1(`sourceType=attendance, sourceId=날짜`). 홈 퀵메뉴 "출석체크" 클릭으로 실행, `HomePayload.attendedToday` 로 체크 표시. 마이비 러쉬 스탬프 미션 보상(10P)과 동일.
+  - Repo 확장: `hasStamp`, `consumeStamps`, `listPrizes`, `saveSpin`, `listSpins` (memory·supabase 둘 다 구현, supabase 는 여전히 미연결 검증).
+  - 개발 전용 `POST /api/dev/stamps`(스탬프 n개 지급)는 **`CCR_DEV_TOOLS=1` 일 때만** 열림. 배포 기본값 닫힘. 관리자 화면 생기면 대체.
+  - 진입: 홈 러쉬 배너 "무료 룰렛 돌리기"(스탬프 10 이상이면 빨간 점), 지갑 "B포인트 적금" 카드.
+  - QA: API 스모크(출석 1회/중복, 부족 409, 스핀→잔액 반영, 재스핀 409) + Playwright(출석 토스트 2종, 빈 상태→지급→스핀→결과 모달→잔액 카운트업) 콘솔 에러 0.
+  - 다음 단계: ① 네이티브 화면(홈·지갑·퀴즈·탭바) 실기기 캡처로 재보정 ② Supabase 연결 ③ 관리자(퀴즈·미션·룰렛 확률·배지별 유저 수) ④ 포인트 교환(기프티콘 신청) ⑤ Vercel 배포 ⑥ 비포인트 러쉬·bplay·월간미션 웹뷰(추가 mock 필요).

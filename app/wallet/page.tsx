@@ -86,16 +86,16 @@ export default function WalletPage() {
             </div>
             <ChevronRight className="text-muted" />
           </div>
-          <div className="mt-3 flex items-center justify-between rounded-2xl border border-[#9fd3e6] px-4 py-4">
+          <Link href="/roulette" className="mt-3 flex items-center justify-between rounded-2xl border border-[#9fd3e6] px-4 py-4">
             <div>
               <p className="flex items-center gap-2 text-[14px] font-bold text-myb-dark">
                 <span className="rounded-full border border-myb-dark px-2 py-0.5 text-[11px]">예치 중</span> B포인트 적금
               </p>
-              <p className="mt-1.5 text-[13px] text-muted">스탬프 {data?.wallet.stamps ?? 0}개 · 10개 모으면 룰렛 1회</p>
+              <p className="mt-1.5 text-[13px] text-muted">스탬프 {data?.wallet.stamps ?? 0}개 · 10개 모으면 룰렛 1회 <ChevronRight size={12} className="inline text-muted" /></p>
               <div className="mt-2 h-1.5 w-40 overflow-hidden rounded-full bg-[#e3e8f0]"><div className="myb-progress h-full rounded-full bg-myb" style={{ width: `${Math.min(100, ((data?.wallet.stamps ?? 0) % 10) * 10)}%` }} /></div>
             </div>
             <img src="/myb/bh/img_stamp.webp" alt="" width={48} height={48} className="h-12 w-12" />
-          </div>
+          </Link>
         </section>
       )}
 

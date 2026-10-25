@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Repo } from "./repo";
-import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, SetCompletion, Stamp, UserBadge } from "@/lib/types";
+import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, RoulettePrize, SetCompletion, Stamp, UserBadge } from "@/lib/types";
 
 /**
  * Supabase(Postgres) 구현. 서비스 롤 키로 서버에서만 접근한다.
@@ -157,6 +157,42 @@ export function createSupabaseRepo(url: string, serviceRoleKey: string): Repo {
       const { count, error } = await sb.from("stamps").select("id", { count: "exact", head: true }).eq("user_id", userId).is("consumed_by", null);
       if (error) throw new Error(`[supabase:stamps.count] ${error.message}`);
       return count ?? 0;
+    },
+    async hasStamp(userId, sourceType, sourceId) {
+      const { count, error } = await sb.from("stamps").select("id", { count: "exact", head: true }).eq("user_id", userId).eq("source_type", sourceType).eq("source_id", sourceId);
+      if (error) throw new Error(`[supabase:stamps.has] ${error.message}`);
+      return (count ?? 0) > 0;
+    },
+    async consumeStamps(userId, n, spinId) {
+      // 오래된 미사용 스탬프 n개를 고른 뒤 consumed_by 세팅. 동시 요청 경합은 스핀 1건당 10개 고정이라 재검증으로 방어.
+      const rows = ok<{ id: string }[]>(
+        await sb.from("stamps").select("id").eq("user_id", userId).is("consumed_by", null).order("created_at", { ascending: true }).limit(n),
+        "stamps.pick",
+      );
+      if (rows.length < n) return 0;
+      const ids = rows.map((r) => r.id);
+      const { error, count } = await sb.from("stamps").update({ consumed_by: spinId }, { count: "exact" }).in("id", ids).is("consumed_by", null);
+      if (error) throw new Error(`[supabase:stamps.consume] ${error.message}`);
+      return count ?? 0;
+    },
+
+    async listPrizes() {
+      const rows = ok<{ id: string; name: string; kind: RoulettePrize["kind"]; value: number; weight: number; active: boolean; sort: number }[]>(
+        await sb.from("roulette_prizes").select("*").eq("active", true).order("sort"),
+        "roulette_prizes.list",
+      );
+      return rows;
+    },
+    async saveSpin(input) {
+      ok(await sb.from("roulette_spins").insert({ id: input.id, user_id: input.userId, prize_id: input.prizeId, roll: input.roll, spun_at: input.spunAt }).select("id").single(), "roulette_spins.insert");
+      return input;
+    },
+    async listSpins(userId) {
+      const rows = ok<{ id: string; user_id: string; prize_id: string; roll: number; spun_at: string }[]>(
+        await sb.from("roulette_spins").select("*").eq("user_id", userId).order("spun_at", { ascending: false }).limit(50),
+        "roulette_spins.list",
+      );
+      return rows.map((r) => ({ id: r.id, userId: r.user_id, prizeId: r.prize_id, roll: r.roll, spunAt: r.spun_at }));
     },
   };
 }
