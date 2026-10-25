@@ -1,10 +1,12 @@
 import type {
+  AdminStats,
   Badge,
   LedgerEntry,
   Profile,
   Quiz,
   QuizResponse,
   QuizSet,
+  Redemption,
   RoulettePrize,
   RouletteSpin,
   SetCompletion,
@@ -51,4 +53,22 @@ export interface Repo {
   listPrizes(): Promise<RoulettePrize[]>;
   saveSpin(input: RouletteSpin): Promise<RouletteSpin>;
   listSpins(userId: string): Promise<RouletteSpin[]>;
+
+  listLedger(userId: string, limit?: number): Promise<LedgerEntry[]>;
+
+  addRedemption(input: Omit<Redemption, "id" | "requestedAt" | "status">): Promise<Redemption>;
+  listRedemptions(userId?: string): Promise<Redemption[]>;
+  updateRedemption(id: string, patch: { status: Redemption["status"]; memo?: string }): Promise<Redemption | null>;
+
+  // ── 관리자 ──
+  listAllSets(): Promise<QuizSet[]>;
+  createSet(set: QuizSet): Promise<QuizSet>;
+  updateSet(id: string, patch: Partial<Pick<QuizSet, "title" | "imageUrl" | "rewardPoints" | "capacity" | "todayOnly" | "active" | "sort">>): Promise<QuizSet | null>;
+  createQuiz(quiz: Quiz): Promise<Quiz>;
+  listAllPrizes(): Promise<RoulettePrize[]>;
+  createPrize(p: RoulettePrize): Promise<RoulettePrize>;
+  updatePrize(id: string, patch: Partial<Pick<RoulettePrize, "name" | "kind" | "value" | "weight" | "active" | "sort">>): Promise<RoulettePrize | null>;
+  countUserBadges(): Promise<Record<string, number>>;
+  findProfile(idOrAnonKey: string): Promise<Profile | null>;
+  adminStats(dayKey: string): Promise<AdminStats>;
 }

@@ -165,3 +165,26 @@ export interface SubmitResult {
   newBadges: Badge[];
   recommended: SetCard[];
 }
+
+export type RedemptionStatus = "requested" | "processing" | "done" | "rejected";
+
+export interface Redemption {
+  id: string;
+  userId: string;
+  kind: string; // 상품 코드(lib/exchange/products.ts)
+  amountPoints: number;
+  status: RedemptionStatus;
+  requestedAt: string;
+  processedAt?: string;
+  memo?: string;
+}
+
+export interface AdminStats {
+  users: number;
+  completionsToday: number;
+  pointsIssued: number; // 원장 + 합
+  pointsRedeemed: number; // 원장 - 합(절대값)
+  freeStamps: number;
+  spins: number;
+  redemptionsRequested: number;
+}

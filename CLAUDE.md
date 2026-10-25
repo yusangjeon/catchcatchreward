@@ -88,4 +88,11 @@
   - 개발 전용 `POST /api/dev/stamps`(스탬프 n개 지급)는 **`CCR_DEV_TOOLS=1` 일 때만** 열림. 배포 기본값 닫힘. 관리자 화면 생기면 대체.
   - 진입: 홈 러쉬 배너 "무료 룰렛 돌리기"(스탬프 10 이상이면 빨간 점), 지갑 "B포인트 적금" 카드.
   - QA: API 스모크(출석 1회/중복, 부족 409, 스핀→잔액 반영, 재스핀 409) + Playwright(출석 토스트 2종, 빈 상태→지급→스핀→결과 모달→잔액 카운트업) 콘솔 에러 0.
-  - 다음 단계: ① 네이티브 화면(홈·지갑·퀴즈·탭바) 실기기 캡처로 재보정 ② Supabase 연결 ③ 관리자(퀴즈·미션·룰렛 확률·배지별 유저 수) ④ 포인트 교환(기프티콘 신청) ⑤ Vercel 배포 ⑥ 비포인트 러쉬·bplay·월간미션 웹뷰(추가 mock 필요).
+- 2026-10-25(8차): **포인트 교환(MVP ⑤) + 관리자(MVP ⑥).**
+  - 교환 `/exchange`: 카탈로그 `lib/exchange/products.ts`(8종, 마이비 상품 구매 탭 가격), 최소 1,000P. 신청 즉시 원장 `redeem` 차감 + `redemptions(requested)`. 상태 칩(신청/처리 중/발송 완료/반려·환불). `/history` = 원장 내역. 지갑 "교환"·"내역"·상품 카드 → 연결. API `GET/POST /api/exchange`, `GET /api/ledger`.
+  - 관리자 `/admin` (Shell 우회, 데스크톱 폭): 대시보드(유저·오늘 완료·적립/차감·스탬프·스핀·교환 대기·룰렛 기대값·배지별 유저 수) · 퀴즈(세트 활성 토글·세트 등록·문항 등록: 줄당 `라벨 | 태그 | 이미지URL`) · 룰렛 확률(가중치·활성 즉시 저장, 확률·기대값 계산) · 배지(세그먼트 비율) · 교환 신청(처리 중/발송 완료/반려→**자동 환불** admin_adjust) · 수동 지급(유저 id 또는 anonKey 로 포인트±·스탬프+).
+  - 인증 `lib/admin/auth.ts`: `ADMIN_KEY` 환경변수 ↔ 로그인 → httpOnly 쿠키(sha256, path=/admin, 12h). ADMIN_KEY 없으면 비활성(로컬 QA 는 `CCR_DEV_TOOLS=1` 로 키 없이 열림). 서버 액션(`app/admin/actions.ts`) + `requireAdmin()` 가드.
+  - Repo 확장: listLedger · add/list/updateRedemption · listAllSets/createSet/updateSet/createQuiz · listAllPrizes/createPrize/updatePrize · countUserBadges · findProfile · adminStats (memory·supabase).
+  - 발견·수정: ① 서버 액션에서 submit 버튼 name/value 가 FormData 에 안 실림 → 버튼별 `formAction={action.bind(null, id, status)}` ② 인메모리 저장소는 같은 객체 참조를 돌려줘 갱신 후 이전 상태 비교가 깨짐 → 갱신 전 `prevStatus` 보관(환불 누락 버그) ③ 총 차감 `-0` 표시 → Math.abs.
+  - QA(Playwright): 잘못된 키 거부 → 로그인 → 지급 30,000P → 유저 교환 2건(1,900/5,900 차감) → 관리자 발송 완료/반려 → 반려 건 5,900 환불 확인(잔액 28,100) · 세트/문항 등록 · 가중치 50→40 저장 시 확률 44.4% 반영 · 콘솔 에러 0. 스크립트 스크래치 `qa/admin.js`.
+  - 다음 단계: ① Supabase 연결(키 필요) + 어댑터 첫 스모크 ② Vercel 배포(ADMIN_KEY·SUPABASE 환경변수) ③ 네이티브 화면 실기기 캡처 재보정 ④ 미션(캐치랭크 매장 미션·제휴 쇼핑 → 스탬프) 등록 UI ⑤ 비포인트 러쉬·bplay·월간미션 웹뷰(추가 mock 필요).

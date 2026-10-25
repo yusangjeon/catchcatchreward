@@ -22,7 +22,7 @@ pnpm dev        # http://localhost:3000
 환경변수 없이 실행하면 **인메모리 저장소**로 동작한다(서버 재시작 시 초기화). Supabase를 붙이려면:
 
 1. Supabase 프로젝트 생성 → SQL Editor에서 `supabase/migrations/0001_init.sql` 실행 → `supabase/seed.sql` 실행
-2. `.env.example`을 `.env.local`로 복사하고 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` 입력
+2. `.env.example`을 `.env.local`로 복사하고 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` 입력. 관리자(`/admin`)는 `ADMIN_KEY` 설정 시 열림(로컬 QA: `CCR_DEV_TOOLS=1`)
 
 ```powershell
 pnpm typecheck  # tsc

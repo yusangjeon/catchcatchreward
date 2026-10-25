@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Repo } from "./repo";
-import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, RoulettePrize, SetCompletion, Stamp, UserBadge } from "@/lib/types";
+import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, Redemption, RoulettePrize, SetCompletion, Stamp, UserBadge } from "@/lib/types";
 
 /**
  * Supabase(Postgres) 구현. 서비스 롤 키로 서버에서만 접근한다.
@@ -194,5 +194,98 @@ export function createSupabaseRepo(url: string, serviceRoleKey: string): Repo {
       );
       return rows.map((r) => ({ id: r.id, userId: r.user_id, prizeId: r.prize_id, roll: r.roll, spunAt: r.spun_at }));
     },
+
+    async listLedger(userId, limit = 100) {
+      const rows = ok<{ id: number; user_id: string; delta: number; reason: LedgerEntry["reason"]; ref_type: string | null; ref_id: string | null; memo: string | null; created_at: string }[]>(
+        await sb.from("point_ledger").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(limit),
+        "point_ledger.list",
+      );
+      return rows.map((r) => ({ id: String(r.id), userId: r.user_id, delta: r.delta, reason: r.reason, refType: r.ref_type ?? undefined, refId: r.ref_id ?? undefined, memo: r.memo ?? undefined, createdAt: r.created_at }));
+    },
+
+    async addRedemption(input) {
+      const r = ok<RedRow>(await sb.from("redemptions").insert({ user_id: input.userId, kind: input.kind, amount_points: input.amountPoints, memo: input.memo ?? null }).select("*").single(), "redemptions.insert");
+      return toRed(r);
+    },
+    async listRedemptions(userId) {
+      let q = sb.from("redemptions").select("*").order("requested_at", { ascending: false }).limit(200);
+      if (userId) q = q.eq("user_id", userId);
+      return ok<RedRow[]>(await q, "redemptions.list").map(toRed);
+    },
+    async updateRedemption(id, patch) {
+      const processed = patch.status === "done" || patch.status === "rejected" ? new Date().toISOString() : null;
+      const { data, error } = await sb.from("redemptions").update({ status: patch.status, memo: patch.memo, processed_at: processed }).eq("id", id).select("*").maybeSingle();
+      if (error) throw new Error(`[supabase:redemptions.update] ${error.message}`);
+      return data ? toRed(data as RedRow) : null;
+    },
+
+    async listAllSets() {
+      return ok<SetRow[]>(await sb.from("quiz_sets").select("*").order("sort"), "quiz_sets.all").map(toSet);
+    },
+    async createSet(set) {
+      ok(await sb.from("quiz_sets").insert({ id: set.id, title: set.title, image_url: set.imageUrl, reward_points: set.rewardPoints, capacity: set.capacity, base_participants: set.baseParticipants, today_only: set.todayOnly, active: set.active, sort: set.sort }).select("id").single(), "quiz_sets.insert");
+      return set;
+    },
+    async updateSet(id, patch) {
+      const row: Record<string, unknown> = {};
+      if (patch.title !== undefined) row.title = patch.title;
+      if (patch.imageUrl !== undefined) row.image_url = patch.imageUrl;
+      if (patch.rewardPoints !== undefined) row.reward_points = patch.rewardPoints;
+      if (patch.capacity !== undefined) row.capacity = patch.capacity;
+      if (patch.todayOnly !== undefined) row.today_only = patch.todayOnly;
+      if (patch.active !== undefined) row.active = patch.active;
+      if (patch.sort !== undefined) row.sort = patch.sort;
+      const { data, error } = await sb.from("quiz_sets").update(row).eq("id", id).select("*").maybeSingle();
+      if (error) throw new Error(`[supabase:quiz_sets.update] ${error.message}`);
+      return data ? toSet(data as SetRow) : null;
+    },
+    async createQuiz(quiz) {
+      ok(await sb.from("quizzes").insert({ id: quiz.id, set_id: quiz.setId, question: quiz.question, kind: quiz.kind, active: quiz.active, sort: quiz.sort }).select("id").single(), "quizzes.insert");
+      ok(await sb.from("quiz_options").insert(quiz.options.map((o) => ({ id: o.id, quiz_id: quiz.id, label: o.label, image_url: o.imageUrl ?? null, tags: o.tags, sort: o.sort }))).select("id"), "quiz_options.insert");
+      return quiz;
+    },
+    async listAllPrizes() {
+      return ok<RoulettePrize[]>(await sb.from("roulette_prizes").select("*").order("sort"), "roulette_prizes.all");
+    },
+    async createPrize(p) {
+      ok(await sb.from("roulette_prizes").insert(p).select("id").single(), "roulette_prizes.insert");
+      return p;
+    },
+    async updatePrize(id, patch) {
+      const { data, error } = await sb.from("roulette_prizes").update(patch).eq("id", id).select("*").maybeSingle();
+      if (error) throw new Error(`[supabase:roulette_prizes.update] ${error.message}`);
+      return (data as RoulettePrize | null) ?? null;
+    },
+    async countUserBadges() {
+      const rows = ok<{ badge_code: string }[]>(await sb.from("user_badges").select("badge_code"), "user_badges.all");
+      const out: Record<string, number> = {};
+      for (const r of rows) out[r.badge_code] = (out[r.badge_code] ?? 0) + 1;
+      return out;
+    },
+    async findProfile(idOrAnonKey) {
+      const { data } = await sb.from("profiles").select("*").or(`id.eq.${idOrAnonKey},anon_key.eq.${idOrAnonKey}`).maybeSingle();
+      return data ? { id: data.id, anonKey: data.anon_key, nickname: data.nickname ?? undefined, createdAt: data.created_at } : null;
+    },
+    async adminStats(dayKey) {
+      const count = async (q: PromiseLike<{ count: number | null; error: unknown }>) => {
+        const { count: c, error } = await q;
+        if (error) throw new Error(`[supabase:adminStats] ${JSON.stringify(error)}`);
+        return c ?? 0;
+      };
+      const head = { count: "exact" as const, head: true };
+      const ledger = ok<{ delta: number }[]>(await sb.from("point_ledger").select("delta"), "point_ledger.sum");
+      return {
+        users: await count(sb.from("profiles").select("id", head)),
+        completionsToday: await count(sb.from("set_completions").select("id", head).eq("day_key", dayKey)),
+        pointsIssued: ledger.filter((e) => e.delta > 0).reduce((a, e) => a + e.delta, 0),
+        pointsRedeemed: Math.abs(ledger.filter((e) => e.delta < 0).reduce((a, e) => a + e.delta, 0)),
+        freeStamps: await count(sb.from("stamps").select("id", head).is("consumed_by", null)),
+        spins: await count(sb.from("roulette_spins").select("id", head)),
+        redemptionsRequested: await count(sb.from("redemptions").select("id", head).eq("status", "requested")),
+      };
+    },
   };
 }
+
+type RedRow = { id: string; user_id: string; kind: string; amount_points: number; status: Redemption["status"]; requested_at: string; processed_at: string | null; memo: string | null };
+const toRed = (r: RedRow): Redemption => ({ id: r.id, userId: r.user_id, kind: r.kind, amountPoints: r.amount_points, status: r.status, requestedAt: r.requested_at, processedAt: r.processed_at ?? undefined, memo: r.memo ?? undefined });

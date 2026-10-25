@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Repo } from "./repo";
-import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, RoulettePrize, RouletteSpin, SetCompletion, Stamp, UserBadge } from "@/lib/types";
+import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, Redemption, RoulettePrize, RouletteSpin, SetCompletion, Stamp, UserBadge } from "@/lib/types";
 import { SEED_BADGES, SEED_QUIZZES, SEED_SETS } from "@/lib/quiz/seed";
 import { SEED_PRIZES } from "@/lib/roulette/seed";
 
@@ -17,6 +17,7 @@ interface Store {
   stamps: Stamp[];
   prizes: RoulettePrize[];
   spins: RouletteSpin[];
+  redemptions: Redemption[];
 }
 
 // dev 서버 HMR 때 모듈이 재평가돼도 데이터가 유지되도록 globalThis 에 붙인다.
@@ -37,6 +38,7 @@ function store(): Store {
       stamps: [],
       prizes: structuredClone(SEED_PRIZES),
       spins: [],
+      redemptions: [],
     };
   }
   return g.__ccrStore;
@@ -152,5 +154,78 @@ export const memoryRepo: Repo = {
   },
   async listSpins(userId) {
     return store().spins.filter((s) => s.userId === userId).sort((a, b) => b.spunAt.localeCompare(a.spunAt));
+  },
+
+  async listLedger(userId, limit = 100) {
+    return store().ledger.filter((e) => e.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, limit);
+  },
+
+  async addRedemption(input) {
+    const r: Redemption = { ...input, id: randomUUID(), status: "requested", requestedAt: now() };
+    store().redemptions.push(r);
+    return r;
+  },
+  async listRedemptions(userId) {
+    return store().redemptions.filter((r) => !userId || r.userId === userId).sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
+  },
+  async updateRedemption(id, patch) {
+    const r = store().redemptions.find((x) => x.id === id);
+    if (!r) return null;
+    r.status = patch.status;
+    if (patch.memo !== undefined) r.memo = patch.memo;
+    if (patch.status === "done" || patch.status === "rejected") r.processedAt = now();
+    return r;
+  },
+
+  async listAllSets() {
+    return [...store().sets].sort((a, b) => a.sort - b.sort);
+  },
+  async createSet(set) {
+    store().sets.push(set);
+    return set;
+  },
+  async updateSet(id, patch) {
+    const s = store().sets.find((x) => x.id === id);
+    if (!s) return null;
+    Object.assign(s, patch);
+    return s;
+  },
+  async createQuiz(quiz) {
+    store().quizzes.push(quiz);
+    return quiz;
+  },
+  async listAllPrizes() {
+    return [...store().prizes].sort((a, b) => a.sort - b.sort);
+  },
+  async createPrize(p) {
+    store().prizes.push(p);
+    return p;
+  },
+  async updatePrize(id, patch) {
+    const p = store().prizes.find((x) => x.id === id);
+    if (!p) return null;
+    Object.assign(p, patch);
+    return p;
+  },
+  async countUserBadges() {
+    const out: Record<string, number> = {};
+    for (const list of store().userBadges.values()) for (const b of list) out[b.badgeCode] = (out[b.badgeCode] ?? 0) + 1;
+    return out;
+  },
+  async findProfile(idOrAnonKey) {
+    const s = store();
+    return s.profiles.get(idOrAnonKey) ?? [...s.profiles.values()].find((p) => p.id === idOrAnonKey) ?? null;
+  },
+  async adminStats(dayKey) {
+    const s = store();
+    return {
+      users: s.profiles.size,
+      completionsToday: s.completions.filter((c) => c.dayKey === dayKey).length,
+      pointsIssued: s.ledger.filter((e) => e.delta > 0).reduce((a, e) => a + e.delta, 0),
+      pointsRedeemed: Math.abs(s.ledger.filter((e) => e.delta < 0).reduce((a, e) => a + e.delta, 0)),
+      freeStamps: s.stamps.filter((st) => !st.consumedBy).length,
+      spins: s.spins.length,
+      redemptionsRequested: s.redemptions.filter((r) => r.status === "requested").length,
+    };
   },
 };

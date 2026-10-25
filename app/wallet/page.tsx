@@ -61,7 +61,7 @@ export default function WalletPage() {
           <h2 className="mt-[36px] flex items-center gap-1.5 text-[17px] font-bold">총 보상 잔액 <InfoIcon className="text-[#c5cbd4]" /></h2>
           <div className="mt-[18px] flex items-center justify-between">
             <p className="flex items-center gap-2"><PXCoin size={30} /><span className="text-[26px] font-extrabold tabular-nums"><NumberFlow value={balance} /> 원</span></p>
-            <span className="flex items-center text-[13px] text-muted">내역 <ChevronRight size={15} /></span>
+            <Link href="/history" className="flex items-center text-[13px] text-muted">내역 <ChevronRight size={15} /></Link>
           </div>
           <div className="mt-[14px] flex h-[42px] items-center justify-between rounded-xl border border-[#e3e8f0] px-3 text-[12px]">
             <span className="flex items-center gap-2"><CXCoin size={18} /> 1 CONX당 <b className="text-red">{fmt(CONX_RATE)}원</b>이에요. <span className="text-red">▲</span></span>
@@ -111,7 +111,7 @@ export default function WalletPage() {
           </div>
           <div className="no-scrollbar mt-[22px] grid grid-flow-col grid-rows-2 gap-x-[10px] gap-y-6 overflow-x-auto [grid-auto-columns:100px]">
             {PRODUCTS.map((p) => (
-              <div key={p.name} className="w-[100px]">
+              <Link key={p.name} href={p.p === null ? "/wallet" : "/exchange"} className="block w-[100px]">
                 <div className={`flex aspect-square items-center justify-center rounded-xl text-[40px] ${p.bg}`} aria-hidden>{p.emoji}</div>
                 <p className="mt-2.5 line-clamp-2 text-[12px] leading-snug">{p.name}</p>
                 {p.p === null ? (
@@ -122,7 +122,7 @@ export default function WalletPage() {
                     <p className="mt-0.5 flex items-center gap-1 text-[13px] font-bold"><CXCoin size={14} />{fmt(p.cx!)}</p>
                   </>
                 )}
-              </div>
+              </Link>
             ))}
           </div>
         </section>
@@ -160,7 +160,7 @@ function AssetRow({ icon, name, value }: { icon: React.ReactNode; name: string; 
           <p className="text-[18px] font-extrabold tabular-nums">{value}</p>
         </div>
       </div>
-      <button type="button" className="h-8 rounded-lg bg-myb px-4 text-[13px] font-bold text-white">교환</button>
+      <Link href="/exchange" className="flex h-8 items-center rounded-lg bg-myb px-4 text-[13px] font-bold text-white">교환</Link>
     </div>
   );
 }
