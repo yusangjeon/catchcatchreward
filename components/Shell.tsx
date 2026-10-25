@@ -12,10 +12,10 @@ const TABS = [
   { href: "/walk", label: "만보기", Icon: WalkIcon, highlight: true },
 ] as const;
 
-/** 마이비 5탭 셸. 폰 폭(최대 430px) 중앙 정렬. 퀴즈 풀기/보상 화면(/quiz/:id)에서는 탭바 숨김 */
+/** 마이비 5탭 셸. 폰 폭(최대 430px) 중앙 정렬. 퀴즈 풀기/보상(/quiz/:id)·쇼핑적립 웹뷰(/shop)에서는 탭바 숨김 */
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const fullscreen = /^\/quiz\/[^/]+/.test(pathname);
+  const fullscreen = /^\/(quiz\/[^/]+|shop)/.test(pathname);
   return (
     <div className="relative mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.04)]">
       <main className={`flex-1 ${fullscreen ? "" : "pb-[84px]"}`}>{children}</main>

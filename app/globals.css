@@ -124,3 +124,22 @@ body {
 /* 가로 스크롤 스냅 */
 .myb-hscroll { scroll-snap-type: x mandatory; }
 .myb-hscroll > * { scroll-snap-align: start; }
+
+/* shop.myb.im NEW 태그: linear-gradient(90deg,#007bff 0%,#87ceeb 80%,#007bff 100%) 200% 가로 이동 */
+@keyframes myb-newtag {
+  0% { background-position: 200% 0; }
+  100% { background-position: 0% 0; }
+}
+.myb-newtag {
+  background: linear-gradient(90deg, rgb(0, 123, 255) 0%, rgb(135, 206, 235) 80%, rgb(0, 123, 255) 100%);
+  background-size: 200% 100%;
+  animation: myb-newtag 2s linear infinite;
+}
+/* 팝업 등장(0.3s ease-out) */
+@keyframes myb-modal-in {
+  0% { opacity: 0; transform: translateY(16px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.myb-modal-in { animation: myb-modal-in 0.3s ease-out both; }
+@keyframes myb-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.myb-fade-in { animation: myb-fade-in 0.3s ease-out both; }

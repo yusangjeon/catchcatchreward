@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
+import Link from "next/link";
 import { useState } from "react";
 import { useHome, fmt } from "@/hooks/useHome";
 import { ChevronRight, ClockIcon, CXCoin, GiftIcon, InfoIcon, PCoin, PCoinPink, PXCoin } from "@/components/icons";
@@ -71,10 +72,10 @@ export default function WalletPage() {
           <AssetRow icon={<PCoin size={22} />} name="B포인트" value={fmt(balance)} />
           <AssetRow icon={<CXCoin size={22} />} name="CONX" value={conx} />
 
-          <div className="mt-[30px] flex h-[46px] items-center justify-between rounded-xl bg-[#fff0f6] px-4 text-[13px]">
+          <Link href="/shop" className="mt-[30px] flex h-[46px] items-center justify-between rounded-xl bg-[#fff0f6] px-4 text-[13px]">
             <span className="flex items-center gap-1.5"><span aria-hidden>🛍️</span> 쇼핑적립 예정 포인트</span>
             <span className="flex items-center gap-1 text-[16px] font-extrabold"><PCoinPink size={16} />5,298 <ChevronRight size={15} className="text-muted" /></span>
-          </div>
+          </Link>
 
           <div className="mt-2 flex h-[84px] items-center justify-between rounded-2xl border border-[#e3e8f0] px-4">
             <div>

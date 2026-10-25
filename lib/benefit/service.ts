@@ -7,7 +7,7 @@ import type { BenefitPayload, EarnMenu } from "./types";
 const EARN_MENU: EarnMenu[] = [
   { key: "bpr", icon: "/myb/bh/ic_beginner_earn_bpr.webp", title: "비포인트 러쉬", sub: "가장 많은 혜택은 여기서!", hot: true, href: "/" },
   { key: "cpa", icon: "/myb/bh/ic_beginner_earn_cpa.webp", title: "초간단적립", sub: "1분만에 미션하고 적립받기", href: "/benefits" },
-  { key: "cps", icon: "/myb/bh/ic_beginner_earn_cps.webp", title: "쇼핑적립", sub: "하던 쇼핑하고 웰컴 2배 혜택 받기", href: "/wallet" },
+  { key: "cps", icon: "/myb/bh/ic_beginner_earn_cps.webp", title: "쇼핑적립", sub: "하던 쇼핑하고 웰컴 2배 혜택 받기", href: "/shop" },
   { key: "music", icon: "/myb/bh/ic_beginner_earn_music.webp", title: "음악적립", sub: "음악 잠깐 듣고 포인트 받기", href: "/benefits" },
 ];
 
