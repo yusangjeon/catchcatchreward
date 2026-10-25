@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useHome, fmt } from "@/hooks/useHome";
 import { useToast } from "@/components/motion/Toast";
-import { BellIcon, ChevronRight, GiftIcon, PCoin } from "@/components/icons";
+import { ChevronRight, PCoin } from "@/components/icons";
 import { SetCard } from "@/components/SetCard";
 import { Banners } from "@/components/motion/Banners";
 import { NumberFlow } from "@/components/motion/NumberFlow";
@@ -13,11 +13,12 @@ import { NumberFlow } from "@/components/motion/NumberFlow";
 /** 마이비 reward-banner 원본(327×72) — upload.myb.im 캡처본 */
 const BANNERS = ["/myb/up/2025-12-19T03_30_12.125Z_banner.webp", "/myb/up/2025-12-29T08_07_33.114Z_133.webp", "/myb/up/2025-12-29T08_07_50.926Z_banner.webp", "/myb/up/2026-02-11T05-23-58.433Z_2509_myb_quizpass-banner_v1_327x72.webp", "/myb/up/2026-04-24T07-33-12.788Z_2604_myb_manboki-banner_v1_327x72-1.webp", "/myb/up/2026-04-24T07-33-32.380Z_2604_myb_manboki-banner_v1_327x72.webp", "/myb/up/2026-04-27T01-55-48.943Z_2604_myb_manboki-banner_v1_327x72.webp"];
 
+/** 퀵메뉴 아이콘 — 앱스토어 스크린샷 원본 픽셀(꿀 충전은 툴팁에 가려져 꿀단지 아이콘으로 대체) */
 const QUICK = [
-  { icon: "📅", label: "출석체크" },
-  { icon: "🎮", label: "미니게임" },
-  { icon: "🍯", label: "꿀 충전", tip: "903개 충전 가능" },
-  { icon: "💌", label: "친구초대" },
+  { icon: "/myb/native/qm_attend.png", label: "출석체크" },
+  { icon: "/myb/native/qm_minigame.png", label: "미니게임" },
+  { icon: "/myb/native/ic_honey_jar.png", label: "꿀 충전", tip: "903개 충전 가능" },
+  { icon: "/myb/native/qm_invite.png", label: "친구초대" },
 ];
 
 export default function HomePage() {
@@ -45,14 +46,11 @@ export default function HomePage() {
         </Link>
         <div className="flex items-center gap-3">
           <span className="flex h-[26px] items-center gap-1.5 rounded-lg border border-line bg-bg-2 px-2 text-[12px] font-semibold">
-            <span className="inline-block h-3 w-3 rotate-45 rounded-[3px] bg-[#d9c7a3] ring-2 ring-[#f0e6d2]" aria-hidden />
+            <img src="/myb/native/ic_basic_hex.png" alt="" className="h-[14px] w-[14px]" />
             베이직
           </span>
-          <span className="relative flex h-[26px] w-[26px] items-center justify-center rounded-md bg-myb text-white">
-            <GiftIcon size={16} />
-            <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />
-          </span>
-          <BellIcon size={22} className="text-[#b8bfc9]" />
+          <img src="/myb/native/ic_gift_badge.png" alt="선물함" className="h-[28px] w-[28px]" />
+          <img src="/myb/native/ic_bell.png" alt="알림" className="h-[24px] w-[24px]" />
         </div>
       </header>
 
@@ -77,8 +75,8 @@ export default function HomePage() {
             더보기 <ChevronRight size={12} />
           </button>
         </div>
-        <div className="mt-[14px] flex h-[74px] items-center gap-3 rounded-2xl border-2 border-[#ffcf6b] bg-[#fffbf1] px-4">
-          <span className="text-[28px] leading-none" aria-hidden>🍯</span>
+        <div className="mt-[12px] flex h-[70px] items-center gap-3 rounded-2xl border-2 border-[#ffcf6b] bg-[#fffbf1] px-4">
+          <img src="/myb/native/ic_honey_jar.png" alt="" className="h-[36px] w-[30px] object-contain" />
           <div className="flex-1">
             <p className="text-[15px] font-semibold">첫번째 무료 꿀 <b className="font-extrabold">받기</b></p>
             <p className="mt-0.5 text-[13px] text-muted">퀴즈 푸는데 필요해요</p>
@@ -91,18 +89,18 @@ export default function HomePage() {
       </section>
 
       {/* 내게 딱 맞는 퀴즈 */}
-      <section className="mt-[14px] bg-[#f4f6fa] pb-5 pt-[26px]">
+      <section className="mt-[12px] bg-[#f4f6fa] pb-5 pt-[24px]">
         <Link href="/quiz" className="flex items-center justify-between px-5">
           <h2 className="text-[20px] font-bold">내게 딱 맞는 퀴즈</h2>
           <ChevronRight size={20} className="text-ink-2" />
         </Link>
         <div className="mt-[14px] flex gap-3 px-5">
           <span className="flex h-[42px] items-center gap-1.5 rounded-xl border border-myb-line bg-myb-soft px-3.5 text-[15px] font-semibold">
-            <span aria-hidden>🍯</span> 보유 꿀 {data ? data.honey : "—"} <ChevronRight size={14} className="text-muted" />
+            <img src="/myb/native/ic_honey_small.png" alt="" className="h-[16px] w-[14px] object-contain" /> 보유 꿀 {data ? data.honey : "—"} <ChevronRight size={14} className="text-muted" />
           </span>
-          <span className="relative flex h-[42px] flex-1 items-center justify-between overflow-hidden rounded-xl bg-gradient-to-r from-[#3f7cff] via-[#6a6cf8] to-[#9c5af5] px-4 text-white">
-            <span className="whitespace-nowrap text-[16px] font-black italic tracking-tight text-[#ffe14d]">프리패스</span>
-            <span className="whitespace-nowrap text-[11px] font-semibold">광고 시청 없이</span>
+          {/* 프리패스 배너 — 원본 픽셀(캐릭터 장식 포함) */}
+          <span className="relative flex h-[42px] flex-1 items-end">
+            <img src="/myb/native/img_freepass_pill.png" alt="프리패스 · 광고 시청 없이" className="absolute bottom-0 left-0 h-[52px] w-full object-fill object-bottom" />
           </span>
         </div>
 
@@ -122,7 +120,7 @@ export default function HomePage() {
                   {qk.tip}
                 </span>
               )}
-              <span className="text-[26px] leading-none" aria-hidden>{qk.icon}</span>
+              <img src={qk.icon} alt="" className="h-[30px] w-[34px] object-contain" />
               <span className="text-[11px] font-medium text-ink-2">{qk.label}</span>
             </li>
           ))}

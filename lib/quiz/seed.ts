@@ -27,7 +27,7 @@ function q(setId: string, n: number, question: string, options: SeedOption[]): Q
       id: `${id}-${String.fromCharCode(97 + i)}`,
       label,
       tags,
-      imageUrl: seed ? img(seed, 400, 400) : undefined,
+      imageUrl: seed ? (seed.startsWith("/") ? seed : img(seed, 400, 400)) : undefined,
       sort: i,
     })),
   };
@@ -55,7 +55,7 @@ export const SEED_QUIZZES: Quiz[] = [
   q("s03", 1, "밤 11시, 지금 뭐 해?", [["야식 주문 중", ["late_night", "delivery"]], ["드라마 정주행", ["late_night", "home"]], ["이미 잠듦", ["early_bird", "rest"]], ["운동 또는 산책", ["late_night", "fitness"]]]),
   q("s03", 2, "드라마는 어떻게 봐?", [["본방 사수", ["home"]], ["몰아보기", ["late_night", "home"]]]),
 
-  q("s04", 1, "짜장면이 더 좋나요?\n짬뽕이 더 좋나요?", [["짜장면", ["mild"], "jajang"], ["짬뽕", ["spicy"], "jjamppong"]]),
+  q("s04", 1, "짜장면이 더 좋나요?\n짬뽕이 더 좋나요?", [["짜장면", ["mild"], "/myb/native/opt_jjajang.png"], ["짬뽕", ["spicy"], "/myb/native/opt_jjamppong.png"]]),
   q("s04", 2, "치킨 시킬 때 나의 선택은?", [["매운 양념", ["spicy", "delivery"], "chicken1"], ["후라이드", ["mild", "delivery"], "chicken2"]]),
   q("s04", 3, "떡볶이 맵기, 나는?", [["순한맛", ["mild"]], ["보통", ["mild"]], ["매운맛", ["spicy"]], ["극한맵기 도전", ["spicy", "challenge"]]]),
 

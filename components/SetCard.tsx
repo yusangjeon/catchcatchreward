@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { HeartIcon, PCoin } from "./icons";
+/* eslint-disable @next/next/no-img-element */
 import type { SetCard as SetCardT } from "@/lib/types";
 import { fmt } from "@/hooks/useHome";
 
@@ -10,11 +11,10 @@ export function SetCard({ s, size = 145 }: { s: SetCardT; size?: number }) {
   return (
     <Link href={`/quiz/${s.id}`} className="block shrink-0" style={{ width: size }}>
       <div className="relative overflow-hidden rounded-xl bg-bg-2" style={{ width: size, height: size }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={s.imageUrl} alt="" className={`h-full w-full object-cover ${s.done ? "opacity-50" : ""}`} loading="lazy" />
         {s.todayOnly && (
           <div className="absolute inset-x-0 top-0 flex h-[26px] items-center justify-between bg-myb px-2 text-[11px] font-bold text-white">
-            <span className="flex items-center gap-1"><span aria-hidden>⏰</span> 오늘만</span>
+            <span className="flex items-center gap-1"><img src="/myb/native/ic_today_clock.png" alt="" className="h-[15px] w-[15px]" /> 오늘만</span>
             <span className="tabular-nums">00:00:00</span>
           </div>
         )}
@@ -33,7 +33,6 @@ export function SetGridCard({ s }: { s: SetCardT }) {
   return (
     <Link href={`/quiz/${s.id}`} className="block">
       <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-bg-2">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={s.imageUrl} alt="" className={`h-full w-full object-cover ${s.done ? "opacity-50" : ""}`} loading="lazy" />
         {s.done && <span className="absolute inset-x-0 bottom-0 bg-black/55 py-1 text-center text-[12px] font-bold text-white">참여 완료</span>}
       </div>

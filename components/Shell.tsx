@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BenefitIcon, HomeIcon, QuizIcon, WalkIcon, WalletIcon } from "./icons";
+/* eslint-disable @next/next/no-img-element */
+
+/** 탭 아이콘 — 앱스토어 스크린샷(2.44x)에서 잘라낸 원본 픽셀. 홈은 활성(진회색) 상태로, 나머지는 비활성(회색) 상태로 캡처됨 */
+const TAB_ICON: Record<string, string> = { "/": "/myb/native/tab_home.png", "/quiz": "/myb/native/tab_quiz.png", "/benefits": "/myb/native/tab_benefit.png", "/wallet": "/myb/native/tab_wallet.png", "/walk": "/myb/native/tab_walk.png" };
 
 const TABS = [
-  { href: "/", label: "홈", Icon: HomeIcon },
-  { href: "/quiz", label: "퀴즈", Icon: QuizIcon },
-  { href: "/benefits", label: "혜택", Icon: BenefitIcon },
-  { href: "/wallet", label: "지갑", Icon: WalletIcon },
-  { href: "/walk", label: "만보기", Icon: WalkIcon, highlight: true },
+  { href: "/", label: "홈" },
+  { href: "/quiz", label: "퀴즈" },
+  { href: "/benefits", label: "혜택" },
+  { href: "/wallet", label: "지갑" },
+  { href: "/walk", label: "만보기", highlight: true },
 ] as const;
 
 /** 마이비 5탭 셸. 폰 폭(최대 430px) 중앙 정렬. 퀴즈 풀기/보상(/quiz/:id)·쇼핑적립 웹뷰(/shop)에서는 탭바 숨김 */
@@ -33,7 +36,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
               return (
                 <li key={t.href}>
                   <Link href={t.href} aria-current={active ? "page" : undefined} className={`flex h-full flex-col items-center justify-center gap-1 ${color}`}>
-                    <t.Icon size={24} />
+                    <img
+                      src={TAB_ICON[t.href]}
+                      alt=""
+                      className={`h-[26px] w-auto ${"highlight" in t && t.highlight ? "" : t.href === "/" ? (active ? "" : "grayscale brightness-[1.75]") : active ? "brightness-[0.45]" : ""}`}
+                    />
                     <span className={`text-[11px] ${active || ("highlight" in t && t.highlight) ? "font-bold" : "font-medium"}`}>{t.label}</span>
                   </Link>
                 </li>

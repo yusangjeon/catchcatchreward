@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Avatar, CheckIcon, ChevronLeft, CXCoin, PCoin } from "./icons";
+import { CheckIcon, CXCoin, PCoin } from "./icons";
 import { Lottie } from "./motion/Lottie";
 import { ToastOnMount } from "./motion/Toast";
 
@@ -69,27 +69,27 @@ export function QuizPlay({ setId }: { setId: string }) {
   return (
     <div className="flex min-h-dvh flex-col">
       {/* 상단 흰 영역 */}
-      <div className="bg-white px-[30px] pb-[48px]">
+      <div className="bg-white px-[40px] pb-[36px]">
         <div className="relative flex h-[60px] items-center pt-2">
           <button type="button" onClick={() => (idx > 0 ? setIdx(idx - 1) : router.back())} aria-label="뒤로" className="-ml-1 p-1">
-            <ChevronLeft />
+            <img src="/myb/native/ic_back.png" alt="" className="h-[22px] w-[12px]" />
           </button>
           <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pt-2 text-[17px] font-bold tabular-nums">
             {String(idx + 1).padStart(2, "0")} <span className="font-medium text-[#b8bfc9]">/ {String(total).padStart(2, "0")}</span>
           </p>
         </div>
         <span className="mt-[40px] inline-flex h-5 items-center gap-1 rounded-md bg-myb-soft px-2 text-[12px] font-semibold text-myb-dark">
-          <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-[3px] bg-myb-dark text-[9px] text-white" aria-hidden>≡</span>
+          <img src="/myb/native/ic_multiple_choice.png" alt="" className="h-[14px] w-[14px]" />
           객관식
         </span>
         <h1 className="mt-[26px] whitespace-pre-line text-[22px] font-bold leading-[1.4]">{q.question}</h1>
-        <p className="mt-[18px] flex items-center gap-1.5 text-[13px] font-medium"><CheckIcon size={14} /> 1개만 선택 가능해요.</p>
+        <p className="mt-[10px] flex items-center gap-1.5 text-[13px] font-medium"><img src="/myb/native/ic_check_small.png" alt="" className="h-[13px] w-[13px]" /> 1개만 선택 가능해요.</p>
       </div>
 
       {/* 하단 파란 영역 */}
-      <div className="flex flex-1 flex-col bg-myb px-[30px] pt-[34px] pb-28">
+      <div className="flex flex-1 flex-col bg-myb px-[40px] pt-[38px] pb-28">
         <div className="flex items-center gap-3">
-          <Avatar seed={data.persona.code} size={50} className="ring-[3px] ring-white" />
+          <img src="/myb/native/avatar_intj.png" alt="" className="h-[52px] w-[52px] rounded-full ring-[3px] ring-white" />
           <div>
             <p className="text-[13px] font-medium text-white">
               {data.persona.title} · <b className="font-extrabold">{data.persona.code}</b>
@@ -105,7 +105,7 @@ export function QuizPlay({ setId }: { setId: string }) {
         <Options q={q} picked={picked} onPick={(oid) => setAnswers({ ...answers, [q.id]: oid })} />
       </div>
 
-      <div className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 bg-myb px-[30px] pb-6 pt-3" style={{ paddingBottom: "max(24px, env(safe-area-inset-bottom))" }}>
+      <div className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 bg-myb px-[40px] pb-6 pt-3" style={{ paddingBottom: "max(24px, env(safe-area-inset-bottom))" }}>
         <button
           type="button"
           disabled={!picked || busy}
@@ -129,7 +129,7 @@ function Options({ q, picked, onPick }: { q: PublicQuestion; picked?: string; on
           return (
             <li key={o.id}>
               <button type="button" onClick={() => onPick(o.id)} className={`relative w-full overflow-hidden rounded-2xl bg-white text-left shadow-[0_6px_0_rgba(0,0,0,0.18)] ${on ? "ring-4 ring-white" : ""}`}>
-                <img src={o.imageUrl} alt="" className="aspect-[160/145] w-full object-cover" />
+                <img src={o.imageUrl} alt="" className="h-[130px] w-full object-cover" />
                 <Radio on={on} className="absolute left-2.5 top-2.5" />
                 <span className="block py-[7px] text-center text-[14px] font-semibold">{o.label}</span>
               </button>
@@ -175,7 +175,7 @@ function RewardScreen({ result }: { result: SubmitResult }) {
   return (
     <div className="min-h-dvh bg-white pb-32">
       <div className="flex h-[60px] items-center px-4 pt-2">
-        <Link href="/" aria-label="뒤로" className="p-1"><ChevronLeft /></Link>
+        <Link href="/" aria-label="뒤로" className="p-1"><img src="/myb/native/ic_back.png" alt="" className="h-[22px] w-[12px]" /></Link>
       </div>
       <div className="mt-[20px] flex justify-center">
         <span className="flex h-[42px] items-center gap-3 rounded-full bg-[#eef3ff] px-6 text-[13px] text-ink-2">
@@ -184,11 +184,12 @@ function RewardScreen({ result }: { result: SubmitResult }) {
       </div>
 
       {/* 코인 일러스트 — 원본 img_points_group.webp + Lottie confetti_pop(1회) */}
-      <div className="relative mx-auto mt-[40px] flex h-[130px] w-64 items-center justify-center">
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2">
+      <div className="relative mx-auto mt-[18px] flex h-[160px] w-[260px] items-center justify-center">
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2">
           <Lottie src="/myb/lottie_confetti_pop.json" className="h-full w-full" />
         </div>
-        <img src="/myb/bh/img_points_group.webp" alt="" width={130} height={130} className="myb-pop-in myb-float relative h-[130px] w-[130px] object-contain" draggable={false} />
+        {/* 원본 보상 일러스트(코인 스택 + 뱃지 + 색종이) — 앱스토어 스크린샷 픽셀, 레퍼런스 약 150×235 */}
+        <img src="/myb/native/reward_hero.png" alt="" className="myb-pop-in myb-float relative h-[160px] w-[260px] object-contain" draggable={false} />
       </div>
       <ToastOnMount text="포인트를 받았어요!" />
 
