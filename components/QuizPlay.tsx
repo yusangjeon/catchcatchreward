@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CheckIcon, ChevronLeft, CXCoin, PCoin } from "./icons";
+import { Avatar, CheckIcon, ChevronLeft, CXCoin, PCoin } from "./icons";
+import { Lottie } from "./motion/Lottie";
+import { ToastOnMount } from "./motion/Toast";
+
+/* eslint-disable @next/next/no-img-element */
 import { SetGridCard } from "./SetCard";
 import { fmt } from "@/hooks/useHome";
 import type { PublicQuestion, SetPayload, SubmitResult } from "@/lib/types";
@@ -85,7 +89,7 @@ export function QuizPlay({ setId }: { setId: string }) {
       {/* 하단 파란 영역 */}
       <div className="flex flex-1 flex-col bg-myb px-[30px] pt-[34px] pb-28">
         <div className="flex items-center gap-3">
-          <span className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-[#ffb36b] text-[26px] ring-[3px] ring-white" aria-hidden>🧑‍🎨</span>
+          <Avatar seed={data.persona.code} size={50} className="ring-[3px] ring-white" />
           <div>
             <p className="text-[13px] font-medium text-white">
               {data.persona.title} · <b className="font-extrabold">{data.persona.code}</b>
@@ -125,7 +129,6 @@ function Options({ q, picked, onPick }: { q: PublicQuestion; picked?: string; on
           return (
             <li key={o.id}>
               <button type="button" onClick={() => onPick(o.id)} className={`relative w-full overflow-hidden rounded-2xl bg-white text-left shadow-[0_6px_0_rgba(0,0,0,0.18)] ${on ? "ring-4 ring-white" : ""}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={o.imageUrl} alt="" className="aspect-[160/145] w-full object-cover" />
                 <Radio on={on} className="absolute left-2.5 top-2.5" />
                 <span className="block py-[7px] text-center text-[14px] font-semibold">{o.label}</span>
@@ -180,20 +183,14 @@ function RewardScreen({ result }: { result: SubmitResult }) {
         </span>
       </div>
 
-      {/* 코인 일러스트 */}
-      <div className="confetti relative mx-auto mt-[40px] flex h-[130px] w-64 items-center justify-center">
-        <i style={{ left: "6%", top: "30%", background: "#ff3d9a", animationDelay: "0s" }} />
-        <i style={{ left: "16%", top: "10%", background: "#ffb02e", animationDelay: ".4s" }} />
-        <i style={{ left: "80%", top: "14%", background: "#427dff", animationDelay: ".2s" }} />
-        <i style={{ left: "90%", top: "48%", background: "#ff3d9a", animationDelay: ".7s" }} />
-        <i style={{ left: "70%", top: "70%", background: "#ffb02e", animationDelay: "1s" }} />
-        <i style={{ left: "24%", top: "76%", background: "#2bd4a8", animationDelay: ".9s" }} />
-        <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,#dbe7ff_0%,rgba(219,231,255,0)_65%)]" />
-        <div className="relative flex items-center">
-          <span className="relative z-10 flex h-[108px] w-[108px] items-center justify-center rounded-full bg-myb text-[60px] font-black text-white shadow-[0_10px_0_#1d5ef6]">P</span>
-          <span className="-ml-8 h-[92px] w-[92px] rounded-full border-[6px] border-myb bg-[#dfe7f3] shadow-[0_8px_0_#1d5ef6]" />
+      {/* 코인 일러스트 — 원본 img_points_group.webp + Lottie confetti_pop(1회) */}
+      <div className="relative mx-auto mt-[40px] flex h-[130px] w-64 items-center justify-center">
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2">
+          <Lottie src="/myb/lottie_confetti_pop.json" className="h-full w-full" />
         </div>
+        <img src="/myb/bh/img_points_group.webp" alt="" width={130} height={130} className="myb-pop-in myb-float relative h-[130px] w-[130px] object-contain" draggable={false} />
       </div>
+      <ToastOnMount text="포인트를 받았어요!" />
 
       <h1 className="mt-[10px] text-center text-[22px] font-bold">축하해요! 보상을 받았어요 🎉</h1>
       <p className="mt-[14px] text-center text-[13px] leading-[1.7] text-muted">

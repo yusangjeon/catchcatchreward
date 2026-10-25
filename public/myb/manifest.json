@@ -1,0 +1,902 @@
+[
+ {
+  "file": "sign/ic_smile.png",
+  "w": 78,
+  "h": 78,
+  "src": "https://signup.myb.im/images/ic_smile.png"
+ },
+ {
+  "file": "sign/ic_check.png",
+  "w": 42,
+  "h": 27,
+  "src": "https://signup.myb.im/images/ic_check.png"
+ },
+ {
+  "file": "sign/ic_right.png",
+  "w": 64,
+  "h": 64,
+  "src": "https://signup.myb.im/images/ic_right.png"
+ },
+ {
+  "file": "bh/ic_bpoint_01.webp",
+  "w": 48,
+  "h": 48,
+  "src": "https://benefit-hub.myb.im/images/ic_bpoint_01.webp"
+ },
+ {
+  "file": "bh/ic_conx.webp",
+  "w": 54,
+  "h": 54,
+  "src": "https://benefit-hub.myb.im/images/ic_conx.webp"
+ },
+ {
+  "file": "adj/img_myb_logo.webp",
+  "w": 429,
+  "h": 216,
+  "src": "https://adjoe.myb.im/images/img_myb_logo.webp"
+ },
+ {
+  "file": "adj/ic_bpoint.png",
+  "w": 120,
+  "h": 120,
+  "src": "https://adjoe.myb.im/images/ic_bpoint.png"
+ },
+ {
+  "file": "adj/img_game06.webp",
+  "w": 768,
+  "h": 768,
+  "src": "https://adjoe.myb.im/images/img_game06.webp"
+ },
+ {
+  "file": "adj/img_rank1.png",
+  "w": 102,
+  "h": 102,
+  "src": "https://adjoe.myb.im/images/img_rank1.png"
+ },
+ {
+  "file": "adj/img_game08.webp",
+  "w": 768,
+  "h": 768,
+  "src": "https://adjoe.myb.im/images/img_game08.webp"
+ },
+ {
+  "file": "adj/img_game09.webp",
+  "w": 768,
+  "h": 768,
+  "src": "https://adjoe.myb.im/images/img_game09.webp"
+ },
+ {
+  "file": "adj/ic_bpoint3.png",
+  "w": 45,
+  "h": 45,
+  "src": "https://adjoe.myb.im/images/ic_bpoint3.png"
+ },
+ {
+  "file": "adj/img_game10.webp",
+  "w": 867,
+  "h": 867,
+  "src": "https://adjoe.myb.im/images/img_game10.webp"
+ },
+ {
+  "file": "adj/img_star2.png",
+  "w": 42,
+  "h": 42,
+  "src": "https://adjoe.myb.im/images/img_star2.png"
+ },
+ {
+  "file": "adj/img_star1.png",
+  "w": 42,
+  "h": 42,
+  "src": "https://adjoe.myb.im/images/img_star1.png"
+ },
+ {
+  "file": "adj/img_game07.webp",
+  "w": 768,
+  "h": 768,
+  "src": "https://adjoe.myb.im/images/img_game07.webp"
+ },
+ {
+  "file": "adj/ic_bridge_lotto.webp",
+  "w": 96,
+  "h": 96,
+  "src": "https://adjoe.myb.im/images/ic_bridge_lotto.webp"
+ },
+ {
+  "file": "adj/img_bridge_hero_bonus.webp",
+  "w": 512,
+  "h": 512,
+  "src": "https://adjoe.myb.im/images/img_bridge_hero_bonus.webp"
+ },
+ {
+  "file": "adj/img_rank2.png",
+  "w": 68,
+  "h": 68,
+  "src": "https://adjoe.myb.im/images/img_rank2.png"
+ },
+ {
+  "file": "adj/img_rank3.png",
+  "w": 68,
+  "h": 68,
+  "src": "https://adjoe.myb.im/images/img_rank3.png"
+ },
+ {
+  "file": "bh/img_label_offerwall_event.webp",
+  "w": 198,
+  "h": 60,
+  "src": "https://benefit-hub.myb.im/images/img_label_offerwall_event.webp"
+ },
+ {
+  "file": "bh/img_label_new.webp",
+  "w": 120,
+  "h": 60,
+  "src": "https://benefit-hub.myb.im/images/img_label_new.webp"
+ },
+ {
+  "file": "bh/ic_bpointrush.webp",
+  "w": 351,
+  "h": 52,
+  "src": "https://benefit-hub.myb.im/images/ic_bpointrush.webp"
+ },
+ {
+  "file": "bh/img_bpointrush_visual.webp",
+  "w": 360,
+  "h": 360,
+  "src": "https://benefit-hub.myb.im/images/img_bpointrush_visual.webp"
+ },
+ {
+  "file": "bh/ic_bonus_mission.webp",
+  "w": 120,
+  "h": 120,
+  "src": "https://benefit-hub.myb.im/images/ic_bonus_mission.webp"
+ },
+ {
+  "file": "bh/ic_bpointrush_adjoe.webp",
+  "w": 96,
+  "h": 102,
+  "src": "https://benefit-hub.myb.im/images/ic_bpointrush_adjoe.webp"
+ },
+ {
+  "file": "up/2026-04-27T01-55-48.943Z_2604_myb_manboki-banner_v1_327x72.webp",
+  "w": 981,
+  "h": 216,
+  "src": "https://upload.myb.im/admin/2026-04-27T01%3A55%3A48.943Z_2604_myb_manboki-banner_v1_327x72.webp"
+ },
+ {
+  "file": "bh/ic_bpointrush_cpx.webp",
+  "w": 120,
+  "h": 120,
+  "src": "https://benefit-hub.myb.im/images/ic_bpointrush_cpx.webp"
+ },
+ {
+  "file": "bh/img_stamp.webp",
+  "w": 120,
+  "h": 120,
+  "src": "https://benefit-hub.myb.im/images/img_stamp.webp"
+ },
+ {
+  "file": "bh/ic_high_reward_coin_02.webp",
+  "w": 137,
+  "h": 142,
+  "src": "https://benefit-hub.myb.im/images/ic_high_reward_coin_02.webp"
+ },
+ {
+  "file": "bh/ic_high_reward_coin_01.webp",
+  "w": 123,
+  "h": 117,
+  "src": "https://benefit-hub.myb.im/images/ic_high_reward_coin_01.webp"
+ },
+ {
+  "file": "bh/ic_high_reward_coin_04.webp",
+  "w": 48,
+  "h": 111,
+  "src": "https://benefit-hub.myb.im/images/ic_high_reward_coin_04.webp"
+ },
+ {
+  "file": "bh/ic_high_reward_coin_03.webp",
+  "w": 205,
+  "h": 172,
+  "src": "https://benefit-hub.myb.im/images/ic_high_reward_coin_03.webp"
+ },
+ {
+  "file": "bh/ic_menu_adjoe.webp",
+  "w": 185,
+  "h": 120,
+  "src": "https://benefit-hub.myb.im/images/ic_menu_adjoe.webp"
+ },
+ {
+  "file": "bh/ic_menu_cpx.webp",
+  "w": 185,
+  "h": 120,
+  "src": "https://benefit-hub.myb.im/images/ic_menu_cpx.webp"
+ },
+ {
+  "file": "bh/ic_menu_cpa.webp",
+  "w": 185,
+  "h": 120,
+  "src": "https://benefit-hub.myb.im/images/ic_menu_cpa.webp"
+ },
+ {
+  "file": "bh/ic_menu_cpa_high_reward.webp",
+  "w": 182,
+  "h": 120,
+  "src": "https://benefit-hub.myb.im/images/ic_menu_cpa_high_reward.webp"
+ },
+ {
+  "file": "bh/ic_menu_offerwall.webp",
+  "w": 185,
+  "h": 120,
+  "src": "https://benefit-hub.myb.im/images/ic_menu_offerwall.webp"
+ },
+ {
+  "file": "bh/ic_menu_cps.webp",
+  "w": 185,
+  "h": 120,
+  "src": "https://benefit-hub.myb.im/images/ic_menu_cps.webp"
+ },
+ {
+  "file": "up/2025-12-29T08_07_33.114Z_133.webp",
+  "w": 981,
+  "h": 216,
+  "src": "https://upload.myb.im/admin/2025-12-29T08_07_33.114Z_133.webp"
+ },
+ {
+  "file": "bh/ic_menu_cpq.webp",
+  "w": 166,
+  "h": 102,
+  "src": "https://benefit-hub.myb.im/images/ic_menu_cpq.webp"
+ },
+ {
+  "file": "res/naverpay_text_logo.png",
+  "w": 211,
+  "h": 78,
+  "src": "https://djnav3z3hsgft.cloudfront.net/cps/naverpay_text_logo.png"
+ },
+ {
+  "file": "res/update_banner_thumbnail.webp",
+  "w": 981,
+  "h": 216,
+  "src": "https://resource.myb.im/banner/update_banner_thumbnail.webp"
+ },
+ {
+  "file": "bh/ic_menu_music.webp",
+  "w": 153,
+  "h": 120,
+  "src": "https://benefit-hub.myb.im/images/ic_menu_music.webp"
+ },
+ {
+  "file": "bh/ic_section_adjoe.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_section_adjoe.webp"
+ },
+ {
+  "file": "bh/ic_arrow_section_title.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_arrow_section_title.webp"
+ },
+ {
+  "file": "bh/ic_profile_02.webp",
+  "w": 48,
+  "h": 48,
+  "src": "https://benefit-hub.myb.im/images/ic_profile_02.webp"
+ },
+ {
+  "file": "up/2025-12-19T03_30_12.125Z_banner.webp",
+  "w": 981,
+  "h": 216,
+  "src": "https://upload.myb.im/admin/2025-12-19T03_30_12.125Z_banner.webp"
+ },
+ {
+  "file": "up/2026-02-11T05-23-58.433Z_2509_myb_quizpass-banner_v1_327x72.webp",
+  "w": 981,
+  "h": 216,
+  "src": "https://upload.myb.im/admin/2026-02-11T05%3A23%3A58.433Z_2509_myb_quizpass-banner_v1_327x72.webp"
+ },
+ {
+  "file": "bh/ic_bpoint_02.webp",
+  "w": 36,
+  "h": 36,
+  "src": "https://benefit-hub.myb.im/images/ic_bpoint_02.webp"
+ },
+ {
+  "file": "bh/img_adjoe_game_01.webp",
+  "w": 600,
+  "h": 600,
+  "src": "https://benefit-hub.myb.im/images/img_adjoe_game_01.webp"
+ },
+ {
+  "file": "up/2026-04-24T07-33-32.380Z_2604_myb_manboki-banner_v1_327x72.webp",
+  "w": 981,
+  "h": 216,
+  "src": "https://upload.myb.im/admin/2026-04-24T07%3A33%3A32.380Z_2604_myb_manboki-banner_v1_327x72.webp"
+ },
+ {
+  "file": "up/2026-04-24T07-33-12.788Z_2604_myb_manboki-banner_v1_327x72-1.webp",
+  "w": 981,
+  "h": 216,
+  "src": "https://upload.myb.im/admin/2026-04-24T07%3A33%3A12.788Z_2604_myb_manboki-banner_v1_327x72-1.webp"
+ },
+ {
+  "file": "up/2025-12-29T08_07_50.926Z_banner.webp",
+  "w": 981,
+  "h": 216,
+  "src": "https://upload.myb.im/admin/2025-12-29T08_07_50.926Z_banner.webp"
+ },
+ {
+  "file": "bh/img_adjoe_game_02.webp",
+  "w": 600,
+  "h": 600,
+  "src": "https://benefit-hub.myb.im/images/img_adjoe_game_02.webp"
+ },
+ {
+  "file": "bh/img_adjoe_game_03.webp",
+  "w": 600,
+  "h": 600,
+  "src": "https://benefit-hub.myb.im/images/img_adjoe_game_03.webp"
+ },
+ {
+  "file": "bh/img_adjoe_game_04.webp",
+  "w": 600,
+  "h": 600,
+  "src": "https://benefit-hub.myb.im/images/img_adjoe_game_04.webp"
+ },
+ {
+  "file": "bh/img_adjoe_game_05.webp",
+  "w": 600,
+  "h": 600,
+  "src": "https://benefit-hub.myb.im/images/img_adjoe_game_05.webp"
+ },
+ {
+  "file": "bh/img_adjoe_game_06.webp",
+  "w": 600,
+  "h": 600,
+  "src": "https://benefit-hub.myb.im/images/img_adjoe_game_06.webp"
+ },
+ {
+  "file": "bh/ic_arrow_cpa_list.webp",
+  "w": 96,
+  "h": 96,
+  "src": "https://benefit-hub.myb.im/images/ic_arrow_cpa_list.webp"
+ },
+ {
+  "file": "bh/ic_adjoe_notice_01.webp",
+  "w": 60,
+  "h": 60,
+  "src": "https://benefit-hub.myb.im/images/ic_adjoe_notice_01.webp"
+ },
+ {
+  "file": "bh/ic_adjoe_notice_02.webp",
+  "w": 60,
+  "h": 60,
+  "src": "https://benefit-hub.myb.im/images/ic_adjoe_notice_02.webp"
+ },
+ {
+  "file": "bh/ic_adjoe_notice_03.webp",
+  "w": 60,
+  "h": 60,
+  "src": "https://benefit-hub.myb.im/images/ic_adjoe_notice_03.webp"
+ },
+ {
+  "file": "res/img_shopping_coupang.webp",
+  "w": 420,
+  "h": 156,
+  "src": "https://resource.myb.im/cps/img_shopping_coupang.webp"
+ },
+ {
+  "file": "res/img_shopping_auction.png",
+  "w": 211,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_auction.png"
+ },
+ {
+  "file": "res/img_shopping_yanolja.png",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_yanolja.png"
+ },
+ {
+  "file": "bh/ic_section_cpx.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_section_cpx.webp"
+ },
+ {
+  "file": "bh/ic_profile_03.webp",
+  "w": 48,
+  "h": 48,
+  "src": "https://benefit-hub.myb.im/images/ic_profile_03.webp"
+ },
+ {
+  "file": "res/img_shopping_gmarket.png",
+  "w": 211,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_gmarket.png"
+ },
+ {
+  "file": "bh/ic_cpx_notice.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_cpx_notice.webp"
+ },
+ {
+  "file": "bh/ic_cpx_clock.webp",
+  "w": 42,
+  "h": 42,
+  "src": "https://benefit-hub.myb.im/images/ic_cpx_clock.webp"
+ },
+ {
+  "file": "bh/ic_section_cpa.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_section_cpa.webp"
+ },
+ {
+  "file": "bh/ic_section_cpa_high_reward.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_section_cpa_high_reward.webp"
+ },
+ {
+  "file": "bh/img_high_reward_mission.webp",
+  "w": 408,
+  "h": 408,
+  "src": "https://benefit-hub.myb.im/images/img_high_reward_mission.webp"
+ },
+ {
+  "file": "bh/ic_section_offerwall.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_section_offerwall.webp"
+ },
+ {
+  "file": "bh/img_offerwall_visual.webp",
+  "w": 347,
+  "h": 240,
+  "src": "https://benefit-hub.myb.im/images/img_offerwall_visual.webp"
+ },
+ {
+  "file": "bh/ic_offerwall_02.webp",
+  "w": 130,
+  "h": 112,
+  "src": "https://benefit-hub.myb.im/images/ic_offerwall_02.webp"
+ },
+ {
+  "file": "bh/ic_offerwall_01.webp",
+  "w": 108,
+  "h": 108,
+  "src": "https://benefit-hub.myb.im/images/ic_offerwall_01.webp"
+ },
+ {
+  "file": "bh/ic_section_cps.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_section_cps.webp"
+ },
+ {
+  "file": "bh/ic_profile_04.webp",
+  "w": 48,
+  "h": 48,
+  "src": "https://benefit-hub.myb.im/images/ic_profile_04.webp"
+ },
+ {
+  "file": "bh/ic_section_cpq.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_section_cpq.webp"
+ },
+ {
+  "file": "bh/img_cpq_visual.webp",
+  "w": 360,
+  "h": 222,
+  "src": "https://benefit-hub.myb.im/images/img_cpq_visual.webp"
+ },
+ {
+  "file": "bh/ic_section_live_shopping.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_section_live_shopping.webp"
+ },
+ {
+  "file": "bh/img_live_shopping_card.webp",
+  "w": 981,
+  "h": 240,
+  "src": "https://benefit-hub.myb.im/images/img_live_shopping_card.webp"
+ },
+ {
+  "file": "bh/ic_section_music.webp",
+  "w": 72,
+  "h": 72,
+  "src": "https://benefit-hub.myb.im/images/ic_section_music.webp"
+ },
+ {
+  "file": "bh/img_music_visual.webp",
+  "w": 486,
+  "h": 240,
+  "src": "https://benefit-hub.myb.im/images/img_music_visual.webp"
+ },
+ {
+  "file": "bh/img_surprise_benefit.webp",
+  "w": 318,
+  "h": 297,
+  "src": "https://benefit-hub.myb.im/images/img_surprise_benefit.webp"
+ },
+ {
+  "file": "bh/ic_toast_point.webp",
+  "w": 42,
+  "h": 42,
+  "src": "https://benefit-hub.myb.im/images/ic_toast_point.webp"
+ },
+ {
+  "file": "adj/img_bridge_ai_label.webp",
+  "w": 244,
+  "h": 84,
+  "src": "https://adjoe.myb.im/images/img_bridge_ai_label.webp"
+ },
+ {
+  "file": "adj/ic_bridge_token15.webp",
+  "w": 60,
+  "h": 60,
+  "src": "https://adjoe.myb.im/images/ic_bridge_token15.webp"
+ },
+ {
+  "file": "bh/ic_promotion_spark.webp",
+  "w": 24,
+  "h": 24,
+  "src": "https://benefit-hub.myb.im/images/ic_promotion_spark.webp"
+ },
+ {
+  "file": "bh/ic_promotion_lightning.webp",
+  "w": 28,
+  "h": 28,
+  "src": "https://benefit-hub.myb.im/images/ic_promotion_lightning.webp"
+ },
+ {
+  "file": "bh/img_promotion_ai_label.webp",
+  "w": 188,
+  "h": 84,
+  "src": "https://benefit-hub.myb.im/images/img_promotion_ai_label.webp"
+ },
+ {
+  "file": "bh/ic_beginner_medal_01.webp",
+  "w": 85,
+  "h": 123,
+  "src": "https://benefit-hub.myb.im/images/ic_beginner_medal_01.webp"
+ },
+ {
+  "file": "bh/ic_beginner_medal_02.webp",
+  "w": 85,
+  "h": 123,
+  "src": "https://benefit-hub.myb.im/images/ic_beginner_medal_02.webp"
+ },
+ {
+  "file": "bh/ic_beginner_medal_03.webp",
+  "w": 85,
+  "h": 123,
+  "src": "https://benefit-hub.myb.im/images/ic_beginner_medal_03.webp"
+ },
+ {
+  "file": "bh/ic_beginner_earn_bpr.webp",
+  "w": 160,
+  "h": 160,
+  "src": "https://benefit-hub.myb.im/images/ic_beginner_earn_bpr.webp"
+ },
+ {
+  "file": "bh/ic_beginner_earn_cpa.webp",
+  "w": 160,
+  "h": 160,
+  "src": "https://benefit-hub.myb.im/images/ic_beginner_earn_cpa.webp"
+ },
+ {
+  "file": "bh/ic_beginner_earn_music.webp",
+  "w": 160,
+  "h": 160,
+  "src": "https://benefit-hub.myb.im/images/ic_beginner_earn_music.webp"
+ },
+ {
+  "file": "bh/ic_beginner_earn_cps.webp",
+  "w": 160,
+  "h": 160,
+  "src": "https://benefit-hub.myb.im/images/ic_beginner_earn_cps.webp"
+ },
+ {
+  "file": "adj/ic_gd_clock.webp",
+  "w": 80,
+  "h": 80,
+  "src": "https://adjoe.myb.im/images/ic_gd_clock.webp"
+ },
+ {
+  "file": "shop/ic_left.png",
+  "w": 84,
+  "h": 84,
+  "src": "https://shop.myb.im/images/ic_left.png"
+ },
+ {
+  "file": "shop/ic_close.png",
+  "w": 48,
+  "h": 48,
+  "src": "https://shop.myb.im/images/ic_close.png"
+ },
+ {
+  "file": "shop/ic_question.png",
+  "w": 51,
+  "h": 51,
+  "src": "https://shop.myb.im/images/ic_question.png"
+ },
+ {
+  "file": "shop/ic_filter.png",
+  "w": 42,
+  "h": 43,
+  "src": "https://shop.myb.im/images/ic_filter.png"
+ },
+ {
+  "file": "shop/img_welcome_2x.png",
+  "w": 129,
+  "h": 160,
+  "src": "https://shop.myb.im/images/img_welcome_2x.png"
+ },
+ {
+  "file": "shop/img_tag_hot.png",
+  "w": 147,
+  "h": 75,
+  "src": "https://shop.myb.im/images/img_tag_hot.png"
+ },
+ {
+  "file": "shop/ic_bpoint.png",
+  "w": 120,
+  "h": 120,
+  "src": "https://shop.myb.im/images/ic_bpoint.png"
+ },
+ {
+  "file": "shop/ic_refresh.png",
+  "w": 56,
+  "h": 56,
+  "src": "https://shop.myb.im/images/ic_refresh.png"
+ },
+ {
+  "file": "res/img_shopping_round_gmarket.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_gmarket.png"
+ },
+ {
+  "file": "res/img_shopping_agoda.png",
+  "w": 211,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_agoda.png"
+ },
+ {
+  "file": "res/img_shopping_house.webp",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_house.webp"
+ },
+ {
+  "file": "res/img_shopping_hotelscom.webp",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_hotelscom.webp"
+ },
+ {
+  "file": "res/img_shopping_emart.png",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_emart.png"
+ },
+ {
+  "file": "res/img_shopping_trip.png",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_trip.png"
+ },
+ {
+  "file": "res/img_shopping_ali.png",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_ali.png"
+ },
+ {
+  "file": "res/img_shopping_ssg.png",
+  "w": 211,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_ssg.png"
+ },
+ {
+  "file": "res/img_shopping_expedia.webp",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_expedia.webp"
+ },
+ {
+  "file": "res/img_shopping_himart.webp",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_himart.webp"
+ },
+ {
+  "file": "res/img_shopping_wconcept.webp",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_wconcept.webp"
+ },
+ {
+  "file": "res/img_shopping_11street.png",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_11street.png"
+ },
+ {
+  "file": "res/img_shopping_kyobo.png",
+  "w": 211,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_kyobo.png"
+ },
+ {
+  "file": "res/img_shopping_gsshop.png",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_gsshop.png"
+ },
+ {
+  "file": "res/img_shopping_lotteshopping.png",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_lotteshopping.png"
+ },
+ {
+  "file": "res/img_shopping_cjthemarket.webp",
+  "w": 210,
+  "h": 78,
+  "src": "https://resource.myb.im/cps/img_shopping_cjthemarket.webp"
+ },
+ {
+  "file": "shop/img_promotion_banner.png",
+  "w": 981,
+  "h": 1200,
+  "src": "https://shop.myb.im/images/img_promotion_banner.png"
+ },
+ {
+  "file": "shop/ic_like_disable.png",
+  "w": 96,
+  "h": 96,
+  "src": "https://shop.myb.im/images/ic_like_disable.png"
+ },
+ {
+  "file": "res/img_shopping_round_coupang.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_coupang.png"
+ },
+ {
+  "file": "shop/ic_x.png",
+  "w": 48,
+  "h": 48,
+  "src": "https://shop.myb.im/images/ic_x.png"
+ },
+ {
+  "file": "res/img_shopping_round_ali.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_ali.png"
+ },
+ {
+  "file": "res/img_shopping_round_yanolja.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_yanolja.png"
+ },
+ {
+  "file": "res/img_shopping_round_hotelscom.webp",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_hotelscom.webp"
+ },
+ {
+  "file": "res/img_shopping_round_expedia.webp",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_expedia.webp"
+ },
+ {
+  "file": "shop/img_quick_menu.png",
+  "w": 1308,
+  "h": 600,
+  "src": "https://shop.myb.im/images/img_quick_menu.png"
+ },
+ {
+  "file": "res/naverpay_circle.png",
+  "w": 144,
+  "h": 144,
+  "src": "https://djnav3z3hsgft.cloudfront.net/cps/naverpay_circle.png"
+ },
+ {
+  "file": "res/img_shopping_round_himart.webp",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_himart.webp"
+ },
+ {
+  "file": "res/img_shopping_round_trip.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_trip.png"
+ },
+ {
+  "file": "res/img_shopping_round_house.webp",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_house.webp"
+ },
+ {
+  "file": "res/img_shopping_round_emart.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_emart.png"
+ },
+ {
+  "file": "res/img_shopping_round_agoda.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_agoda.png"
+ },
+ {
+  "file": "res/img_shopping_round_ssg.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_ssg.png"
+ },
+ {
+  "file": "res/img_shopping_round_auction.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_auction.png"
+ },
+ {
+  "file": "res/img_shopping_round_wconcept.webp",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_wconcept.webp"
+ },
+ {
+  "file": "res/img_shopping_round_11street.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_11street.png"
+ },
+ {
+  "file": "res/img_shopping_round_kyobo.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_kyobo.png"
+ },
+ {
+  "file": "res/img_shopping_round_gsshop.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_gsshop.png"
+ },
+ {
+  "file": "res/img_shopping_round_lotteshopping.png",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_lotteshopping.png"
+ },
+ {
+  "file": "res/img_shopping_round_cjthemarket.webp",
+  "w": 192,
+  "h": 192,
+  "src": "https://resource.myb.im/cps/img_shopping_round_cjthemarket.webp"
+ },
+ {
+  "file": "shop/ic_up.png",
+  "w": 72,
+  "h": 72,
+  "src": "https://shop.myb.im/images/ic_up.png"
+ },
+ {
+  "file": "shop/ic_like.png",
+  "w": 96,
+  "h": 96,
+  "src": "https://shop.myb.im/images/ic_like.png"
+ }
+]

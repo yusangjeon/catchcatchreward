@@ -71,3 +71,56 @@ body {
   border-radius: 2px;
   animation: confetti 1.6s ease-out infinite;
 }
+
+/* ===== 마이비 모션 복제 ===== */
+/* react-toastify bounce (top-center): Toastify__bounceInDown / Toastify__bounceOutUp 원본 keyframes */
+@keyframes Toastify__bounceInDown {
+  0%, 60%, 75%, 90%, to { animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+  0% { opacity: 0; transform: translate3d(0, -3000px, 0); }
+  60% { opacity: 1; transform: translate3d(0, 25px, 0); }
+  75% { transform: translate3d(0, -10px, 0); }
+  90% { transform: translate3d(0, 5px, 0); }
+  to { transform: none; }
+}
+@keyframes Toastify__bounceOutUp {
+  20% { transform: translate3d(0, -10px, 0); }
+  40%, 45% { opacity: 1; transform: translate3d(0, 20px, 0); }
+  to { opacity: 0; transform: translate3d(0, -2000px, 0); }
+}
+.myb-toast-in { animation: Toastify__bounceInDown 0.75s both; }
+.myb-toast-out { animation: Toastify__bounceOutUp 0.75s both; }
+
+/* 벤핏허브 스켈레톤 shimmer: linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%) 200% */
+@keyframes myb-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.myb-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: myb-shimmer 1.5s ease-in-out infinite;
+}
+
+/* 보상 화면 코인 등장: 0.3s ease-out (벤핏허브 reward 모달) + 둥실 */
+@keyframes myb-pop-in {
+  0% { opacity: 0; transform: scale(0.6); }
+  70% { transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes myb-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.myb-pop-in { animation: myb-pop-in 0.3s ease-out both; }
+.myb-float { animation: myb-float 2.4s ease-in-out infinite; }
+
+/* 벤핏허브 버튼 눌림: transform .15s ease-out, filter .15s ease-out */
+.myb-press { transition: transform 0.15s ease-out, filter 0.15s ease-out; }
+.myb-press:active { transform: scale(0.97); filter: brightness(0.96); }
+
+/* 진행 바: width 0.8s cubic-bezier(0.22, 1, 0.36, 1) */
+.myb-progress { transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* 가로 스크롤 스냅 */
+.myb-hscroll { scroll-snap-type: x mandatory; }
+.myb-hscroll > * { scroll-snap-align: start; }

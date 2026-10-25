@@ -95,36 +95,48 @@ export function ClockIcon({ className, size = 14 }: P) {
   );
 }
 
-/** B포인트 코인 (파란 원 + 흰 P) */
+/* eslint-disable @next/next/no-img-element */
+/** B포인트 코인 — 마이비 benefit-hub 원본 ic_bpoint_01.webp(48px) */
 export function PCoin({ size = 24, className }: P) {
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-myb font-extrabold text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.18)] ${className ?? ""}`}
-      style={{ width: size, height: size, fontSize: size * 0.62, lineHeight: 1 }}
-      aria-label="B포인트"
-    >
-      P
-    </span>
-  );
+  return <img src="/myb/bh/ic_bpoint_01.webp" width={size} height={size} alt="B포인트" draggable={false} className={`inline-block shrink-0 select-none ${className ?? ""}`} />;
 }
-/** CONX 코인 (검정 원 + CX) */
+/** 핑크 P 코인 — 쇼핑적립 예정 포인트(ic_bpoint_02.webp) */
+export function PCoinPink({ size = 24, className }: P) {
+  return <img src="/myb/bh/ic_bpoint_02.webp" width={size} height={size} alt="쇼핑적립 포인트" draggable={false} className={`inline-block shrink-0 select-none ${className ?? ""}`} />;
+}
+/** CONX 코인 — 원본 ic_conx.webp(54px) */
 export function CXCoin({ size = 24, className }: P) {
+  return <img src="/myb/bh/ic_conx.webp" width={size} height={size} alt="CONX" draggable={false} className={`inline-block shrink-0 select-none ${className ?? ""}`} />;
+}
+/** XPLA 코인 — 원본 ic_xpla.webp */
+export function XplaCoin({ size = 24, className }: P) {
+  return <img src="/myb/bh/ic_xpla.webp" width={size} height={size} alt="XPLA" draggable={false} className={`inline-block shrink-0 select-none ${className ?? ""}`} />;
+}
+/**
+ * P + CX 겹친 코인 (벤핏허브 헤더 DOM 그대로): P(18) → 흰 원(18, margin -16) → CX(18, margin -10).
+ * 흰 원이 P와 CX 사이의 링 역할. 18px 기준 총 폭 28px.
+ */
+export function PXCoin({ size = 18, className }: P) {
+  const k = size / 18;
+  const circle = "relative flex items-center justify-center rounded-full bg-white";
   return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-full border-2 border-ink bg-white font-extrabold text-ink ${className ?? ""}`}
-      style={{ width: size, height: size, fontSize: size * 0.4, lineHeight: 1 }}
-      aria-label="CONX"
-    >
-      CX
+    <span className={`flex shrink-0 items-center ${className ?? ""}`} style={{ height: size }} aria-label="B포인트·CONX">
+      <span className={`${circle} z-[2]`} style={{ width: size, height: size }}><PCoin size={size} /></span>
+      <span className={`${circle} z-[1]`} style={{ width: size, height: size, marginLeft: -16 * k }} aria-hidden />
+      <span className={`${circle} z-0`} style={{ width: size, height: size, marginLeft: -10 * k }}><CXCoin size={size} /></span>
     </span>
   );
 }
-/** P + CX 겹친 코인 (지갑 총액·만보기 헤더) */
-export function PXCoin({ size = 28 }: P) {
+/** 벤핏허브 버튼·칩 안의 흰색 P 아이콘(원본 SVG path) */
+export function PSvg({ size = 16, className, fill = "#FFFFFF" }: P & { fill?: string }) {
   return (
-    <span className="relative inline-block shrink-0" style={{ width: size * 1.85, height: size }}>
-      <CXCoin size={size} className="absolute left-[55%] top-0" />
-      <PCoin size={size} className="absolute left-0 top-0 ring-2 ring-white" />
-    </span>
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" className={`shrink-0 ${className ?? ""}`} aria-hidden>
+      <path d="M8 0C12.4183 0 16 3.58172 16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8C0 3.58172 3.58172 0 8 0ZM8.33594 4.57422C7.5882 4.57422 6.48358 4.64579 5.02344 4.79004V11.8242H7.90723V10.5488L8.69336 10.5664C9.15259 10.5664 9.584 10.49 9.9873 10.3369C10.3906 10.1838 10.7427 9.97006 11.043 9.69629C11.3431 9.42258 11.5803 9.09446 11.7539 8.71191C11.9276 8.32922 12.0137 7.90748 12.0137 7.44824C12.0136 6.42695 11.7399 5.69252 11.1924 5.24512C10.9098 5.01559 10.5489 4.8462 10.1104 4.7373C9.67476 4.62847 9.08329 4.57423 8.33594 4.57422ZM9.00293 6.40625C9.08222 6.40631 9.15315 6.42179 9.21484 6.45117C9.40584 6.54252 9.50098 6.72937 9.50098 7.01172C9.50092 7.29411 9.37491 7.57795 9.12207 7.86328C8.98666 8.01635 8.74769 8.17694 8.40625 8.34473L7.88965 8.59668V6.93164C8.37824 6.5814 8.74979 6.40625 9.00293 6.40625Z" fill={fill} />
+    </svg>
   );
+}
+/** 프로필 아바타 — ic_profile_01~04.webp. 페르소나 코드로 결정적 선택 */
+export function Avatar({ seed, size = 50, className }: P & { seed: string }) {
+  const n = ([...seed].reduce((a, c) => a + c.charCodeAt(0), 0) % 4) + 1;
+  return <img src={`/myb/bh/ic_profile_0${n}.webp`} width={size} height={size} alt="" draggable={false} className={`inline-block shrink-0 rounded-full select-none ${className ?? ""}`} />;
 }

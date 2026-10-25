@@ -1,9 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useHome, fmt } from "@/hooks/useHome";
+import { useHome } from "@/hooks/useHome";
 import { BellIcon, ChevronRight, GiftIcon, PCoin } from "@/components/icons";
 import { SetCard } from "@/components/SetCard";
+import { Banners } from "@/components/motion/Banners";
+import { NumberFlow } from "@/components/motion/NumberFlow";
+
+/* eslint-disable @next/next/no-img-element */
+
+/** 마이비 reward-banner 원본(327×72) — upload.myb.im 캡처본 */
+const BANNERS = ["/myb/up/2025-12-19T03_30_12.125Z_banner.webp", "/myb/up/2025-12-29T08_07_33.114Z_133.webp", "/myb/up/2025-12-29T08_07_50.926Z_banner.webp", "/myb/up/2026-02-11T05-23-58.433Z_2509_myb_quizpass-banner_v1_327x72.webp", "/myb/up/2026-04-24T07-33-12.788Z_2604_myb_manboki-banner_v1_327x72-1.webp", "/myb/up/2026-04-24T07-33-32.380Z_2604_myb_manboki-banner_v1_327x72.webp", "/myb/up/2026-04-27T01-55-48.943Z_2604_myb_manboki-banner_v1_327x72.webp"];
 
 const QUICK = [
   { icon: "📅", label: "출석체크" },
@@ -22,7 +29,7 @@ export default function HomePage() {
       <header className="flex h-[55px] items-center justify-between px-5">
         <Link href="/wallet" className="flex items-center gap-2">
           <PCoin size={24} />
-          <span className="text-[16px] font-bold tabular-nums">{data ? fmt(data.wallet.balance) : "—"}</span>
+          <span className="text-[16px] font-bold tabular-nums">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span>
         </Link>
         <div className="flex items-center gap-3">
           <span className="flex h-[26px] items-center gap-1.5 rounded-lg border border-line bg-bg-2 px-2 text-[12px] font-semibold">
@@ -40,11 +47,9 @@ export default function HomePage() {
       {/* 비포인트 러쉬 배너 */}
       <div className="flex h-[44px] items-center justify-between bg-gradient-to-r from-[#efe6ff] via-[#f3e4fb] to-[#ffe3f3] px-5">
         <p className="flex items-center gap-1.5 text-[14px] font-extrabold text-purple">
-          <span className="relative">
-            비포인트 러쉬
-            <span className="absolute -right-3 -top-3 text-[14px]" aria-hidden>🪙</span>
-          </span>
-          <span className="ml-2 text-[12px] font-semibold">6일 남음</span>
+          {/* 원본 라벨 이미지 ic_bpointrush.webp(351×52) */}
+          <img src="/myb/bh/ic_bpointrush.webp" alt="비포인트 러쉬" height={22} className="h-[22px] w-auto" draggable={false} />
+          <span className="ml-1 text-[12px] font-semibold">{data ? `${Math.max(1, Math.ceil((new Date(data.rushEndsAt).getTime() - Date.now()) / 86400_000))}일 남음` : "—"}</span>
         </p>
         <button type="button" className="relative flex h-[26px] items-center gap-0.5 rounded-lg bg-gradient-to-r from-[#8e5cf0] to-[#b56cf3] px-2.5 text-[11px] font-bold text-white">
           무료 룰렛 돌리기 <ChevronRight size={12} />
@@ -109,6 +114,9 @@ export default function HomePage() {
             </li>
           ))}
         </ul>
+
+        {/* 리워드 배너(자동 롤링) — 원본 327×72 */}
+        <Banners images={BANNERS} className="mx-5 mt-[22px]" />
       </section>
 
       {error && <p className="py-3 text-center text-xs text-red">연결 오류: {error}</p>}

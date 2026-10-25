@@ -59,4 +59,13 @@
   - 레퍼런스 원본: 앱스토어 `apps.apple.com/kr/app/id6476365625`, 공식 `myb.im`. 세션 스크래치에 크롭본 있었음(재수집 가능).
   - 픽셀 캘리브레이션(2026-10-25 3차): 서체 Pretendard Variable(jsDelivr) 로드. 앱스토어 스크린샷의 폰 화면 내부(1242px 원본 기준 x 178~1082, y 900~)를 390px 폭으로 리스케일해 20px 격자 위에서 우리 스크린샷과 요소 좌표를 대조, 헤더 55·배너 44·세그먼트 50·카드 145 등 수치로 맞춤. 도구: Playwright 390×844 dpr1 스크린샷 + PIL 격자/블렌드 비교(세션 스크래치 `grid.py`, `compare.py` — 리포 밖). 퀴즈 화면 좌우 패딩은 30px(다른 화면 20px).
   - 한계: 레퍼런스가 마케팅 프레임 속 축소 목업이라 ±3px 오차. 3D 캐릭터·브랜드 로고·실사진은 저작권 자산이라 이모지/placeholder. 실기기 캡처를 받으면 그 기준으로 재보정.
-  - 다음 단계: ① 대표님 실기기 캡처로 재보정 + 실제 이미지·문구 교체 ② Supabase 연결 ③ 룰렛(스탬프 10개 소비) ④ 관리자 ⑤ Vercel 배포.
+- 2026-10-25(4차): **마이비 iOS HTTP 캡처 기반 실자산·모션 복제 + QA 3회.**
+  - 대표님이 Drive로 넘긴 iOS 프록시 캡처(53.7MB, 리포 밖 스크래치에만 보관·**절대 커밋 금지**: Bearer 토큰·fcmToken·idfa 포함)를 바이너리 프레이밍(len3·kind1·flow4)으로 파싱 → 929 flow, 863 응답, 웹뷰 번들(benefit-hub/shop/adjoe/reward-event/survey)·아이콘 300+·Pretendard ExtraBold/Black·Lottie 2종·API 응답 29종 추출.
+  - 추출 자산은 `public/myb/`(bh=benefit-hub, shop, adj=adjoe, res=제휴 로고, up=배너 327×72, sign) 19MB. 게임 아이콘(adjoe CDN)·3D 캐릭터는 저작권/미캡처라 benefit-hub 자체 이미지로 대체.
+  - 실제 웹뷰를 Playwright로 **오프라인 렌더**(api-gateway → 캡처 JSON 라우팅, `?u=MOCKTOKEN`, Flutter 브릿지 모킹)해 DOM 좌표·computed style 스냅샷을 얻고, 그 치수로 **혜택 탭(`app/benefits`)을 1:1 복제**(헤더 48, 카운트다운 74, 히어로 그라디언트, 게임 카드 150×220 r16, 설문 카드 r20, 적립 메뉴 아이콘 40). 데이터는 `lib/benefit/seed.ts`(캡처 응답값) → `/api/benefit`.
+  - 코인 아이콘(P/CX/핑크P/XPLA)·P+CX 겹침 스택·아바타·러쉬 라벨·스탬프·배너를 원본 이미지로 교체(`components/icons.tsx`).
+  - 모션(`components/motion/`): react-toastify bounceInDown/OutUp 토스트(bg #293a60, r100, ic_toast_point), number-flow 카운트업, 러쉬 카운트다운 칩, Lottie(lottie-react v3 `LottieSvg`, confetti_pop), Swiper 자동 배너, 스켈레톤 shimmer, 버튼 press(.15s), 진행바(.8s cubic-bezier(0.22,1,0.36,1)).
+  - QA 3회: ① typecheck·lint·build + API 스모크(INCOMPLETE/BAD_OPTION/ALREADY_DONE/404, /api/benefit) ② 원본 렌더 DOM 좌표 대조 — 혜택 탭 주요 요소 0~2px 이내(발견·수정: 스크롤 스냅으로 첫 카드 x=0, 코인 스택 z-order) ③ Playwright 전 화면 e2e — 콘솔 에러 0, 실패 요청 0, Lottie/토스트 렌더 확인. 스크립트: 스크래치 `qa/shots.js`, `smoke2.sh`(리포 밖).
+  - 주의: `pkill -f "next start"` 는 자기 셸까지 죽인다(exit 144). 서버 교체는 `pgrep -x next-server` → kill PID.
+  - 남은 차이(원본 불가): 하단 탭 아이콘·꿀·퀵메뉴·베이직 뱃지는 Flutter 네이티브라 캡처에 없음(SVG/이모지 근사), 게임 아이콘 대체, 홈/지갑/퀴즈는 앱스토어 스크린샷 기준(웹뷰 아님).
+  - 다음 단계: ① 네이티브 화면(홈·지갑·퀴즈) 실기기 캡처로 재보정 ② Supabase 연결 ③ 룰렛(스탬프 10개 소비) ④ 관리자 ⑤ Vercel 배포 ⑥ 쇼핑적립/게임적립/무한적립 웹뷰 복제(렌더 스냅샷 확보됨).

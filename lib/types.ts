@@ -120,6 +120,7 @@ export interface HomePayload {
   persona: Persona;
   badges: (Badge & { earnedAt: string })[];
   sets: SetCard[];
+  rushEndsAt: string; // 비포인트 러쉬 주차 종료(ISO)
 }
 
 export interface PublicQuestion {

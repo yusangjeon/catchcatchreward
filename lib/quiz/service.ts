@@ -1,4 +1,5 @@
 import "server-only";
+import { rushEndsAt } from "@/lib/benefit/service";
 import { getRepo } from "@/lib/db";
 import { kstDayKey } from "@/lib/time";
 import type { Badge, HomePayload, Persona, PublicQuestion, Quiz, QuizSet, SetCard, SetPayload, SubmitResult, Wallet } from "@/lib/types";
@@ -82,7 +83,7 @@ function toPublic(q: Quiz): PublicQuestion {
 export async function getHome(userId: string): Promise<HomePayload> {
   const repo = getRepo();
   const [sets, w, badges, scores] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId)]);
-  return { wallet: w, honey: sets.filter((s) => !s.done).length, persona: persona(scores), badges, sets };
+  return { wallet: w, honey: sets.filter((s) => !s.done).length, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt() };
 }
 
 export async function getSetPayload(userId: string, setId: string): Promise<SetPayload> {

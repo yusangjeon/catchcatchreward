@@ -1,8 +1,11 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useState } from "react";
 import { useHome, fmt } from "@/hooks/useHome";
-import { ChevronRight, ClockIcon, CXCoin, GiftIcon, InfoIcon, PCoin, PXCoin } from "@/components/icons";
+import { ChevronRight, ClockIcon, CXCoin, GiftIcon, InfoIcon, PCoin, PCoinPink, PXCoin } from "@/components/icons";
+import { NumberFlow } from "@/components/motion/NumberFlow";
 
 const CONX_RATE = 3426.45;
 const TABS = ["자산", "상품 구매", "뱃지"] as const;
@@ -56,7 +59,7 @@ export default function WalletPage() {
         <section className="animate-pop">
           <h2 className="mt-[36px] flex items-center gap-1.5 text-[17px] font-bold">총 보상 잔액 <InfoIcon className="text-[#c5cbd4]" /></h2>
           <div className="mt-[18px] flex items-center justify-between">
-            <p className="flex items-center gap-2"><PXCoin size={30} /><span className="text-[26px] font-extrabold tabular-nums">{fmt(balance)} 원</span></p>
+            <p className="flex items-center gap-2"><PXCoin size={30} /><span className="text-[26px] font-extrabold tabular-nums"><NumberFlow value={balance} /> 원</span></p>
             <span className="flex items-center text-[13px] text-muted">내역 <ChevronRight size={15} /></span>
           </div>
           <div className="mt-[14px] flex h-[42px] items-center justify-between rounded-xl border border-[#e3e8f0] px-3 text-[12px]">
@@ -70,7 +73,7 @@ export default function WalletPage() {
 
           <div className="mt-[30px] flex h-[46px] items-center justify-between rounded-xl bg-[#fff0f6] px-4 text-[13px]">
             <span className="flex items-center gap-1.5"><span aria-hidden>🛍️</span> 쇼핑적립 예정 포인트</span>
-            <span className="flex items-center gap-1 text-[16px] font-extrabold"><PCoin size={16} className="!bg-pink" />5,298 <ChevronRight size={15} className="text-muted" /></span>
+            <span className="flex items-center gap-1 text-[16px] font-extrabold"><PCoinPink size={16} />5,298 <ChevronRight size={15} className="text-muted" /></span>
           </div>
 
           <div className="mt-2 flex h-[84px] items-center justify-between rounded-2xl border border-[#e3e8f0] px-4">
@@ -88,8 +91,9 @@ export default function WalletPage() {
                 <span className="rounded-full border border-myb-dark px-2 py-0.5 text-[11px]">예치 중</span> B포인트 적금
               </p>
               <p className="mt-1.5 text-[13px] text-muted">스탬프 {data?.wallet.stamps ?? 0}개 · 10개 모으면 룰렛 1회</p>
+              <div className="mt-2 h-1.5 w-40 overflow-hidden rounded-full bg-[#e3e8f0]"><div className="myb-progress h-full rounded-full bg-myb" style={{ width: `${Math.min(100, ((data?.wallet.stamps ?? 0) % 10) * 10)}%` }} /></div>
             </div>
-            <span className="text-[36px]" aria-hidden>🏦</span>
+            <img src="/myb/bh/img_stamp.webp" alt="" width={48} height={48} className="h-12 w-12" />
           </div>
         </section>
       )}
