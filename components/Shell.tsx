@@ -32,8 +32,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
               return (
                 <li key={t.href}>
                   <Link href={t.href} aria-current={active ? "page" : undefined} className={`flex h-full flex-col items-center justify-center gap-1 ${color}`}>
-                    <t.Icon />
-                    <span className={`text-[12px] ${active || ("highlight" in t && t.highlight) ? "font-bold" : "font-medium"}`}>{t.label}</span>
+                    <t.Icon size={24} />
+                    <span className={`text-[11px] ${active || ("highlight" in t && t.highlight) ? "font-bold" : "font-medium"}`}>{t.label}</span>
                   </Link>
                 </li>
               );
