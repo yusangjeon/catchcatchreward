@@ -15,6 +15,7 @@ export const SEED_BADGES: Badge[] = [
   { code: "investor", name: "재테크러", description: "저축·투자 선택지를 3번 이상 골랐어요", emoji: "📈", rule: { tag: "saving", min: 3 } },
   { code: "foodie", name: "맛집탐험가", description: "외식·맛집 선택지를 3번 이상 골랐어요", emoji: "🍽️", rule: { tag: "dining_out", min: 3 } },
   { code: "car_owner", name: "드라이버", description: "자동차 선택지를 2번 이상 골랐어요", emoji: "🚗", rule: { tag: "car", min: 2 } },
+  { code: "wellness", name: "건강러", description: "건강 관리 선택지를 3번 이상 골랐어요", emoji: "🥗", rule: { tag: "health", min: 3 } },
 ];
 
 const img = (seed: string, w = 600, h = 600) => `https://picsum.photos/seed/${seed}/${w}/${h}`;

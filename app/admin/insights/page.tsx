@@ -35,7 +35,10 @@ export default async function AdminInsights() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-[22px] font-bold">세그먼트 인사이트 <span className="ml-2 text-[13px] font-medium text-[#8b94a0]">유저 {fmt(totalUsers)}명 · 응답 유저 {fmt(scoresByUser.size)}명 · 배지 보유 {fmt(new Set(userBadges.map((u) => u.userId)).size)}명</span></h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-[22px] font-bold">세그먼트 인사이트 <span className="ml-2 text-[13px] font-medium text-[#8b94a0]">유저 {fmt(totalUsers)}명 · 응답 유저 {fmt(scoresByUser.size)}명 · 배지 보유 {fmt(new Set(userBadges.map((u) => u.userId)).size)}명</span></h1>
+        <a href="/admin/export?type=segments" className="rounded-lg border border-[#dee2e9] bg-white px-4 py-2 text-[13px] font-bold text-[#191f28]">세그먼트 CSV 내보내기</a>
+      </div>
 
       <section className="rounded-2xl bg-white p-5 shadow-sm">
         <h2 className="text-[16px] font-bold">배지 세그먼트</h2>
