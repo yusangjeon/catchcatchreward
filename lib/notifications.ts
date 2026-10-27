@@ -1,0 +1,41 @@
+import "server-only";
+import { getRepo } from "@/lib/db";
+import { getRush } from "@/lib/rush/service";
+import { HONEY_PER_DAY } from "@/lib/quiz/service";
+import { kstDayKey } from "@/lib/time";
+import { PRODUCTS } from "@/lib/exchange/products";
+
+export interface Notice {
+  id: string;
+  kind: "rush" | "redeem" | "referral" | "honey" | "attendance" | "roulette";
+  title: string;
+  body: string;
+  href: string;
+  at: string;
+  action?: boolean; // 지금 할 일(빨간 점)
+}
+
+/** 알림 — 별도 저장 없이 현재 상태에서 파생(받을 보상·교환 진행·초대 보상·출석·룰렛) */
+export async function getNotifications(userId: string): Promise<{ notices: Notice[]; actionCount: number }> {
+  const repo = getRepo();
+  const today = kstDayKey();
+  const [rush, redemptions, invites, attended, stamps, completions] = await Promise.all([
+    getRush(userId), repo.listRedemptions(userId), repo.listReferralsByInviter(userId), repo.hasStamp(userId, "attendance", today), repo.countUnconsumedStamps(userId), repo.listCompletions(userId),
+  ]);
+  const now = new Date().toISOString();
+  const notices: Notice[] = [];
+  if (rush.claimable > 0) notices.push({ id: "rush", kind: "rush", title: `러쉬 보상 ${rush.claimable}개를 받을 수 있어요`, body: "비포인트 러쉬에서 보상받기를 누르면 포인트와 스탬프가 적립돼요", href: "/rush", at: now, action: true });
+  if (!attended) notices.push({ id: "attend", kind: "attendance", title: "오늘 출석체크를 아직 안 했어요", body: "10P와 스탬프 1개를 바로 받을 수 있어요", href: "/", at: now, action: true });
+  if (stamps >= 10) notices.push({ id: "roulette", kind: "roulette", title: "무료 룰렛을 돌릴 수 있어요", body: `스탬프 ${stamps}개 보유 · 10개마다 1회`, href: "/roulette", at: now, action: true });
+  const honey = Math.max(0, HONEY_PER_DAY - completions.filter((c) => c.dayKey === today).length);
+  if (honey > 0) notices.push({ id: "honey", kind: "honey", title: `오늘 풀 수 있는 퀴즈가 ${honey}개 남았어요`, body: "취향 퀴즈 풀고 포인트·배지 받기", href: "/quiz", at: now });
+  for (const r of redemptions.slice(0, 5)) {
+    const name = PRODUCTS.find((p) => p.kind === r.kind)?.name ?? r.kind;
+    const label = { requested: "신청 접수", processing: "처리 중", done: "발송 완료", rejected: "반려·환불" }[r.status];
+    notices.push({ id: `rd-${r.id}`, kind: "redeem", title: `${name} 교환 ${label}`, body: `${r.amountPoints.toLocaleString("ko-KR")}P · ${r.status === "done" ? "기프티콘을 확인하세요" : r.status === "rejected" ? "포인트가 환불됐어요" : "영업일 기준 1~3일 걸려요"}`, href: "/exchange", at: r.processedAt ?? r.requestedAt });
+  }
+  for (const r of invites.filter((x) => x.status === "rewarded").slice(0, 5)) {
+    notices.push({ id: `rf-${r.id}`, kind: "referral", title: "초대한 친구가 첫 퀴즈를 완료했어요", body: "친구초대 보상 500P가 적립됐어요", href: "/invite", at: r.rewardedAt ?? r.createdAt });
+  }
+  return { notices, actionCount: notices.filter((n) => n.action).length };
+}

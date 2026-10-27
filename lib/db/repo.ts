@@ -97,5 +97,7 @@ export interface Repo {
   updatePrize(id: string, patch: Partial<Pick<RoulettePrize, "name" | "kind" | "value" | "weight" | "active" | "sort">>): Promise<RoulettePrize | null>;
   countUserBadges(): Promise<Record<string, number>>;
   findProfile(idOrAnonKey: string): Promise<Profile | null>;
+  /** 관리자 유저 목록(최신순, limit) */
+  listProfiles(limit?: number): Promise<Profile[]>;
   adminStats(dayKey: string): Promise<AdminStats>;
 }

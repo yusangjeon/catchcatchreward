@@ -365,6 +365,9 @@ export function createSupabaseRepo(url: string, serviceRoleKey: string): Repo {
       const { data } = await sb.from("profiles").select(PROFILE_COLS).or(`id.eq.${idOrAnonKey},anon_key.eq.${idOrAnonKey}`).maybeSingle<ProfileRow>();
       return data ? toProfile(data) : null;
     },
+    async listProfiles(limit = 200) {
+      return ok<ProfileRow[]>(await sb.from("profiles").select(PROFILE_COLS).order("created_at", { ascending: false }).limit(limit), "profiles.list").map(toProfile);
+    },
     async adminStats(dayKey) {
       const count = async (q: PromiseLike<{ count: number | null; error: unknown }>) => {
         const { count: c, error } = await q;

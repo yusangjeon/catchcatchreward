@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: "쉽고 간편하게 즐기는 퀴즈형 앱테크",
   applicationName: "캐치캐치리워드",
   appleWebApp: { capable: true, title: "캐치캐치리워드", statusBarStyle: "default" },
+  manifest: "/manifest.webmanifest",
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {

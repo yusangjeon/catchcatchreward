@@ -19,7 +19,7 @@ const TABS = [
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   if (pathname.startsWith("/admin")) return <>{children}</>; // 관리자: 폰 프레임 없이 데스크톱 폭
-  const fullscreen = /^\/(quiz\/[^/]+|shop|game|cpq|survey|roulette|exchange|history|rush|invite|missions)/.test(pathname);
+  const fullscreen = /^\/(quiz\/[^/]+|shop|game|cpq|survey|roulette|exchange|history|rush|invite|missions|notifications)/.test(pathname);
   return (
     <div className="relative mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.04)]">
       <main className={`flex-1 ${fullscreen ? "" : "pb-[84px]"}`}>{children}</main>

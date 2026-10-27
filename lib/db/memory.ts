@@ -295,6 +295,9 @@ export const memoryRepo: Repo = {
     const s = store();
     return s.profiles.get(idOrAnonKey) ?? [...s.profiles.values()].find((p) => p.id === idOrAnonKey) ?? null;
   },
+  async listProfiles(limit = 200) {
+    return [...store().profiles.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, limit);
+  },
   async adminStats(dayKey) {
     const s = store();
     return {

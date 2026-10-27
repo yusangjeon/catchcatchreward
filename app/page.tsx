@@ -51,8 +51,11 @@ export default function HomePage() {
             <img src="/myb/native/ic_basic_hex.png" alt="" className="h-[14px] w-[14px]" />
             베이직
           </span>
-          <img src="/myb/native/ic_gift_badge.png" alt="선물함" className="h-[28px] w-[28px]" />
-          <img src="/myb/native/ic_bell.png" alt="알림" className="h-[24px] w-[24px]" />
+          <Link href="/roulette" aria-label="선물함(룰렛)"><img src="/myb/native/ic_gift_badge.png" alt="" className="h-[28px] w-[28px]" /></Link>
+          <Link href="/notifications" aria-label="알림" className="relative">
+            <img src="/myb/native/ic_bell.png" alt="" className="h-[24px] w-[24px]" />
+            {data && (data.rush.claimable > 0 || !data.attendedToday) && <i className="absolute -right-0.5 top-0 h-2 w-2 rounded-full bg-red ring-2 ring-white" />}
+          </Link>
         </div>
       </header>
 
