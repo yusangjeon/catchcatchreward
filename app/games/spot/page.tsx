@@ -7,6 +7,7 @@ import { GameHeader } from "@/components/games/GameHeader";
 import { useToast } from "@/components/motion/Toast";
 import { fmt } from "@/hooks/useHome";
 import { PCoin } from "@/components/icons";
+import { StarRating } from "@/components/motion/StarRating";
 import { haptic, sfx } from "@/lib/fx";
 import { burst, confetti, flyCoins } from "@/lib/fxEngine";
 import { showReward } from "@/lib/reward";
@@ -290,10 +291,10 @@ export default function SpotPage() {
         <>
           <div className="myb-fade-in fixed inset-0 z-[999] bg-black/55" />
           <div className="myb-modal-in fixed left-1/2 top-1/2 z-[1000] w-[calc(100%-56px)] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-[24px] bg-white px-6 pb-6 pt-7 text-center">
-            <p className="flex items-center justify-center gap-2 text-[38px] leading-none">{[0, 1, 2].map((i) => <span key={i} className={i < stars ? "spot-star text-[#ffb400] drop-shadow-[0_2px_6px_rgba(255,180,0,.5)]" : "text-[#e5e8ee]"} style={{ animationDelay: `${0.25 + i * 0.18}s` }}><svg width="38" height="38" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" /></svg></span>)}</p>
+            <p className="flex justify-center"><StarRating earned={stars} size={46} /></p>
             <p className="mt-2 text-[24px] font-extrabold">{result.all ? "완벽해요!" : `${result.found}/${result.total} 찾았어요`}</p>
             <p className="mt-2 flex items-center justify-center gap-1 text-[20px] font-extrabold text-[var(--color-myb)]"><PCoin size={20} />+{fmt(result.points)}</p>
-            <p className="mt-1 text-[12px] text-[#8b94a0]">{result.seconds}초{result.speedBonus ? ` · 스피드 보너스 +${result.speedBonus}P` : ""}{!result.all ? " · 놓친 곳은 분홍 점선" : ""}</p>
+            <p className="mt-1 text-[12px] text-[#8b94a0]">{result.seconds}초{result.speedBonus ? <> · <DuoIcon name="bolt" size={12} className="inline text-[#d98a00]" /> 스피드 +{result.speedBonus}P</> : ""}{!result.all ? " · 놓친 곳은 분홍 점선" : ""}</p>
             <div className="mt-5 grid grid-cols-2 gap-2">
               <button type="button" onClick={() => router.push("/games")} className="myb-press h-12 rounded-xl border border-[#dee2e9] text-[14px] font-bold">나가기</button>
               {result.left > 0 ? (

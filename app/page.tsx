@@ -1,5 +1,6 @@
 "use client";
 
+import { Mascot } from "@/components/motion/Mascot";
 import { DuoIcon, IconTile, type DuoName, type Tone } from "@/components/icons/duo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -127,11 +128,12 @@ export default function HomePage() {
         <span className="absolute right-5 top-4 flex h-[26px] items-center gap-1 rounded-full bg-ink px-3 text-[12px] font-bold text-white">
           <img src="/brand/ic_clock.svg" alt="" className="h-[13px] w-[13px] brightness-0 invert" /> {data ? (data.newbie.active ? `${data.newbie.dayNo}일차` : "오늘") : "—"}
         </span>
-                <p className="text-[14px] font-medium text-ink-2">오늘도 만나서 반가워요</p>
-        <p className="mt-1 text-[22px] font-extrabold leading-[30px]">
-          <span className="text-[#2f6fed]">{data?.newbie.active ? `${data.newbie.dayNo}일차 퀴즈 ${data.newbie.goal}개` : "오늘의 퀴즈 3개"}</span>로 시작해요!
+        <div className="absolute bottom-[14px] right-3"><Mascot size={124} /></div>
+        <p className="pr-[120px] text-[14px] font-medium text-ink-2">오늘도 만나서 반가워요</p>
+        <p className="mt-1 pr-[120px] text-[22px] font-extrabold leading-[30px]">
+          <span className="text-[#2f6fed]">{data?.newbie.active ? `${data.newbie.dayNo}일차 퀴즈 ${data.newbie.goal}개` : "오늘의 퀴즈 3개"}</span>로<br />시작해요!
         </p>
-        <Link href={data?.newbie.active ? "/newbie" : "/quiz"} className="mt-[22px] flex h-[52px] items-center gap-3 rounded-[14px] bg-white px-4 shadow-[0_4px_14px_rgba(47,111,237,.10)]">
+        <Link href={data?.newbie.active ? "/newbie" : "/quiz"} className="mt-[22px] mr-[128px] flex h-[52px] items-center gap-3 rounded-[14px] bg-white px-4 shadow-[0_4px_14px_rgba(47,111,237,.10)]">
           <span className="text-[15px] font-bold tabular-nums text-[#2f6fed]">{data ? Math.min(3, data.todayDone) : 0}/3</span>
           <span className="flex flex-1 gap-1.5">
             {[0, 1, 2].map((i) => <i key={i} className={`h-[8px] flex-1 rounded-full ${data && data.todayDone > i ? "bg-[#2f6fed]" : "bg-[#e3ecff]"}`} />)}

@@ -213,3 +213,22 @@ body {
 .rw-rays { animation: rwRays 9s linear infinite; }
 .rw-glow { animation: rwGlow 1.6s ease-in-out infinite; }
 .rw-sticker { animation: rwSticker .4s cubic-bezier(.2,.9,.25,1) both; }
+
+/* 별 스탬프(짠·짠·짠) */
+@keyframes starStamp { 0% { transform: scale(0) rotate(-40deg); opacity: 0 } 55% { transform: scale(1.55) rotate(6deg); opacity: 1 } 72% { transform: scale(.92) rotate(-2deg) } 100% { transform: scale(1) rotate(0) } }
+@keyframes starStampOff { 0% { transform: scale(0); opacity: 0 } 70% { transform: scale(1.1); opacity: 1 } 100% { transform: scale(1) } }
+@keyframes starRing { 0% { transform: translate(-50%,-50%) scale(.4); opacity: .9 } 100% { transform: translate(-50%,-50%) scale(2.2); opacity: 0 } }
+.star-stamp { position: relative; display: inline-block; animation: starStamp .62s cubic-bezier(.2,1.2,.3,1) both; filter: drop-shadow(0 4px 10px rgba(255,160,0,.45)); transform-origin: 50% 60% }
+.star-stamp-off { position: relative; display: inline-block; animation: starStampOff .4s cubic-bezier(.22,1,.36,1) both; transform-origin: 50% 60% }
+.star-ring { position: absolute; left: 50%; top: 52%; width: 70%; height: 70%; border-radius: 9999px; border: 3px solid #ffd54a; animation: starRing .55s ease-out both; pointer-events: none }
+
+/* 마스코트 모션 */
+@keyframes mascotIdle { 0%, 100% { transform: translateY(0) rotate(0) } 50% { transform: translateY(-6px) rotate(-1.5deg) } }
+@keyframes mascotShadow { 0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 1 } 50% { transform: translateX(-50%) scaleX(.82); opacity: .7 } }
+@keyframes mascotJump { 0% { transform: translateY(0) scale(1) } 35% { transform: translateY(-22px) scale(1.08) rotate(4deg) } 70% { transform: translateY(2px) scale(.96) } 100% { transform: translateY(0) scale(1) } }
+@keyframes mascotWiggle { 0%, 100% { transform: rotate(0) } 25% { transform: rotate(-7deg) } 50% { transform: rotate(6deg) } 75% { transform: rotate(-3deg) } }
+.mascot-idle { animation: mascotIdle 3s ease-in-out infinite }
+.mascot-idle .mascot-shadow { animation: mascotShadow 3s ease-in-out infinite }
+.mascot-jump { animation: mascotJump .7s cubic-bezier(.22,1,.36,1) both }
+.mascot-wiggle { animation: mascotWiggle .9s ease-in-out both; transform-origin: 50% 85% }
+.mascot-wrap:active { transform: scale(.96) }

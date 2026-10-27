@@ -108,13 +108,16 @@ export function PCoin({ size = 24, className }: P) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" className={`inline-block shrink-0 select-none ${className ?? ""}`} aria-label="캐치포인트" role="img">
       <defs>
-        <linearGradient id="ccr-coin-ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ff7a4d" /><stop offset="1" stopColor="#d93f16" /></linearGradient>
-        <radialGradient id="ccr-coin-face" cx=".35" cy=".3" r=".8"><stop offset="0" stopColor="#ffe08a" /><stop offset="1" stopColor="#f2a81d" /></radialGradient>
+        <linearGradient id="ccr-coin-rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ffd45c" /><stop offset=".55" stopColor="#f5a400" /><stop offset="1" stopColor="#d97a00" /></linearGradient>
+        <radialGradient id="ccr-coin-face" cx=".4" cy=".32" r=".75"><stop offset="0" stopColor="#fff2b8" /><stop offset=".6" stopColor="#ffcb3d" /><stop offset="1" stopColor="#f3a300" /></radialGradient>
+        <linearGradient id="ccr-coin-shine" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff" stopOpacity=".85" /><stop offset=".5" stopColor="#fff" stopOpacity="0" /></linearGradient>
       </defs>
-      <circle cx="12" cy="12" r="12" fill="url(#ccr-coin-ring)" />
-      <circle cx="12" cy="12" r="9" fill="url(#ccr-coin-face)" />
-      <circle cx="12" cy="12" r="9" fill="none" stroke="rgba(0,0,0,.08)" strokeWidth="1" />
-      <path d="M15.4 9.3a3.6 3.6 0 1 0 0 5.4" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="12" fill="url(#ccr-coin-rim)" />
+      <circle cx="12" cy="12" r="9.3" fill="url(#ccr-coin-face)" />
+      <circle cx="12" cy="12" r="9.3" fill="none" stroke="#c97a00" strokeOpacity=".35" strokeWidth=".8" />
+      <path d="M7.6 17.2V7.4h4.6c2.3 0 3.8 1.3 3.8 3.3s-1.5 3.3-3.8 3.3h-2.1v3.2zm2.5-5.4h1.9c1 0 1.5-.5 1.5-1.2s-.5-1.2-1.5-1.2h-1.9z" fill="#c25a00" opacity=".35" transform="translate(.4 .5)" />
+      <path d="M7.6 17.2V7.4h4.6c2.3 0 3.8 1.3 3.8 3.3s-1.5 3.3-3.8 3.3h-2.1v3.2zm2.5-5.4h1.9c1 0 1.5-.5 1.5-1.2s-.5-1.2-1.5-1.2h-1.9z" fill="#fff" />
+      <path d="M4.2 9.5A8.4 8.4 0 0 1 11 3.8" fill="none" stroke="url(#ccr-coin-shine)" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
 }
