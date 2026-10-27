@@ -1,49 +1,44 @@
 "use client";
 
 import Link from "next/link";
+import { PCoin } from "@/components/icons";
 import type { Merchant } from "@/lib/shop/types";
 
 /* eslint-disable @next/next/no-img-element */
 
-/** shop.myb.im "NEW" 태그 — gradient 200% 가로 흐름(shimmer) */
 export function NewTag() {
-  return (
-    <span className="myb-newtag absolute right-[15px] top-[-8px] flex h-[25px] w-[49px] items-center justify-center rounded-xl pl-1 pr-[6px] text-center text-[14px] font-bold leading-[21px] text-white">NEW</span>
-  );
+  return <span className="absolute right-3 top-3 rounded-full bg-pink px-2 py-0.5 text-[10px] font-bold text-white">NEW</span>;
 }
 
-/** 적립률 표기: ic_bpoint 18 + "1.2" 20/700 + "% 적립" 16/500 */
-export function Rate({ m, suffix = "% 적립" }: { m: Merchant; suffix?: string }) {
+/** 적립률: 코인 + 숫자(브랜드색) + 단위 */
+export function Rate({ m, size = "md" }: { m: Merchant; size?: "md" | "lg" }) {
   const isCoupang = m.rate === 0;
+  const big = size === "lg";
   return (
-    <div className="flex items-center gap-1">
-      <img src="/myb/shop/ic_bpoint.png" width={18} height={18} alt="" className="h-[18px] w-[18px]" />
-      <div className="flex items-end gap-[2px] overflow-hidden whitespace-nowrap text-[#33363f]">
-        <span className="text-[20px] font-bold leading-[23px]">{isCoupang ? "1,100" : m.rate}</span>
-        <span className="text-[16px] font-medium leading-[22px]">{isCoupang ? "P 적립" : suffix}</span>
-      </div>
-    </div>
+    <span className="flex items-center gap-1 whitespace-nowrap">
+      <PCoin size={big ? 20 : 16} />
+      <span className={`font-bold text-myb-dark ${big ? "text-[22px]" : "text-[17px]"}`}>{isCoupang ? "1,100" : m.rate}</span>
+      <span className={`font-semibold text-ink-2 ${big ? "text-[14px]" : "text-[12px]"}`}>{isCoupang ? "P" : "%"}</span>
+    </span>
   );
 }
 
-/**
- * 전체 쇼핑몰·추천 카드 — 167×126(그리드) / 160×126(가로 스크롤). white r12 padding 18 16 gap 12 border var(--color-bg-3)
- * @param shadow 추천 영역(r14, 그림자, padding 16)
- */
-export function MerchantCard({ m, width, shadow = false, suffix }: { m: Merchant; width?: number; shadow?: boolean; suffix?: string }) {
+/** 쇼핑몰 카드 — 흰 카드 + 그림자(테두리 없음), 로고 가운데, 이름, 적립률. hot 이면 브랜드 테두리 + HOT 칩 */
+export function MerchantCard({ m, width, hot = false }: { m: Merchant; width?: number; hot?: boolean }) {
   return (
     <Link
       href={`/shop/${m.id}`}
-      className={`myb-press relative flex shrink-0 flex-col gap-3 border border-[var(--color-bg-3)] bg-white ${shadow ? "rounded-[14px] p-4" : "rounded-xl px-4 py-[18px]"}`}
-      style={{ width, boxShadow: shadow ? "0 5px 16px 0 rgba(40, 24, 14, 0.09)" : undefined }}
+      className={`myb-press relative flex shrink-0 flex-col gap-3 rounded-[18px] bg-white px-4 pb-4 pt-5 ${hot ? "ring-2 ring-myb" : ""}`}
+      style={{ width, boxShadow: "0 4px 14px rgba(40,24,14,.06)" }}
     >
-      {m.isNew && <NewTag />}
-      <div className="flex h-8 items-center justify-center">
-        <img src={m.logo} alt={m.name} className="max-h-8 max-w-[133px] object-contain" />
+      {m.isNew && !hot && <NewTag />}
+      {hot && <span className="absolute right-3 top-3 rounded-full bg-myb px-2 py-0.5 text-[10px] font-bold text-white">HOT</span>}
+      <div className="flex h-8 items-center justify-start">
+        <img src={m.logo} alt={m.name} className="max-h-7 max-w-[120px] object-contain" />
       </div>
       <div className="flex flex-col gap-1">
-        <p className="h-[17px] overflow-hidden whitespace-nowrap text-[14px] font-medium leading-[16.1px] text-[#33363f]">{m.name}</p>
-        <Rate m={m} suffix={suffix} />
+        <p className="truncate text-[13px] font-medium text-ink-2">{m.name}</p>
+        <Rate m={m} />
       </div>
     </Link>
   );
