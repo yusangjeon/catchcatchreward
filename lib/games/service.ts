@@ -9,6 +9,7 @@ import type { GamePlay, Wallet } from "@/lib/types";
  *  - spot(틀린그림 찾기): 날짜 시드로 모두 같은 퍼즐. 6×8 이모지 보드에서 5칸이 다름. 찾은 개수 × 5P, 전부 찾으면 +10P. 하루 1회
  *  - rsp(가위바위보): 하루 3판. 승 10P · 무 3P · 패 0P
  *  - scratch(복권 긁기): 하루 1장. 0P 50% · 5P 25% · 10P 15% · 50P 8% · 500P 2% (기대값 ≈16.8P)
+ *  - memory(카드 뒤집기): 4×4 8쌍. 클라이언트 플레이, 완료 시 시도 수로 보상(≤16회 15P · ≤24회 10P · 그 외 5P). 하루 1회, 서버는 타당성(시도≥8·시간≥5s)만 검사
  */
 export const GAME_LIMITS: Record<GamePlay["game"], number> = { spot: 1, rsp: 3, scratch: 1, memory: 1 };
 export const SPOT_ROWS = 8;
@@ -65,10 +66,11 @@ export interface GamesPayload {
   wallet: Wallet;
 }
 
-const META: Record<Exclude<GamePlay["game"], "memory">, { title: string; desc: string; icon: string }> = {
+const META: Record<GamePlay["game"], { title: string; desc: string; icon: string }> = {
   spot: { title: "틀린그림 찾기", desc: "두 그림에서 다른 5곳을 60초 안에!", icon: "🔍" },
   rsp: { title: "가위바위보", desc: "이기면 10P, 비기면 3P · 하루 3판", icon: "✌️" },
   scratch: { title: "복권 긁기", desc: "하루 한 장, 최대 500P", icon: "🎟️" },
+  memory: { title: "카드 뒤집기", desc: "8쌍을 적은 시도로 맞추면 최대 15P", icon: "🃏" },
 };
 
 export async function getGames(userId: string): Promise<GamesPayload> {
@@ -81,7 +83,7 @@ export async function getGames(userId: string): Promise<GamesPayload> {
     const mine = today.filter((p) => p.game === key);
     return { key, ...META[key], href: `/games/${key}`, limit: GAME_LIMITS[key], played: mine.length, left: Math.max(0, GAME_LIMITS[key] - mine.length), todayPoints: mine.reduce((a, p) => a + p.points, 0) };
   });
-  return { dayKey: day, games, weekPlays: plays.filter((p) => p.createdAt >= weekStart).length, recent: plays.slice(0, 10).map((p) => ({ game: META[p.game as keyof typeof META]?.title ?? p.game, result: p.result, points: p.points, createdAt: p.createdAt })), wallet: w };
+  return { dayKey: day, games, weekPlays: plays.filter((p) => p.createdAt >= weekStart).length, recent: plays.slice(0, 10).map((p) => ({ game: META[p.game]?.title ?? p.game, result: p.result, points: p.points, createdAt: p.createdAt })), wallet: w };
 }
 
 async function assertLimit(userId: string, game: GamePlay["game"], day: string) {
@@ -128,6 +130,16 @@ export async function playRsp(userId: string, choice: "rock" | "paper" | "scisso
   const points = result === "win" ? 10 : result === "draw" ? 3 : 0;
   await record(userId, "rsp", day, result, points, `가위바위보 ${result === "win" ? "승" : result === "draw" ? "무" : "패"}`);
   return { ok: true as const, choice, cpu, result, points, left: GAME_LIMITS.rsp - n - 1, wallet: await wallet(userId) };
+}
+
+export const MEMORY_PAIRS = 8;
+export async function playMemory(userId: string, moves: number, seconds: number) {
+  const day = kstDayKey();
+  await assertLimit(userId, "memory", day);
+  if (moves < MEMORY_PAIRS || seconds < 5) throw new GameError("BAD_INPUT", "기록이 올바르지 않아요");
+  const points = moves <= 16 ? 15 : moves <= 24 ? 10 : 5;
+  await record(userId, "memory", day, `moves:${moves}/${seconds}s`, points, `카드 뒤집기 ${moves}회 ${seconds}초`);
+  return { ok: true as const, moves, seconds, points, wallet: await wallet(userId) };
 }
 
 export async function playScratch(userId: string) {
