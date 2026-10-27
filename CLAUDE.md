@@ -180,3 +180,8 @@
   - 틀린그림(`spotgen/v2/`): 기존 PIL 패치(hue/remove/flip)는 "포토샵 잘린 느낌" → **gpt-image 편집**(참조 이미지 + "정확히 이 n가지만 바꿔라")로 B컷 생성 후, 원본 A 위에 의도한 영역만 **링 정렬(±10px)·페더 타원 합성**(`compose3.py` 수동 좌표 / `compose4.py` 창 내 블롭 검출). 전체 재렌더 드리프트가 있어 영역 밖은 반드시 A 유지. 라운드: 1차 medium(0.5) 15장 → 실패분 2차 high(1.5) 13장 → 잔상 정리 3차 7장 → 대체 차이(깃발·우산·라떼 하트·시계줄 빨강) 4장. 합계 ≈ 42크레딧. 교훈: 모델은 "제거"보다 "색/모양 변경"을 훨씬 잘 지키고, 제거는 블러 잔상이 남기 쉬움 → 잔상은 주변 패치 클론(수평 이동)으로 덮되 다른 물체가 딸려오지 않는 방향 선택. 카툰 공원(park) 레벨은 복구 불가로 제외 → 15레벨(실사 8 + 일러 7). 좌표 `final_regions.json` → `export.py` → `lib/games/spotLevels.ts` + `public/games/spot/*` + QA용 `spotgen/levels_v2.json`(ops cx/cy).
   - QA: Playwright `qa/spotqa.js`(오늘 3레벨 전부 5/5 완주 확인) + `qa/v8.js` 전 화면 콘솔 에러 0·실패 요청 0.
 
+- 2026-10-27(24차): **"대기업 느낌" 듀오톤 아이콘 체계 + 보조 컬러 + 틀린그림 단계별 난이도** (커밋 7b6c1ff). 대표님: 3D 클레이 아이콘도 "대기업은 절대 안 씀", 주황 과다로 눈 아픔, 틀린그림은 갈수록 어렵게.
+  - `components/icons/duo.tsx`: 토스/네이버페이식 듀오톤 SVG 27종(`DuoName`) + `IconTile`(연한 타일 soft bg + deep stroke, `Tone` 9종 blue/green/violet/pink/teal/amber/orange/gray/navy). 라스터 아이콘(`/brand/*.webp`)은 홈 코인 더미·금·마스코트(보상 오버레이 small)만 잔존. 규칙: 리스트/퀵메뉴/카테고리는 IconTile, 히어로는 단색 그라디언트 + 워터마크 DuoIcon, 오렌지는 CTA·포인트 숫자에만.
+  - 토큰(`app/globals.css`): `--color-blue/-soft`, `green`, `violet`, `teal`, `amber`, `navy`. 히어로 재배색: 홈 블루 틴트 · 혜택 블루 · 월간 네이비 · 초대 핑크 · 매장 틸 · 러쉬 다크(영상 기준 유지).
+  - 틀린그림 난이도(`lib/games/service.ts SPOT_STAGES`): LV1 60초/오답 −5/차이당 3P/완주 +10/스피드 +5 → LV2 50/−7/4/+15/+8 → LV3 40/−10/5/+20/+12. 오늘 3레벨은 `spotLevelFor` 가 차이 반경 평균 큰 순(쉬움→어려움) 정렬. 서버 `missPenalty` 를 payload 로 내려 클라이언트가 사용, LV 칩에 제한 초 표시.
+  - QA: tsc·lint 0 경고·build, Playwright `qa/spotqa.js`(3레벨 5/5, 보상 30P/35P/45P 단계 확인) · `qa/v8.js` 전 화면 콘솔 에러 0·실패 요청 0, 갤러리 v9(60장) 아티팩트 갱신.
