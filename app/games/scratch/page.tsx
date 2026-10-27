@@ -5,7 +5,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
-import { Lottie } from "@/components/motion/Lottie";
 import { useToast } from "@/components/motion/Toast";
 import { haptic, sfx } from "@/lib/fx";
 import { burst, confetti } from "@/lib/fxEngine";
@@ -89,7 +88,7 @@ export default function ScratchPage() {
   const winIdx = new Set(ticket?.symbol ? ticket.grid.map((g, i) => (g === ticket.symbol ? i : -1)).filter((i) => i >= 0) : []);
 
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
+    <div className="min-h-dvh bg-[var(--color-bg)] pb-10 text-[#191f28]">
       <GameHeader title="복권 긁기" right={left === null ? null : <span>{left > 0 ? "오늘 1장" : "오늘 완료"}</span>} />
       <div className="flex flex-col items-center gap-4 px-5 pt-[64px]">
         <div className="relative w-full overflow-hidden rounded-[24px] p-4" style={{ background: "linear-gradient(135deg,#ffe9a8,#ffb86b 60%,#ff8a3d)", boxShadow: "0 10px 30px rgba(255,138,61,.35)" }}>
@@ -100,11 +99,11 @@ export default function ScratchPage() {
           <div className="relative mt-3 rounded-2xl bg-white p-3">
             <div className="grid grid-cols-3 gap-2">
               {(ticket?.grid ?? Array(9).fill("?")).map((g, i) => (
-                <div key={i} className={`flex aspect-square items-center justify-center rounded-xl text-[34px] ${revealed && winIdx.has(i) ? "bg-[#fff0b3] ring-2 ring-[#ff8a3d]" : "bg-[#f8f9fc]"}`}>{g === "?" ? <span className="text-[#c5cbd3]">?</span> : <Sym s={g} size={64} />}</div>
+                <div key={i} className={`flex aspect-square items-center justify-center rounded-xl text-[34px] ${revealed && winIdx.has(i) ? "bg-[var(--color-gold-soft)] ring-2 ring-[#ff8a3d]" : "bg-[var(--color-bg)]"}`}>{g === "?" ? <span className="text-[#c5cbd3]">?</span> : <Sym s={g} size={64} />}</div>
               ))}
             </div>
             {ticket && !revealed && <canvas ref={canvas} width={330} height={330} onPointerDown={(e) => { drawing.current = true; scratchAt(e); }} onPointerMove={(e) => { if (drawing.current || e.pointerType === "touch") scratchAt(e); }} onPointerUp={() => (drawing.current = false)} onPointerLeave={() => (drawing.current = false)} className="absolute inset-3 h-[calc(100%-24px)] w-[calc(100%-24px)] touch-none rounded-2xl" />}
-            {revealed && ticket && ticket.points > 0 && <div className="pointer-events-none absolute inset-0 flex items-center justify-center"><Lottie src="/myb/lottie_confetti_pop.json" className="h-[300px] w-[300px]" /></div>}
+            {revealed && ticket && ticket.points > 0 && <div className="pointer-events-none absolute inset-0 flex items-center justify-center"></div>}
           </div>
           <div className="mt-3 flex items-center justify-between px-1 text-[12px] font-bold text-[#7a3f00]">
             <span className="flex items-center gap-1"><Sym s="🍒" size={18} />5P <Sym s="🔔" size={18} />10P <Sym s="⭐" size={18} />50P <Sym s="💎" size={18} />500P</span>
@@ -113,7 +112,7 @@ export default function ScratchPage() {
         </div>
         {revealed && ticket && <p className={`text-[22px] font-extrabold ${ticket.points > 0 ? "text-[#ff8a3d]" : "text-[#8b94a0]"}`}>{ticket.points > 0 ? `${fmt(ticket.points)}P 당첨!` : "꽝 — 내일 또 도전"}</p>}
         {!ticket ? (
-          <button type="button" disabled={busy || left === 0} onClick={() => void buy()} className="myb-press h-[52px] w-full rounded-xl bg-[#427cff] text-[16px] font-bold text-white disabled:opacity-40">{left === 0 ? "오늘은 다 긁었어요" : "오늘의 복권 받기 (무료)"}</button>
+          <button type="button" disabled={busy || left === 0} onClick={() => void buy()} className="myb-press h-[52px] w-full rounded-xl bg-[var(--color-myb)] text-[16px] font-bold text-white disabled:opacity-40">{left === 0 ? "오늘은 다 긁었어요" : "오늘의 복권 받기 (무료)"}</button>
         ) : revealed ? (
           <button type="button" onClick={() => router.push("/games")} className="myb-press h-[52px] w-full rounded-xl bg-[#191f28] text-[16px] font-bold text-white">다른 게임 하러 가기</button>
         ) : null}

@@ -14,12 +14,12 @@ export default async function AdminStores() {
       <h1 className="text-[22px] font-bold">매장 미션 <span className="ml-2 text-[13px] font-medium text-[#8b94a0]">캐치랭크 제휴 매장 방문·저장·리뷰 → 포인트 + 스탬프</span></h1>
       <div className="overflow-x-auto rounded-2xl bg-white shadow-sm">
         <table className="w-full text-left text-[14px]">
-          <thead className="bg-[#f8f9fc] text-[12px] text-[#8b94a0]">
+          <thead className="bg-[var(--color-bg)] text-[12px] text-[#8b94a0]">
             <tr><th className="px-4 py-3">매장</th><th className="px-4 py-3">종류</th><th className="px-4 py-3">미션</th><th className="px-4 py-3">보상</th><th className="px-4 py-3">인증코드</th><th className="px-4 py-3">완료/정원</th><th className="px-4 py-3">상태</th></tr>
           </thead>
           <tbody>
             {missions.map((m) => (
-              <tr key={m.id} className="border-t border-[#f1f3f8]">
+              <tr key={m.id} className="border-t border-[var(--color-bg-2)]">
                 <td className="px-4 py-3">{m.storeName}</td>
                 <td className="px-4 py-3">{KIND_LABEL[m.kind]}</td>
                 <td className="px-4 py-3">{m.title}</td>
@@ -30,7 +30,7 @@ export default async function AdminStores() {
                   <form action={toggleStoreMissionAction} className="inline">
                     <input type="hidden" name="id" value={m.id} />
                     <input type="hidden" name="active" value={m.active ? "0" : "1"} />
-                    <button type="submit" className={`rounded-full px-3 py-1 text-[12px] font-semibold ${m.active ? "bg-[#e9f7ef] text-[#1aa260]" : "bg-[#f2f3f5] text-[#8b94a0]"}`}>{m.active ? "진행 중" : "중지"}</button>
+                    <button type="submit" className={`rounded-full px-3 py-1 text-[12px] font-semibold ${m.active ? "bg-[#e9f7ef] text-[#1aa260]" : "bg-[var(--color-bg-3)] text-[#8b94a0]"}`}>{m.active ? "진행 중" : "중지"}</button>
                   </form>
                 </td>
               </tr>

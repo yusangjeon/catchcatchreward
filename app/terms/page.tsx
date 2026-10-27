@@ -5,10 +5,10 @@ export default function TermsPage() {
   const h = "mt-5 text-[15px] font-bold";
   const p = "mt-2 text-[13px] leading-[21px] text-[#5c6573]";
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
+    <div className="min-h-dvh bg-[var(--color-bg)] pb-10 text-[#191f28]">
       <GameHeader title="약관 · 개인정보" />
       <div className="px-5 pt-[64px]">
-        <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
+        <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           <h2 className="text-[17px] font-extrabold">이용약관 (베타)</h2>
           <h3 className={h}>1. 서비스</h3><p className={p}>캐치캐치리워드(이하 서비스)는 엠플리파이가 운영하는 리워드 서비스로, 퀴즈·미션·게임 참여에 따라 포인트를 지급합니다. 베타 기간 중 기능과 보상 정책은 사전 고지 후 변경될 수 있습니다.</p>
           <h3 className={h}>2. 포인트</h3><p className={p}>포인트는 서비스 내 교환에만 사용할 수 있으며 현금으로 지급되지 않습니다. 최소 교환 단위, 상품 종류, 처리 기간은 교환 화면에 표시된 기준을 따릅니다. 마지막 이용일로부터 1년간 이용이 없으면 포인트가 소멸될 수 있습니다.</p>

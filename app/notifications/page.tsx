@@ -9,7 +9,7 @@ import { PushToggle } from "@/components/PushToggle";
 /* eslint-disable @next/next/no-img-element */
 
 const ICON: Record<Notice["kind"], string> = {
-  rush: "/myb/bh/img_stamp.webp", redeem: "/myb/native/ic_gift_blue.png", referral: "/myb/native/qm_invite.png", honey: "/myb/native/ic_honey_jar.png", attendance: "/myb/native/qm_attend.png", roulette: "/myb/native/qm_minigame.png",
+  rush: "/brand/stamp.webp", redeem: "/brand/qm_roulette.webp", referral: "/brand/qm_invite.webp", honey: "/brand/qm_honey.webp", attendance: "/brand/qm_attend.webp", roulette: "/brand/qm_games.webp",
 };
 
 /** 알림 — 홈 종 아이콘. 상태에서 파생된 할 일·소식 */
@@ -20,10 +20,10 @@ export default function NotificationsPage() {
     fetch("/api/notifications", { cache: "no-store" }).then((r) => r.json()).then(setData).catch(() => setData({ notices: [] }));
   }, []);
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
-      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center bg-[#f8f9fc] px-6">
+    <div className="min-h-dvh bg-[var(--color-bg)] pb-10 text-[#191f28]">
+      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center bg-[var(--color-bg)] px-6">
         <button type="button" onClick={() => router.back()} aria-label="뒤로" className="flex h-7 w-7 items-center justify-center">
-          <img src="/myb/shop/ic_left.png" width={28} height={28} alt="" className="h-7 w-7" />
+          <img src="/brand/ic_left.svg" width={28} height={28} alt="" className="h-7 w-7" />
         </button>
         <h1 className="flex-1 text-center text-[18px] font-semibold">알림</h1>
         <span className="w-7" />
@@ -32,8 +32,8 @@ export default function NotificationsPage() {
       <ul className="flex flex-col gap-2 px-6 pt-3">
         {(data?.notices ?? []).map((n) => (
           <li key={n.id}>
-            <Link href={n.href} className="flex items-center gap-3 rounded-[16px] bg-white px-4 py-[14px]" style={{ boxShadow: "0 2px 10px 0 rgba(0, 43, 141, 0.06)" }}>
-              <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f0f4ff]">
+            <Link href={n.href} className="flex items-center gap-3 rounded-[16px] bg-white px-4 py-[14px]" style={{ boxShadow: "0 2px 10px 0 rgba(40, 24, 14, 0.06)" }}>
+              <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-myb-soft)]">
                 <img src={ICON[n.kind]} width={28} height={28} alt="" className="h-7 w-7 object-contain" />
                 {n.action && <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#ff3939] ring-2 ring-white" />}
               </span>

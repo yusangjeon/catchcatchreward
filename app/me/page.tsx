@@ -40,15 +40,15 @@ function MeView() {
   }, [params, show]);
   const me = data?.me;
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
-      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center bg-[#f8f9fc] px-6">
-        <button type="button" onClick={() => router.back()} aria-label="뒤로" className="flex h-7 w-7 items-center justify-center"><img src="/myb/shop/ic_left.png" width={28} height={28} alt="" className="h-7 w-7" /></button>
+    <div className="min-h-dvh bg-[var(--color-bg)] pb-10 text-[#191f28]">
+      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center bg-[var(--color-bg)] px-6">
+        <button type="button" onClick={() => router.back()} aria-label="뒤로" className="flex h-7 w-7 items-center justify-center"><img src="/brand/ic_left.svg" width={28} height={28} alt="" className="h-7 w-7" /></button>
         <h1 className="flex-1 text-center text-[18px] font-semibold">MY</h1>
         <span className="w-7" />
       </header>
       <div className="flex flex-col gap-4 px-6 pt-[64px]">
-        <section className="flex items-center gap-4 rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
-          {me?.avatarUrl ? <img src={me.avatarUrl} alt="" className="h-14 w-14 rounded-full object-cover" /> : <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#f0f4ff] text-[26px]">🙂</span>}
+        <section className="flex items-center gap-4 rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
+          {me?.avatarUrl ? <img src={me.avatarUrl} alt="" className="h-14 w-14 rounded-full object-cover" /> : <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-myb-soft)] text-[26px]">🙂</span>}
           <div className="min-w-0 flex-1">
             <p className="truncate text-[18px] font-bold">{me?.loggedIn ? me.nickname ?? "회원" : "게스트"}</p>
             <p className="mt-0.5 text-[12px] text-[#8b94a0]">{me?.loggedIn ? `${me.provider === "kakao" ? "카카오" : "테스트"} 계정 연결됨` : "로그인하면 폰을 바꿔도 포인트가 이어져요"}</p>
@@ -59,14 +59,14 @@ function MeView() {
             <Link href="/login" className="rounded-lg bg-[#FEE500] px-3 py-2 text-[12px] font-bold text-[#191600]">로그인</Link>
           )}
         </section>
-        <section className="grid grid-cols-3 divide-x divide-[#eef0f4] rounded-[20px] bg-white p-4 text-center" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
-          <div><p className="text-[12px] text-[#8b94a0]">B포인트</p><p className="mt-1 flex items-center justify-center gap-1 text-[18px] font-bold"><PCoin size={16} />{fmt(data?.wallet.balance ?? 0)}</p></div>
+        <section className="grid grid-cols-3 divide-x divide-[#eef0f4] rounded-[20px] bg-white p-4 text-center" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
+          <div><p className="text-[12px] text-[#8b94a0]">포인트</p><p className="mt-1 flex items-center justify-center gap-1 text-[18px] font-bold"><PCoin size={16} />{fmt(data?.wallet.balance ?? 0)}</p></div>
           <div><p className="text-[12px] text-[#8b94a0]">스탬프</p><p className="mt-1 text-[18px] font-bold">{data?.wallet.stamps ?? 0}</p></div>
           <div><p className="text-[12px] text-[#8b94a0]">배지</p><p className="mt-1 text-[18px] font-bold">{data?.badges.length ?? 0}</p></div>
         </section>
-        <ul className="overflow-hidden rounded-[20px] bg-white" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
+        <ul className="overflow-hidden rounded-[20px] bg-white" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           {MENU.map((m) => (
-            <li key={m.href} className="border-b border-[#f1f3f8] last:border-0">
+            <li key={m.href} className="border-b border-[var(--color-bg-2)] last:border-0">
               <Link href={m.href} className="flex h-[52px] items-center gap-3 px-5 text-[15px]"><span className="text-[18px]">{m.icon}</span><span className="flex-1">{m.label}</span><span className="text-[#b0b8c1]">›</span></Link>
             </li>
           ))}

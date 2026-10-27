@@ -26,7 +26,7 @@ export async function getNotifications(userId: string): Promise<{ notices: Notic
   ]);
   const now = new Date().toISOString();
   const notices: Notice[] = [];
-  if (rush.claimable > 0) notices.push({ id: "rush", kind: "rush", title: `러쉬 보상 ${rush.claimable}개를 받을 수 있어요`, body: "비포인트 러쉬에서 보상받기를 누르면 포인트와 스탬프가 적립돼요", href: "/rush", at: now, action: true });
+  if (rush.claimable > 0) notices.push({ id: "rush", kind: "rush", title: `러쉬 보상 ${rush.claimable}개를 받을 수 있어요`, body: "캐치 러쉬에서 보상받기를 누르면 포인트와 스탬프가 적립돼요", href: "/rush", at: now, action: true });
   if (monthly.claimable > 0) notices.push({ id: "monthly", kind: "rush", title: `월간 도전 과제 보상 ${monthly.claimable}개 달성!`, body: "월간 도전 과제에서 받기를 누르면 포인트가 적립돼요", href: "/monthly", at: now, action: true });
   if (newbie.claimableCount > 0) notices.push({ id: "newbie", kind: "rush", title: "3일 혜택 보상을 받을 수 있어요", body: "오늘 퀴즈 3개를 다 풀었어요. 일차 보상을 받아가세요", href: "/newbie", at: now, action: true });
   if (!attended) notices.push({ id: "attend", kind: "attendance", title: "오늘 출석체크를 아직 안 했어요", body: "10P와 스탬프 1개를 바로 받을 수 있어요", href: "/", at: now, action: true });

@@ -27,15 +27,15 @@ export function Rate({ m, suffix = "% 적립" }: { m: Merchant; suffix?: string 
 }
 
 /**
- * 전체 쇼핑몰·추천 카드 — 167×126(그리드) / 160×126(가로 스크롤). white r12 padding 18 16 gap 12 border #f2f3f5
+ * 전체 쇼핑몰·추천 카드 — 167×126(그리드) / 160×126(가로 스크롤). white r12 padding 18 16 gap 12 border var(--color-bg-3)
  * @param shadow 추천 영역(r14, 그림자, padding 16)
  */
 export function MerchantCard({ m, width, shadow = false, suffix }: { m: Merchant; width?: number; shadow?: boolean; suffix?: string }) {
   return (
     <Link
       href={`/shop/${m.id}`}
-      className={`myb-press relative flex shrink-0 flex-col gap-3 border border-[#f2f3f5] bg-white ${shadow ? "rounded-[14px] p-4" : "rounded-xl px-4 py-[18px]"}`}
-      style={{ width, boxShadow: shadow ? "0 5px 16px 0 rgba(0, 43, 141, 0.1)" : undefined }}
+      className={`myb-press relative flex shrink-0 flex-col gap-3 border border-[var(--color-bg-3)] bg-white ${shadow ? "rounded-[14px] p-4" : "rounded-xl px-4 py-[18px]"}`}
+      style={{ width, boxShadow: shadow ? "0 5px 16px 0 rgba(40, 24, 14, 0.09)" : undefined }}
     >
       {m.isNew && <NewTag />}
       <div className="flex h-8 items-center justify-center">

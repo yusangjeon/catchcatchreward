@@ -23,11 +23,11 @@ const NAV = [
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const authed = await isAdmin();
   return (
-    <div className="min-h-dvh bg-[#f4f6fa] text-[#191f28]">
+    <div className="min-h-dvh bg-[var(--color-bg-2)] text-[#191f28]">
       <header className="border-b border-[#e3e8f0] bg-white">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-5">
           <div className="flex items-center gap-6">
-            <Link href="/admin" className="text-[16px] font-bold">캐치캐치리워드 <span className="text-[#427cff]">관리자</span></Link>
+            <Link href="/admin" className="text-[16px] font-bold">캐치캐치리워드 <span className="text-[var(--color-myb)]">관리자</span></Link>
             {authed && (
               <nav className="hidden gap-4 text-[14px] text-[#5c6573] md:flex">
                 {NAV.map((n) => <Link key={n.href} href={n.href} className="hover:text-[#191f28]">{n.label}</Link>)}
@@ -35,7 +35,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             )}
           </div>
           <div className="flex items-center gap-3 text-[12px] text-[#8b94a0]">
-            <span className="rounded-full bg-[#f0f4ff] px-2 py-1 text-[#427cff]">저장소: {repoKind()}</span>
+            <span className="rounded-full bg-[var(--color-myb-soft)] px-2 py-1 text-[var(--color-myb)]">저장소: {repoKind()}</span>
             {!adminEnabled() && <span className="text-[#ff3939]">ADMIN_KEY 미설정</span>}
             {authed && process.env.ADMIN_KEY && (
               <form action={logoutAction}><button type="submit" className="rounded-lg border border-[#dee2e9] px-3 py-1.5 text-[#5c6573]">로그아웃</button></form>

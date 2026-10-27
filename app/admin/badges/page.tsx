@@ -10,12 +10,12 @@ export default async function AdminBadges() {
       <h1 className="text-[22px] font-bold">취향 배지 · 유저 세그먼트</h1>
       <div className="overflow-x-auto rounded-2xl bg-white shadow-sm">
         <table className="w-full text-left text-[14px]">
-          <thead className="bg-[#f8f9fc] text-[12px] text-[#8b94a0]"><tr><th className="px-4 py-3">배지</th><th className="px-4 py-3">코드</th><th className="px-4 py-3">규칙</th><th className="px-4 py-3">보유 유저</th><th className="px-4 py-3">비율</th></tr></thead>
+          <thead className="bg-[var(--color-bg)] text-[12px] text-[#8b94a0]"><tr><th className="px-4 py-3">배지</th><th className="px-4 py-3">코드</th><th className="px-4 py-3">규칙</th><th className="px-4 py-3">보유 유저</th><th className="px-4 py-3">비율</th></tr></thead>
           <tbody>
             {badges.map((b) => {
               const n = counts[b.code] ?? 0;
               return (
-                <tr key={b.code} className="border-t border-[#f1f3f8]">
+                <tr key={b.code} className="border-t border-[var(--color-bg-2)]">
                   <td className="px-4 py-3">{b.emoji} {b.name}</td>
                   <td className="px-4 py-3 font-mono text-[12px] text-[#5c6573]">{b.code}</td>
                   <td className="px-4 py-3 text-[#5c6573]">태그 <code>{b.rule.tag}</code> ≥ {b.rule.min}</td>

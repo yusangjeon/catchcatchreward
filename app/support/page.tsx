@@ -10,17 +10,17 @@ const FAQ = [
 
 export default function SupportPage() {
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
+    <div className="min-h-dvh bg-[var(--color-bg)] pb-10 text-[#191f28]">
       <GameHeader title="고객센터" />
       <div className="flex flex-col gap-4 px-5 pt-[64px]">
-        <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
+        <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           <h2 className="text-[15px] font-bold">문의하기</h2>
           <p className="mt-2 text-[13px] leading-[20px] text-[#5c6573]">이메일 <b className="select-all text-[#191f28]">amplify15813@gmail.com</b><br />운영시간 평일 10:00~18:00 (주말·공휴일 제외)</p>
           <a href="mailto:amplify15813@gmail.com?subject=[캐치캐치리워드] 문의" className="mt-3 inline-flex h-10 items-center rounded-lg bg-[#191f28] px-4 text-[13px] font-bold text-white">이메일 보내기</a>
         </section>
-        <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
+        <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           <h2 className="text-[15px] font-bold">자주 묻는 질문</h2>
-          <ul className="mt-2 divide-y divide-[#f1f3f8]">
+          <ul className="mt-2 divide-y divide-[var(--color-bg-2)]">
             {FAQ.map(([q, a]) => (
               <li key={q} className="py-3"><details><summary className="cursor-pointer text-[14px] font-semibold">{q}</summary><p className="mt-2 text-[13px] leading-[20px] text-[#5c6573]">{a}</p></details></li>
             ))}

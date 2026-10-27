@@ -9,7 +9,7 @@ import type { GamesPayload } from "@/lib/games/service";
 
 type Grid = number[][];
 const N = 4;
-const COLOR: Record<number, string> = { 2: "#eef2ff", 4: "#dbe4ff", 8: "#ffd6a5", 16: "#ffb86b", 32: "#ff9b5c", 64: "#ff7a45", 128: "#ffe08a", 256: "#ffd84a", 512: "#ffcc1a", 1024: "#ffc400", 2048: "#427cff" };
+const COLOR: Record<number, string> = { 2: "#eef2ff", 4: "#dbe4ff", 8: "#ffd6a5", 16: "#ffb86b", 32: "#ff9b5c", 64: "#ff7a45", 128: "#ffe08a", 256: "#ffd84a", 512: "#ffcc1a", 1024: "#ffc400", 2048: "var(--color-myb)" };
 
 function empty(): Grid { return Array.from({ length: N }, () => Array(N).fill(0)); }
 function addTile(g: Grid): Grid {
@@ -90,11 +90,11 @@ export default function SlidePage() {
   function reset() { setGrid(addTile(addTile(empty()))); setScore(0); setOver(false); }
 
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
+    <div className="min-h-dvh bg-[var(--color-bg)] pb-10 text-[#191f28]">
       <GameHeader title="2048 퍼즐" right={left === null ? null : <span>{left > 0 ? "오늘 1회 보상" : "보상 완료"}</span>} />
       <div className="flex flex-col gap-4 px-5 pt-[64px]">
         <div className="grid grid-cols-3 gap-2 text-center">
-          {[["점수", fmt(score)], ["최고 타일", fmt(maxTile)], ["최고 기록", fmt(best)]].map(([k, v]) => <div key={k} className="rounded-xl bg-white py-2" style={{ boxShadow: "0 2px 8px rgba(0,43,141,.06)" }}><p className="text-[11px] text-[#8b94a0]">{k}</p><p className="text-[18px] font-extrabold tabular-nums">{v}</p></div>)}
+          {[["점수", fmt(score)], ["최고 타일", fmt(maxTile)], ["최고 기록", fmt(best)]].map(([k, v]) => <div key={k} className="rounded-xl bg-white py-2" style={{ boxShadow: "0 2px 8px rgba(40,24,14,.06)" }}><p className="text-[11px] text-[#8b94a0]">{k}</p><p className="text-[18px] font-extrabold tabular-nums">{v}</p></div>)}
         </div>
         <div
           className="relative select-none rounded-2xl bg-[#bbc3d4] p-2 touch-none"
@@ -110,10 +110,10 @@ export default function SlidePage() {
         </div>
         <div className="grid grid-cols-2 gap-2">
           <button type="button" onClick={reset} className="myb-press h-12 rounded-xl border border-[#dee2e9] bg-white text-[14px] font-bold">새 게임</button>
-          <button type="button" disabled={!!submitted || left === 0 || score === 0} onClick={() => void submit()} className="myb-press h-12 rounded-xl bg-[#427cff] text-[14px] font-bold text-white disabled:opacity-40">{submitted ? `+${fmt(submitted.points)}P 받음` : "기록 제출하고 보상"}</button>
+          <button type="button" disabled={!!submitted || left === 0 || score === 0} onClick={() => void submit()} className="myb-press h-12 rounded-xl bg-[var(--color-myb)] text-[14px] font-bold text-white disabled:opacity-40">{submitted ? `+${fmt(submitted.points)}P 받음` : "기록 제출하고 보상"}</button>
         </div>
         <p className="text-[12px] text-[#8b94a0]">스와이프(또는 방향키)로 같은 숫자를 합치세요. 보상: 1024 타일·1만점 50P · 512·5천점 30P · 256·2천점 15P · 그 외 5P. 하루 1회.</p>
-        <button type="button" onClick={() => router.push("/games")} className="text-center text-[13px] text-[#427cff]">다른 게임 보기 →</button>
+        <button type="button" onClick={() => router.push("/games")} className="text-center text-[13px] text-[var(--color-myb)]">다른 게임 보기 →</button>
       </div>
     </div>
   );

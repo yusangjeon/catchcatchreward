@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PCoin } from "@/components/icons";
-import { Lottie } from "@/components/motion/Lottie";
 import { haptic, sfx } from "@/lib/fx";
 import { burst, confetti } from "@/lib/fxEngine";
+import { showReward } from "@/lib/reward";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { useToast } from "@/components/motion/Toast";
 import { fmt } from "@/hooks/useHome";
@@ -16,9 +16,9 @@ import type { PublicPrize, RoulettePayload, SpinResult } from "@/lib/roulette/ty
 
 /**
  * 룰렛 — 스탬프 10개 = 1회. 결과는 서버(/api/roulette/spin)가 정하고, 휠은 그 조각으로 멈추는 연출만 한다.
- * 톤: 마이비 벤핏허브(헤더 48, bg #f8f9fc, 카드 r20, #427cff). 휠 300px SVG, 5바퀴 + 조각 중앙, 4.2s cubic-bezier(0.17,0.67,0.12,1).
+ * 톤: 마이비 벤핏허브(헤더 48, bg var(--color-bg), 카드 r20, var(--color-myb)). 휠 300px SVG, 5바퀴 + 조각 중앙, 4.2s cubic-bezier(0.17,0.67,0.12,1).
  */
-const SEG_COLORS = ["#427cff", "#6ea0ff", "#2f5fd6", "#8bb3ff", "#1d4fc4", "#b5cdff"];
+const SEG_COLORS = ["var(--color-myb)", "var(--color-myb-line)", "#2f5fd6", "#8bb3ff", "#1d4fc4", "#b5cdff"];
 const WHEEL = 300;
 const SPIN_MS = 4200;
 
@@ -59,10 +59,11 @@ export default function RoulettePage() {
       const target = turns.current * 360 - (r.index * seg + seg / 2);
       setDeg(target);
       setTimeout(() => {
-        setResult(r);
         setSpinning(false);
-        if (r.prize.kind === "none") { haptic("warn"); sfx("lose"); } else { haptic("jackpot"); sfx("win"); confetti(200); burst("coins", window.innerWidth / 2, window.innerHeight / 2); burst("stars", window.innerWidth / 2, window.innerHeight / 2 - 40); }
-        if (r.prize.kind !== "none") show(r.prize.kind === "points" ? `${fmt(r.prize.value)}P를 받았어요!` : `${r.prize.name} 당첨!`);
+        if (r.prize.kind === "none") { haptic("warn"); sfx("lose"); setResult(r); }
+        else if (r.prize.kind === "points") { void showReward({ variant: "big", points: r.prize.value, to: r.wallet.balance, title: "룰렛 당첨!", subtitle: "축하해요! 포인트가 적립됐어요 🎉" }).then(() => { setResult(r); burst("stars", window.innerWidth / 2, window.innerHeight / 2 - 40); show(`${fmt(r.prize.value)}P를 받았어요!`); }); }
+        else { haptic("jackpot"); sfx("win"); confetti(200); burst("coins", window.innerWidth / 2, window.innerHeight / 2); burst("stars", window.innerWidth / 2, window.innerHeight / 2 - 40); setResult(r); }
+        if (r.prize.kind === "gifticon") show(`${r.prize.name} 당첨!`);
         setData((d) => (d ? { ...d, stamps: r.wallet.stamps, canSpin: r.wallet.stamps >= d.needed, wallet: r.wallet } : d));
         void load();
       }, SPIN_MS + 100);
@@ -73,10 +74,10 @@ export default function RoulettePage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
-      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center justify-between bg-[#f8f9fc] px-6">
+    <div className="min-h-dvh bg-[var(--color-bg)] pb-10 text-[#191f28]">
+      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center justify-between bg-[var(--color-bg)] px-6">
         <button type="button" onClick={() => router.back()} aria-label="뒤로" className="flex h-7 w-7 items-center justify-center">
-          <img src="/myb/shop/ic_left.png" width={28} height={28} alt="" className="h-7 w-7" />
+          <img src="/brand/ic_left.svg" width={28} height={28} alt="" className="h-7 w-7" />
         </button>
         <h1 className="text-[18px] font-semibold text-[#191f28]">무료 룰렛</h1>
         <Link href="/wallet" className="flex items-center gap-[6px]">
@@ -87,22 +88,22 @@ export default function RoulettePage() {
 
       <div className="flex flex-col gap-6 px-6 pt-[64px]">
         {/* 스탬프 카드 */}
-        <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
+        <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           <div className="flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-[16px] font-semibold">
-              <img src="/myb/bh/img_stamp.webp" width={24} height={24} alt="" className="h-6 w-6" />
+              <img src="/brand/stamp.webp" width={24} height={24} alt="" className="h-6 w-6" />
               내 스탬프
             </h2>
             <span className="text-[14px] font-medium text-[#5c6573]">
-              <b className="text-[18px] font-bold text-[#427cff]">{data?.stamps ?? 0}</b> / {data?.needed ?? 10}
+              <b className="text-[18px] font-bold text-[var(--color-myb)]">{data?.stamps ?? 0}</b> / {data?.needed ?? 10}
             </span>
           </div>
           <div className="mt-4 grid grid-cols-5 gap-2">
             {Array.from({ length: data?.needed ?? 10 }).map((_, i) => {
               const filled = i < Math.min(data?.stamps ?? 0, data?.needed ?? 10);
               return (
-                <span key={i} className={`flex aspect-square items-center justify-center rounded-full border ${filled ? "border-[#ffb3d9] bg-[#fff0f7]" : "border-dashed border-[#dee2e9] bg-[#f8f9fc]"}`}>
-                  {filled ? <img src="/myb/bh/img_stamp.webp" width={28} height={28} alt="" className="myb-pop-in h-7 w-7" /> : <span className="text-[12px] font-medium text-[#b0b8c1]">{i + 1}</span>}
+                <span key={i} className={`flex aspect-square items-center justify-center rounded-full border ${filled ? "border-[#ffb3d9] bg-[var(--color-myb-soft)]" : "border-dashed border-[#dee2e9] bg-[var(--color-bg)]"}`}>
+                  {filled ? <img src="/brand/stamp.webp" width={28} height={28} alt="" className="myb-pop-in h-7 w-7" /> : <span className="text-[12px] font-medium text-[#b0b8c1]">{i + 1}</span>}
                 </span>
               );
             })}
@@ -156,20 +157,20 @@ export default function RoulettePage() {
             type="button"
             onClick={() => void onSpin()}
             disabled={!data || spinning}
-            className={`myb-press mt-6 flex h-[52px] w-full items-center justify-center gap-2 rounded-xl text-[16px] font-bold text-white transition ${!data || spinning ? "bg-[#a9c3ff]" : data.canSpin ? "bg-[#427cff]" : "bg-[#ced5e0]"}`}
+            className={`myb-press mt-6 flex h-[52px] w-full items-center justify-center gap-2 rounded-xl text-[16px] font-bold text-white transition ${!data || spinning ? "bg-[var(--color-myb-line)]" : data.canSpin ? "bg-[var(--color-myb)]" : "bg-[#ced5e0]"}`}
           >
             {spinning ? "돌아가는 중…" : data?.canSpin ? "룰렛 돌리기 (스탬프 10개 사용)" : `스탬프 ${Math.max(0, (data?.needed ?? 10) - (data?.stamps ?? 0))}개 더 모으면 돌릴 수 있어요`}
           </button>
           {error && <p className="mt-2 text-[13px] text-[#ff3939]">{error}</p>}
           {!data?.canSpin && !spinning && (
-            <Link href="/quiz" className="mt-3 text-[14px] font-medium text-[#427cff]">퀴즈 풀고 스탬프 모으기 →</Link>
+            <Link href="/quiz" className="mt-3 text-[14px] font-medium text-[var(--color-myb)]">퀴즈 풀고 스탬프 모으기 →</Link>
           )}
         </section>
 
         {/* 경품·확률 */}
         <section className="rounded-[20px] bg-white p-5">
           <h2 className="text-[16px] font-semibold">경품과 당첨 확률</h2>
-          <ul className="mt-3 flex flex-col divide-y divide-[#f1f3f8]">
+          <ul className="mt-3 flex flex-col divide-y divide-[var(--color-bg-2)]">
             {prizes.map((p, i) => (
               <li key={p.id} className="flex items-center justify-between py-3 text-[14px]">
                 <span className="flex items-center gap-2">
@@ -206,17 +207,17 @@ export default function RoulettePage() {
             <div className="myb-modal-in pointer-events-auto relative w-full max-w-[342px] overflow-hidden rounded-[26px] bg-white px-6 pb-6 pt-8 text-center">
               {result.prize.kind !== "none" && (
                 <div className="pointer-events-none absolute left-1/2 top-0 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/4">
-                  <Lottie src="/myb/lottie_confetti_pop.json" className="h-full w-full" />
+                  
                 </div>
               )}
-              <img src={result.prize.kind === "none" ? "/myb/bh/img_thumb_up_01.webp" : "/myb/bh/img_points_group.webp"} alt="" width={120} height={120} className="myb-pop-in myb-float relative mx-auto h-[120px] w-[120px] object-contain" />
+              <img src={result.prize.kind === "none" ? "/brand/mascot_5.webp" : "/brand/coins.webp"} alt="" width={120} height={120} className="myb-pop-in myb-float relative mx-auto h-[120px] w-[120px] object-contain" />
               <p className="relative mt-4 text-[20px] font-bold">{result.prize.kind === "none" ? "아쉬워요, 다음 기회에!" : "축하해요! 당첨됐어요 🎉"}</p>
-              <p className="relative mt-2 flex items-center justify-center gap-1.5 text-[26px] font-extrabold text-[#427cff]">
+              <p className="relative mt-2 flex items-center justify-center gap-1.5 text-[26px] font-extrabold text-[var(--color-myb)]">
                 {result.prize.kind === "points" && <PCoin size={26} />}
                 {result.prize.kind === "points" ? `+${fmt(result.prize.value)}` : result.prize.name}
               </p>
               {result.prize.kind === "gifticon" && <p className="mt-1 text-[13px] text-[#5c6573]">기프티콘은 영업일 3일 내 발송돼요.</p>}
-              <button type="button" onClick={() => setResult(null)} className="myb-press mt-6 h-[52px] w-full rounded-xl bg-[#427cff] text-[16px] font-bold text-white">확인</button>
+              <button type="button" onClick={() => setResult(null)} className="myb-press mt-6 h-[52px] w-full rounded-xl bg-[var(--color-myb)] text-[16px] font-bold text-white">확인</button>
             </div>
           </div>
         </>

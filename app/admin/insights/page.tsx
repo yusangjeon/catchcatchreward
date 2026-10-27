@@ -45,17 +45,17 @@ export default async function AdminInsights() {
         <p className="mt-1 text-[12px] text-[#8b94a0]">세그먼트 = 배지 보유 유저. &ldquo;함께 강한 취향&rdquo;은 그 유저들이 같이 고른 태그 상위 4개(유저 수 기준). 타깃 퀴즈·광고 상품 단위.</p>
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-left text-[14px]">
-            <thead className="bg-[#f8f9fc] text-[12px] text-[#8b94a0]"><tr><th className="px-3 py-2">배지</th><th className="px-3 py-2">유저</th><th className="px-3 py-2">전체 대비</th><th className="px-3 py-2">함께 강한 취향</th><th className="px-3 py-2">액션</th></tr></thead>
+            <thead className="bg-[var(--color-bg)] text-[12px] text-[#8b94a0]"><tr><th className="px-3 py-2">배지</th><th className="px-3 py-2">유저</th><th className="px-3 py-2">전체 대비</th><th className="px-3 py-2">함께 강한 취향</th><th className="px-3 py-2">액션</th></tr></thead>
             <tbody>
               {segments.map(({ b, n, top }) => (
-                <tr key={b.code} className="border-t border-[#f1f3f8]">
+                <tr key={b.code} className="border-t border-[var(--color-bg-2)]">
                   <td className="px-3 py-2">{b.emoji} {b.name} <span className="text-[11px] text-[#b0b8c1]">{b.code}</span></td>
                   <td className="px-3 py-2 tabular-nums font-semibold">{fmt(n)}</td>
                   <td className="px-3 py-2">
-                    <div className="flex items-center gap-2"><div className="h-2 w-28 overflow-hidden rounded-full bg-[#eef0f4]"><div className="h-full rounded-full bg-[#427cff]" style={{ width: pct(n, totalUsers) }} /></div><span className="tabular-nums text-[12px] text-[#5c6573]">{pct(n, totalUsers)}</span></div>
+                    <div className="flex items-center gap-2"><div className="h-2 w-28 overflow-hidden rounded-full bg-[#eef0f4]"><div className="h-full rounded-full bg-[var(--color-myb)]" style={{ width: pct(n, totalUsers) }} /></div><span className="tabular-nums text-[12px] text-[#5c6573]">{pct(n, totalUsers)}</span></div>
                   </td>
-                  <td className="px-3 py-2 text-[12px]">{top.length ? top.map(([tag, c]) => <span key={tag} className="mr-1 inline-block rounded-full bg-[#f0f4ff] px-2 py-0.5 text-[#427cff]">{tag} {pct(c, n)}</span>) : <span className="text-[#b0b8c1]">-</span>}</td>
-                  <td className="px-3 py-2 text-[12px]"><Link href="/admin/quizzes" className="text-[#427cff]">타깃 퀴즈 등록 →</Link></td>
+                  <td className="px-3 py-2 text-[12px]">{top.length ? top.map(([tag, c]) => <span key={tag} className="mr-1 inline-block rounded-full bg-[var(--color-myb-soft)] px-2 py-0.5 text-[var(--color-myb)]">{tag} {pct(c, n)}</span>) : <span className="text-[#b0b8c1]">-</span>}</td>
+                  <td className="px-3 py-2 text-[12px]"><Link href="/admin/quizzes" className="text-[var(--color-myb)]">타깃 퀴즈 등록 →</Link></td>
                 </tr>
               ))}
             </tbody>
@@ -70,7 +70,7 @@ export default async function AdminInsights() {
           {topTags.map(([tag, total]) => (
             <li key={tag} className="flex items-center gap-3 text-[13px]">
               <span className="w-28 shrink-0 font-mono text-[12px]">{tag}</span>
-              <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-[#eef0f4]"><div className="h-full rounded-full bg-[#9fbcff]" style={{ width: `${Math.round((total / maxTag) * 100)}%` }} /></div>
+              <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-[#eef0f4]"><div className="h-full rounded-full bg-[var(--color-myb-line)]" style={{ width: `${Math.round((total / maxTag) * 100)}%` }} /></div>
               <span className="w-24 shrink-0 text-right tabular-nums text-[#5c6573]">{fmt(total)} <span className="text-[11px] text-[#b0b8c1]">({pct(tagUsers.get(tag) ?? 0, respondents)})</span></span>
             </li>
           ))}

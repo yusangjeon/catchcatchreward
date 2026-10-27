@@ -5,36 +5,41 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHome, fmt } from "@/hooks/useHome";
 import { useToast } from "@/components/motion/Toast";
-import { haptic, sfx } from "@/lib/fx";
 import { burstAtPointer, confetti, flyToBalance } from "@/lib/fxEngine";
+import { showReward } from "@/lib/reward";
 import { ChevronRight, PCoin } from "@/components/icons";
 import { SetCard } from "@/components/SetCard";
-import { Banners } from "@/components/motion/Banners";
+import { Banners, type BannerSlide } from "@/components/motion/Banners";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 
 /* eslint-disable @next/next/no-img-element */
 
-/** 마이비 reward-banner 원본(327×72) — upload.myb.im 캡처본 */
-const BANNERS = ["/myb/up/2025-12-19T03_30_12.125Z_banner.webp", "/myb/up/2025-12-29T08_07_33.114Z_133.webp", "/myb/up/2025-12-29T08_07_50.926Z_banner.webp", "/myb/up/2026-02-11T05-23-58.433Z_2509_myb_quizpass-banner_v1_327x72.webp", "/myb/up/2026-04-24T07-33-12.788Z_2604_myb_manboki-banner_v1_327x72-1.webp", "/myb/up/2026-04-24T07-33-32.380Z_2604_myb_manboki-banner_v1_327x72.webp", "/myb/up/2026-04-27T01-55-48.943Z_2604_myb_manboki-banner_v1_327x72.webp"];
+/** 홈 하단 롤링 배너 */
+const BANNERS: BannerSlide[] = [
+  { title: "친구 초대하고 500P", sub: "친구는 300P, 나는 첫 퀴즈 완료 시 500P", img: "/brand/qm_invite.webp", href: "/invite", bg: "linear-gradient(90deg,#fff0ea,#ffe1d4)" },
+  { title: "스탬프 10개 = 무료 룰렛", sub: "미션마다 스탬프, 최대 5,000원 편의점 상품권", img: "/brand/qm_roulette.webp", href: "/roulette", bg: "linear-gradient(90deg,#fff4d6,#ffe9b3)" },
+  { title: "월간 도전 과제 최대 3,300P", sub: "이번 달 퀴즈·출석·게임 다 채우면", img: "/brand/trophy.webp", href: "/monthly", bg: "linear-gradient(90deg,#ff5a2d,#ff8a5c)", dark: true },
+  { title: "틀린그림찾기 하루 3판", sub: "차이 하나에 3P, 완주 +10P, 30초 안에 +5P", img: "/brand/mascot_3.webp", href: "/games/spot", bg: "linear-gradient(90deg,#fff7e8,#ffefcc)" },
+];
 
 /** 퀵메뉴(마이비 영상 기준: 출석체크·만보기·3일 혜택·게임적립·내 쇼핑 … 가로 스크롤 + 점 인디케이터) */
 const QUICK: { key: string; icon?: string; label: string; href?: string; tip?: string }[] = [
-  { key: "attend", icon: "/myb/native/qm_attend.png", label: "출석체크" },
-  { key: "games", icon: "/myb/native/qm_minigame.png", label: "미니게임", href: "/games" },
+  { key: "attend", icon: "/brand/qm_attend.webp", label: "출석체크" },
+  { key: "games", icon: "/brand/qm_games.webp", label: "미니게임", href: "/games" },
   { key: "newbie", label: "3일 혜택", href: "/newbie", tip: "최대 1,500P" },
-  { key: "honey", icon: "/myb/native/ic_honey_jar.png", label: "꿀 충전" },
-  { key: "invite", icon: "/myb/native/qm_invite.png", label: "친구초대", href: "/invite" },
-  { key: "shop", icon: "/myb/res/naverpay_circle.png", label: "내 쇼핑", href: "/shop" },
+  { key: "honey", icon: "/brand/qm_honey.webp", label: "꿀 충전" },
+  { key: "invite", icon: "/brand/qm_invite.webp", label: "친구초대", href: "/invite" },
+  { key: "shop", icon: "/brand/qm_shop.webp", label: "내 쇼핑", href: "/shop" },
   { key: "store", label: "매장미션", href: "/missions" },
-  { key: "roulette", icon: "/myb/native/ic_gift_blue.png", label: "룰렛", href: "/roulette" },
+  { key: "roulette", icon: "/brand/qm_roulette.webp", label: "룰렛", href: "/roulette" },
 ];
 
 /** 포인트 모아서 살 수 있어요 — 지갑 상품 타일(원본 픽셀) */
 const PRODUCTS: { brand: string; name: string; points: number; img?: string; emoji?: string; bg: string }[] = [
-  { brand: "GS25", name: "빙그레)바나나우유240ML", points: 1900, img: "/products/banana_milk.webp", bg: "#f6f7fb" },
+  { brand: "GS25", name: "빙그레)바나나우유240ML", points: 1900, img: "/products/banana_milk.webp", bg: "var(--color-bg-2)" },
   { brand: "스타벅스", name: "아이스 카페 아메리카노T", points: 6956, img: "/products/americano_tall.webp", bg: "#dff3ea" },
-  { brand: "네이버페이", name: "네이버페이 포인트 10,000원", points: 12000, img: "/myb/native/tile_npay.png", bg: "#f6f7fb" },
-  { brand: "신세계", name: "신세계 상품권 10,000원", points: 14900, img: "/myb/native/tile_ssg.png", bg: "#f6f7fb" },
+  { brand: "네이버페이", name: "네이버페이 포인트 10,000원", points: 12000, img: "/products/npay_10000.webp", bg: "var(--color-bg-2)" },
+  { brand: "신세계", name: "신세계 상품권 10,000원", points: 14900, img: "/products/ssg_10000.webp", bg: "var(--color-bg-2)" },
 ];
 
 export default function HomePage() {
@@ -90,7 +95,7 @@ export default function HomePage() {
     const j = await res.json();
     if (!res.ok) return show("출석체크에 실패했어요", "info");
     if (j.already) show(`오늘은 이미 출석했어요 (${j.streak}일 연속)`, "info");
-    else { haptic("success"); sfx("coin"); burstAtPointer("coins"); flyToBalance(6); if (j.bonus) setTimeout(() => confetti(100), 300); }
+    else { burstAtPointer("coins"); await showReward({ variant: "small", points: j.points + (j.bonus ?? 0), title: j.bonus ? `${j.streak}일 연속 출석 보너스!` : "출석 보상 지급!", subtitle: j.streak > 1 ? `${j.streak}일 연속` : "스탬프 +1" }); flyToBalance(6); if (j.bonus) setTimeout(() => confetti(100), 300); }
     if (!j.already) show(`출석 완료! ${fmt(j.points)}P와 스탬프 1개를 받았어요${j.streak > 1 ? ` · ${j.streak}일 연속` : ""}${j.bonus ? ` · 보너스 +${j.bonus}P` : ""}`);
     await reload();
   }
@@ -105,12 +110,12 @@ export default function HomePage() {
         </Link>
         <div className="flex items-center gap-3">
           <Link href="/me" className="flex h-[26px] items-center gap-1.5 rounded-lg border border-line bg-bg-2 px-2 text-[12px] font-semibold">
-            {data?.me.avatarUrl ? <img src={data.me.avatarUrl} alt="" className="h-[16px] w-[16px] rounded-full object-cover" /> : <img src="/myb/native/ic_basic_hex.png" alt="" className="h-[14px] w-[14px]" />}
+            {data?.me.avatarUrl ? <img src={data.me.avatarUrl} alt="" className="h-[16px] w-[16px] rounded-full object-cover" /> : <img src="/brand/badge.webp" alt="" className="h-[14px] w-[14px]" />}
             {data?.newbie.active ? "신규 유저" : data?.me.loggedIn ? (data.me.nickname ?? "MY").slice(0, 6) : "베이직"}
           </Link>
-          <Link href="/gifts" aria-label="선물함"><img src="/myb/native/ic_gift_badge.png" alt="" className="h-[28px] w-[28px]" /></Link>
+          <Link href="/gifts" aria-label="선물함"><img src="/brand/gift.webp" alt="" className="h-[28px] w-[28px]" /></Link>
           <Link href="/notifications" aria-label="알림" className="relative">
-            <img src="/myb/native/ic_bell.png" alt="" className="h-[24px] w-[24px]" />
+            <img src="/brand/bell.webp" alt="" className="h-[24px] w-[24px]" />
             {data && (data.rush.claimable > 0 || !data.attendedToday) && <i className="absolute -right-0.5 top-0 h-2 w-2 rounded-full bg-red ring-2 ring-white" />}
           </Link>
         </div>
@@ -119,14 +124,14 @@ export default function HomePage() {
       {/* 히어로: 오늘도 만나서 반가워요 / N일차 퀴즈 3개로 시작해요! */}
       <section className="relative overflow-hidden px-5 pb-[22px] pt-[26px]" style={{ background: "linear-gradient(180deg,#fff6cf 0%,#fffaf0 55%,#ffffff 100%)" }}>
         <span className="absolute right-5 top-4 flex h-[26px] items-center gap-1 rounded-full bg-myb px-3 text-[12px] font-bold text-white">
-          <img src="/myb/native/ic_clock_gray.png" alt="" className="h-[13px] w-[13px] brightness-0 invert" /> {data ? (data.newbie.active ? `${data.newbie.dayNo}일차` : "오늘") : "—"}
+          <img src="/brand/ic_clock.svg" alt="" className="h-[13px] w-[13px] brightness-0 invert" /> {data ? (data.newbie.active ? `${data.newbie.dayNo}일차` : "오늘") : "—"}
         </span>
-        <img src="/myb/native/avatar_intj.png" alt="" className="pointer-events-none absolute -right-1 top-[46px] h-[104px] w-[104px] object-contain" />
+        <img src="/brand/mascot_1.webp" alt="" className="pointer-events-none absolute -right-1 top-[46px] h-[104px] w-[104px] object-contain" />
         <p className="text-[14px] font-medium text-ink-2">오늘도 만나서 반가워요</p>
         <p className="mt-1 text-[22px] font-extrabold leading-[30px]">
           <span className="text-myb">{data?.newbie.active ? `${data.newbie.dayNo}일차 퀴즈 ${data.newbie.goal}개` : "오늘의 퀴즈 3개"}</span>로 시작해요!
         </p>
-        <Link href={data?.newbie.active ? "/newbie" : "/quiz"} className="mt-[22px] flex h-[52px] items-center gap-3 rounded-[14px] border border-[#c9d8ff] bg-white px-4">
+        <Link href={data?.newbie.active ? "/newbie" : "/quiz"} className="mt-[22px] flex h-[52px] items-center gap-3 rounded-[14px] border border-[var(--color-myb-line)] bg-white px-4">
           <span className="text-[15px] font-bold tabular-nums text-myb">{data ? Math.min(3, data.todayDone) : 0}/3</span>
           <span className="flex flex-1 gap-1.5">
             {[0, 1, 2].map((i) => <i key={i} className={`h-[8px] flex-1 rounded-full ${data && data.todayDone > i ? "bg-myb" : "bg-[#dfe8ff]"}`} />)}
@@ -162,7 +167,7 @@ export default function HomePage() {
         </Link>
         {data?.newbie.active && (
           <>
-            <Link href="/newbie" className="mt-[18px] flex items-center gap-3 rounded-[14px] border border-[#b9ccff] bg-[#eef3ff] px-4 py-3">
+            <Link href="/newbie" className="mt-[18px] flex items-center gap-3 rounded-[14px] border border-[var(--color-myb-line)] bg-[var(--color-myb-soft)] px-4 py-3">
               <span className="text-[26px]">🎉</span>
               <span>
                 <p className="text-[15px] font-bold text-myb">신규 유저 전용 혜택</p>
@@ -170,7 +175,7 @@ export default function HomePage() {
               </span>
             </Link>
             <div className="relative mt-[14px] grid grid-cols-2 gap-[26px]">
-              {[{ brand: "네이버페이 포인트쿠폰", name: "네이버페이 1,000원", price: "1,500", img: "/myb/native/tile_npay.png", bg: "#6e6e6e" }, { brand: "트레져러", name: "한국거래소 금 1,000원", price: "무제한", img: "/myb/native/tile_gold.png", bg: "#8b6f3a" }].map((p) => (
+              {[{ brand: "네이버페이 포인트쿠폰", name: "네이버페이 1,000원", price: "1,500", img: "/products/npay_10000.webp", bg: "#6e6e6e" }, { brand: "트레져러", name: "한국거래소 금 1,000원", price: "무제한", img: "/brand/gold.webp", bg: "#8b6f3a" }].map((p) => (
                 <Link key={p.name} href="/newbie" className="block">
                   <div className="overflow-hidden rounded-[18px]">
                     <p className="flex h-[36px] items-center justify-center bg-myb text-[13px] font-bold text-white">🎉 신규 유저 전용 🎉</p>
@@ -212,13 +217,13 @@ export default function HomePage() {
         <ul className="mt-[18px] flex flex-col gap-3">
           {[
             { emoji: "🤝", title: "친구 초대", desc: "친구 초대하면 300P 적립", href: "/invite" },
-            { emoji: "🔥", title: "비포인트 러쉬", desc: data ? `이번 주 스탬프 ${data.rush.stamps}/${data.rush.total} · 미션 완료하면 룰렛 스탬프` : "주간 스탬프 미션", href: "/rush", dot: !!data && data.rush.claimable > 0 },
+            { emoji: "🔥", title: "캐치 러쉬", desc: data ? `이번 주 스탬프 ${data.rush.stamps}/${data.rush.total} · 미션 완료하면 룰렛 스탬프` : "주간 스탬프 미션", href: "/rush", dot: !!data && data.rush.claimable > 0 },
             { emoji: "🏆", title: "월간 도전 과제", desc: "이번 달 과제 달성하면 최대 3,300P", href: "/monthly" },
             { emoji: "📍", title: "동네 매장 미션", desc: "매장 방문·저장·리뷰하고 스탬프", href: "/missions" },
             { emoji: "🎡", title: "무료 룰렛", desc: data && data.wallet.stamps >= 10 ? "스탬프 10개 모였어요! 지금 돌리기" : `스탬프 ${data?.wallet.stamps ?? 0}/10 · 10개면 룰렛 1회`, href: "/roulette", dot: !!data && data.wallet.stamps >= 10 },
           ].map((c) => (
             <li key={c.title}>
-              <Link href={c.href} className="flex items-center gap-4 rounded-[18px] bg-white px-5 py-4" style={{ boxShadow: "0 4px 16px rgba(0,43,141,.08)" }}>
+              <Link href={c.href} className="flex items-center gap-4 rounded-[18px] bg-white px-5 py-4" style={{ boxShadow: "0 4px 16px rgba(40,24,14,.08)" }}>
                 <span className="text-[34px] leading-none">{c.emoji}</span>
                 <span className="min-w-0 flex-1">
                   <p className="text-[17px] font-bold">{c.title}</p>
@@ -234,7 +239,7 @@ export default function HomePage() {
       </section>
 
       {/* 리워드 배너(자동 롤링) — 원본 327×72 */}
-      <Banners images={BANNERS} className="mx-5 mb-2 mt-[26px]" />
+      <Banners slides={BANNERS} className="mx-5 mb-2 mt-[26px]" />
 
       {error && <p className="py-3 text-center text-xs text-red">연결 오류: {error}</p>}
 
@@ -250,14 +255,14 @@ export default function HomePage() {
         <>
           <div className="fixed inset-0 z-[999] bg-black/80" />
           <div className="fixed left-1/2 top-1/2 z-[1000] w-[calc(100%-48px)] max-w-[382px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[20px] bg-[#191f28] text-white">
-            <div className="flex h-[200px] flex-col items-center justify-center bg-gradient-to-br from-[#427cff] to-[#6d4cf2]">
-              <img src="/myb/bh/img_bpointrush_visual.webp" alt="" className="h-24 w-24" />
+            <div className="flex h-[200px] flex-col items-center justify-center bg-gradient-to-br from-[var(--color-myb)] to-[#ff8a5c]">
+              <img src="/brand/coins.webp" alt="" className="h-24 w-24" />
               <p className="mt-2 text-[14px] font-bold">광고 영상 자리 (리워드 SDK 연동 예정)</p>
             </div>
             <div className="p-5 text-center">
               <p className="text-[13px] text-white/70">{ad.left > 0 ? `${ad.left}초 후 꿀 1개가 충전돼요` : "시청 완료!"}</p>
-              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-[#fde047] transition-all duration-1000" style={{ width: `${((15 - ad.left) / 15) * 100}%` }} /></div>
-              {ad.left > 0 ? <button type="button" onClick={() => setAd(null)} className="mt-4 text-[12px] text-white/50">그만 보기</button> : <button type="button" onClick={() => void finishAd()} className="myb-press mt-4 h-11 w-full rounded-xl bg-[#fde047] text-[14px] font-bold text-[#191f28]">꿀 받기</button>}
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-[var(--color-gold)] transition-all duration-1000" style={{ width: `${((15 - ad.left) / 15) * 100}%` }} /></div>
+              {ad.left > 0 ? <button type="button" onClick={() => setAd(null)} className="mt-4 text-[12px] text-white/50">그만 보기</button> : <button type="button" onClick={() => void finishAd()} className="myb-press mt-4 h-11 w-full rounded-xl bg-[var(--color-gold)] text-[14px] font-bold text-[#191f28]">꿀 받기</button>}
             </div>
           </div>
         </>
@@ -266,7 +271,7 @@ export default function HomePage() {
         <>
           <div className="myb-fade-in fixed inset-0 z-[999] bg-black/60" onClick={() => setWelcome(false)} />
           <div className="myb-modal-in fixed bottom-0 left-1/2 z-[1000] w-full max-w-[430px] -translate-x-1/2 rounded-t-[24px] bg-white px-6 pb-8 pt-7 text-center">
-            <img src="/myb/bh/img_bpointrush_visual.webp" alt="" className="mx-auto h-[120px] w-[120px]" />
+            <img src="/brand/coins.webp" alt="" className="mx-auto h-[120px] w-[120px]" />
             <p className="mt-2 text-[22px] font-extrabold">환영해요! 가입 보너스 <span className="text-myb">{fmt(data.welcome.points)}P</span></p>
             <p className="mt-2 text-[13px] leading-[19px] text-muted">
               {data.starter.active ? `지금부터 ${Math.max(1, Math.ceil((new Date(data.starter.endsAt).getTime() - Date.now()) / 86400_000))}일 동안 퀴즈 보상이 2배예요.` : "취향 퀴즈 풀고 포인트 받아보세요."}<br />

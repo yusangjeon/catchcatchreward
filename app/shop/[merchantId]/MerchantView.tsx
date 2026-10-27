@@ -11,9 +11,9 @@ import type { MerchantPayload } from "@/lib/shop/types";
 
 /**
  * 쇼핑몰 상세 — shop.myb.im/merchant 웹뷰 DOM 복제.
- * bg #f8f9fc · 헤더 60 · 로고 64 · 제목 24/600 lh36 · 번호 안내 20px 원 · 카드 r12 padding 20 16 shadow · 추천 160×126 · 유의사항 white · 하단 고정 버튼 58
+ * bg var(--color-bg) · 헤더 60 · 로고 64 · 제목 24/600 lh36 · 번호 안내 20px 원 · 카드 r12 padding 20 16 shadow · 추천 160×126 · 유의사항 white · 하단 고정 버튼 58
  */
-const SHADOW = "0 5px 16px 0 rgba(0, 43, 141, 0.1)";
+const SHADOW = "0 5px 16px 0 rgba(40, 24, 14, 0.09)";
 
 export function MerchantView({ merchantId }: { merchantId: string }) {
   const router = useRouter();
@@ -36,10 +36,10 @@ export function MerchantView({ merchantId }: { merchantId: string }) {
 
   if (error) {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-[#f8f9fc] px-6 text-center">
+      <div className="flex min-h-dvh flex-col items-center justify-center bg-[var(--color-bg)] px-6 text-center">
         <img src="/myb/shop/img_notfound.png" alt="" className="h-40 w-40 object-contain" />
         <p className="mt-4 text-[16px] font-medium text-[#33363f]">쇼핑몰을 찾을 수 없어요</p>
-        <Link href="/shop" className="mt-4 rounded-[14px] bg-[#427cff] px-5 py-3 font-medium text-white">쇼핑적립으로</Link>
+        <Link href="/shop" className="mt-4 rounded-[14px] bg-[var(--color-myb)] px-5 py-3 font-medium text-white">쇼핑적립으로</Link>
       </div>
     );
   }
@@ -48,8 +48,8 @@ export function MerchantView({ merchantId }: { merchantId: string }) {
   const isCoupang = merchantId === "coupang_pincrux_group";
 
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] text-[#191f28]">
-      <header className="fixed left-1/2 top-0 z-10 flex h-[60px] w-full max-w-[430px] -translate-x-1/2 items-center justify-center bg-[#f8f9fc] py-4">
+    <div className="min-h-dvh bg-[var(--color-bg)] text-[#191f28]">
+      <header className="fixed left-1/2 top-0 z-10 flex h-[60px] w-full max-w-[430px] -translate-x-1/2 items-center justify-center bg-[var(--color-bg)] py-4">
         <button type="button" onClick={() => router.back()} aria-label="뒤로" className="flex h-7 w-[60px] items-center justify-center">
           <img src="/myb/shop/ic_left.png" width={28} height={28} alt="" className="h-7 w-7" />
         </button>
@@ -79,7 +79,7 @@ export function MerchantView({ merchantId }: { merchantId: string }) {
               <br />
               지금 {m?.name ?? "…"}에서 쇼핑하면
               <br />
-              <span className="text-[#427cff]">{isCoupang ? "최대 1,100P" : `최대 ${m?.rate ?? "—"} %`}</span> 적립!
+              <span className="text-[var(--color-myb)]">{isCoupang ? "최대 1,100P" : `최대 ${m?.rate ?? "—"} %`}</span> 적립!
             </h1>
           </div>
 
@@ -91,7 +91,7 @@ export function MerchantView({ merchantId }: { merchantId: string }) {
                   <span className="mt-[3px] flex h-5 w-5 shrink-0 items-center justify-center rounded-[100px] bg-[#5c6573] text-[12px] font-extrabold leading-5 text-white">{i + 1}</span>
                   <p className="flex flex-wrap text-[16px] font-semibold leading-6 text-[#33363f]">
                     {line.map((t, j) => (
-                      <span key={j} className={t.accent ? "text-[#427cff]" : ""}>{t.text.replace(/ /g, " ")}</span>
+                      <span key={j} className={t.accent ? "text-[var(--color-myb)]" : ""}>{t.text.replace(/ /g, " ")}</span>
                     ))}
                   </p>
                 </div>
@@ -144,18 +144,18 @@ export function MerchantView({ merchantId }: { merchantId: string }) {
         </div>
       </div>
 
-      {/* 하단 고정 CTA 113: 버튼 58 r14 bg #427cff, margin 14 20 40 */}
+      {/* 하단 고정 CTA 113: 버튼 58 r14 bg var(--color-myb), margin 14 20 40 */}
       <div className="fixed bottom-0 left-1/2 z-10 flex w-full max-w-[430px] -translate-x-1/2 bg-white">
         {data?.detail.buttons.length ? (
           <div className="mx-5 mb-[41px] mt-[14px] flex w-full gap-[10px]">
             {data.detail.buttons.map((b) => (
-              <a key={b.id} href={data.outHref} target="_blank" rel="noopener noreferrer" onClick={() => show(`쇼핑몰로 이동해요 · 방문 적립 ${data.clickPoints}P`)} className="myb-press flex h-[58px] flex-1 items-center justify-center rounded-[14px] bg-[#427cff] px-4 py-5 text-[16px] font-medium text-white">
+              <a key={b.id} href={data.outHref} target="_blank" rel="noopener noreferrer" onClick={() => show(`쇼핑몰로 이동해요 · 방문 적립 ${data.clickPoints}P`)} className="myb-press flex h-[58px] flex-1 items-center justify-center rounded-[14px] bg-[var(--color-myb)] px-4 py-5 text-[16px] font-medium text-white">
                 {b.label}
               </a>
             ))}
           </div>
         ) : (
-          <a href={data?.outHref ?? "#"} target="_blank" rel="noopener noreferrer" onClick={() => show(`쇼핑몰로 이동해요 · 방문 적립 ${data?.clickPoints ?? 5}P`)} className="myb-press mx-5 mb-[41px] mt-[14px] flex h-[58px] w-full items-center justify-center gap-[10px] rounded-[14px] bg-[#427cff] px-4 py-5 text-[16px] font-medium text-white">
+          <a href={data?.outHref ?? "#"} target="_blank" rel="noopener noreferrer" onClick={() => show(`쇼핑몰로 이동해요 · 방문 적립 ${data?.clickPoints ?? 5}P`)} className="myb-press mx-5 mb-[41px] mt-[14px] flex h-[58px] w-full items-center justify-center gap-[10px] rounded-[14px] bg-[var(--color-myb)] px-4 py-5 text-[16px] font-medium text-white">
             쇼핑하러 가기
           </a>
         )}

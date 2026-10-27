@@ -1,19 +1,28 @@
 "use client";
 
+import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 
 /* eslint-disable @next/next/no-img-element */
 
-/** 마이비 reward-banner(327×72) 자동 롤링 배너 — benefit-hub와 같은 Swiper 사용. 우측 하단 "n / N" 카운터 */
-export function Banners({ images, className }: { images: string[]; className?: string }) {
+export type BannerSlide = { title: string; sub: string; img: string; href: string; bg: string; dark?: boolean };
+
+/** 자동 롤링 배너(327×72 비율) — 텍스트+브랜드 일러스트를 CSS 로 그린다 */
+export function Banners({ slides, className }: { slides: BannerSlide[]; className?: string }) {
   return (
     <div className={`relative overflow-hidden rounded-xl ${className ?? ""}`} style={{ aspectRatio: "327 / 72" }}>
       <Swiper modules={[Autoplay]} loop autoplay={{ delay: 3000, disableOnInteraction: false }} speed={400} className="h-full">
-        {images.map((src, i) => (
-          <SwiperSlide key={src}>
-            <img src={src} alt={`배너 ${i + 1}`} className="h-full w-full object-cover" draggable={false} />
+        {slides.map((b) => (
+          <SwiperSlide key={b.title}>
+            <Link href={b.href} className={`flex h-full items-center justify-between pl-4 pr-3 ${b.dark ? "text-white" : "text-ink"}`} style={{ background: b.bg }}>
+              <span>
+                <p className="text-[14px] font-extrabold leading-[18px]">{b.title}</p>
+                <p className={`mt-0.5 text-[11px] leading-[14px] ${b.dark ? "text-white/80" : "text-ink-2"}`}>{b.sub}</p>
+              </span>
+              <img src={b.img} alt="" className="h-[56px] w-[56px] object-contain" draggable={false} />
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>

@@ -1,18 +1,22 @@
 @import "tailwindcss";
 
-/* 마이비(MyB) 레퍼런스 컬러. 앱스토어 스크린샷에서 샘플링 */
+/* 캐치캐치 브랜드 토큰(2026-10-28 A안 "캐치 오렌지"). 레이아웃 규칙은 마이비 실측, 색만 우리 것.
+   주색을 바꾸려면 --color-myb* 5줄만 바꾸면 전 화면이 따라온다(클래스명 myb 는 호환을 위해 유지). */
 @theme {
-  --color-myb: #427dff; /* 주 블루 (퀴즈 배경·버튼) */
-  --color-myb-dark: #1d5ef6; /* 진한 블루 (텍스트·칩) */
-  --color-myb-deep: #014bf4;
-  --color-myb-soft: #eaf1ff; /* 연한 블루 배경 */
-  --color-myb-line: #cfe0ff;
-  --color-ink: #111318;
-  --color-ink-2: #3d4350;
-  --color-muted: #8b95a1;
-  --color-line: #eef0f4;
-  --color-bg: #f8f9fd;
-  --color-bg-2: #f1f3f8;
+  --color-myb: #ff5a2d; /* 주색 코랄 오렌지 (버튼·칩·진행바) */
+  --color-myb-dark: #e0441a; /* 진한 주색 (텍스트·눌림) */
+  --color-myb-deep: #c2370f;
+  --color-myb-soft: #fff0ea; /* 연한 주색 배경 */
+  --color-myb-line: #ffd2c2;
+  --color-gold: #ffc53d; /* 보상·코인·별 */
+  --color-gold-soft: #fff4d6;
+  --color-ink: #1a1c22;
+  --color-ink-2: #4d5260;
+  --color-muted: #9196a3;
+  --color-line: #eeece9;
+  --color-bg: #faf9f7; /* 따뜻한 회백색 페이지 배경 */
+  --color-bg-2: #f3f1ee;
+  --color-bg-3: #f1efec;
   --color-purple: #7b3fe4;
   --color-honey: #ffb02e;
   --color-pink: #ff3d9a;
@@ -23,7 +27,7 @@
 
 html,
 body {
-  background: #e9edf5; /* 폰 폭 밖 영역 */
+  background: #efece8; /* 폰 폭 밖 영역 */
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
@@ -178,3 +182,23 @@ body {
 .spot-dot-pop { animation: dotPop .45s cubic-bezier(.22,1,.36,1) both }
 @keyframes fxBump { 0% { transform: scale(1) } 35% { transform: scale(1.35) } 100% { transform: scale(1) } }
 .fx-bump { display: inline-block; animation: fxBump .45s cubic-bezier(.22,1,.36,1) both }
+
+/* ── 보상 지급 오버레이(마이비 실측: 딤 .13s · 타이틀 팝 · 코인 스프링 · 2.5s 유지 · .3s 페이드) ── */
+@keyframes rwDim { from { opacity: 0 } to { opacity: 1 } }
+@keyframes rwOut { from { opacity: 1 } to { opacity: 0 } }
+@keyframes rwRise { 0% { opacity: 0; transform: translateY(14px) scale(.96) } 100% { opacity: 1; transform: translateY(0) scale(1) } }
+@keyframes rwTitle { 0% { opacity: 0; transform: scale(.6) } 55% { opacity: 1; transform: scale(1.12) } 100% { transform: scale(1) } }
+@keyframes rwCoin { 0% { opacity: 0; transform: translateY(40px) scale(.4) } 55% { opacity: 1; transform: translateY(-10px) scale(1.08) } 75% { transform: translateY(4px) scale(.98) } 100% { transform: translateY(0) scale(1) } }
+@keyframes rwRays { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
+@keyframes rwGlow { 0%, 100% { transform: scale(.92); opacity: .8 } 50% { transform: scale(1.1); opacity: 1 } }
+@keyframes rwSticker { 0% { opacity: 0; transform: scale(0) rotate(-20deg) } 70% { opacity: 1; transform: scale(1.2) rotate(14deg) } 100% { transform: scale(1) rotate(12deg) } }
+.rw-dim { animation: rwDim .13s ease-out both; }
+.rw-dim-fast { animation: rwDim .07s ease-out both; }
+.rw-out { animation: rwOut .3s ease-in both; }
+.rw-out-fast { animation: rwOut .2s ease-in both; }
+.rw-rise { animation: rwRise .35s cubic-bezier(.2,.9,.25,1) both; }
+.rw-title { animation: rwTitle .45s cubic-bezier(.2,.9,.25,1) both; }
+.rw-coin { animation: rwCoin .6s cubic-bezier(.2,.9,.25,1) both; }
+.rw-rays { animation: rwRays 9s linear infinite; }
+.rw-glow { animation: rwGlow 1.6s ease-in-out infinite; }
+.rw-sticker { animation: rwSticker .4s cubic-bezier(.2,.9,.25,1) both; }

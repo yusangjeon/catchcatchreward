@@ -23,7 +23,7 @@ function emit(ps: Particle[]) { for (const l of listeners) l(ps); }
 
 const rnd = (a: number, b: number) => a + Math.random() * (b - a);
 const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
-const PALETTE = ["#427cff", "#22d3ee", "#22c55e", "#fde047", "#ff8a3d", "#ff3e9a", "#a855f7", "#ffffff"];
+const PALETTE = ["#427cff", "#22d3ee", "#22c55e", "#fde047", "#ff8a3d", "var(--color-myb)", "#a855f7", "#ffffff"];
 
 export function burst(kind: BurstKind, x: number, y: number) {
   const now = performance.now();
@@ -50,7 +50,7 @@ export function burst(kind: BurstKind, x: number, y: number) {
       radial(16, [4, 10], () => ({ shape: "star", color: pick(["#fde047", "#ffb400", "#ffffff", "#ff8a3d"]), size: rnd(5, 11), ttl: rnd(600, 1000), g: 0.1 }));
       break;
     case "hearts":
-      for (let i = 0; i < 10; i++) ps.push({ x: x + rnd(-14, 14), y, vx: rnd(-1.5, 1.5), vy: rnd(-5, -2.5), born: now, ttl: rnd(900, 1300), size: rnd(7, 12), color: pick(["#ff3e9a", "#ff7ab8", "#ff8a3d"]), rot: 0, vr: 0, shape: "heart", g: -0.02, drag: 0.98 });
+      for (let i = 0; i < 10; i++) ps.push({ x: x + rnd(-14, 14), y, vx: rnd(-1.5, 1.5), vy: rnd(-5, -2.5), born: now, ttl: rnd(900, 1300), size: rnd(7, 12), color: pick(["var(--color-myb)", "#ff7ab8", "#ff8a3d"]), rot: 0, vr: 0, shape: "heart", g: -0.02, drag: 0.98 });
       break;
     case "ring":
       ps.push({ x, y, vx: 0, vy: 0, born: now, ttl: 500, size: 10, color: "#427cff", rot: 0, vr: 0, shape: "ring", g: 0, drag: 1 });
@@ -74,7 +74,7 @@ export function confetti(count = 140) {
 }
 
 /** 코인이 target 요소 중심으로 날아감(포물선). 도착마다 onArrive(i) */
-export function flyCoins(from: { x: number; y: number }, target: HTMLElement | null, n = 5, onArrive?: (i: number) => void, icon = "/myb/bh/ic_bpoint_01.webp") {
+export function flyCoins(from: { x: number; y: number }, target: HTMLElement | null, n = 5, onArrive?: (i: number) => void, icon = "/brand/coin.svg") {
   if (typeof document === "undefined") return;
   const t = target?.getBoundingClientRect();
   const tx = t ? t.left + t.width / 2 : window.innerWidth / 2, ty = t ? t.top + t.height / 2 : 60;

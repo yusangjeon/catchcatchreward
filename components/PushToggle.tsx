@@ -75,8 +75,8 @@ export function PushToggle({ compact = false }: { compact?: boolean }) {
 
   const label = state === "on" ? "켜짐" : state === "off" ? "꺼짐" : state === "denied" ? "권한 거부됨" : state === "disabled" ? "서버 미설정" : state === "unsupported" ? "이 브라우저 미지원" : "…";
   return (
-    <div className={`flex items-center gap-3 rounded-[16px] bg-white ${compact ? "px-4 py-3" : "px-4 py-[14px]"}`} style={{ boxShadow: "0 2px 10px 0 rgba(0, 43, 141, 0.06)" }}>
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f0f4ff] text-[22px]">🔔</span>
+    <div className={`flex items-center gap-3 rounded-[16px] bg-white ${compact ? "px-4 py-3" : "px-4 py-[14px]"}`} style={{ boxShadow: "0 2px 10px 0 rgba(40, 24, 14, 0.06)" }}>
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-myb-soft)] text-[22px]">🔔</span>
       <div className="min-w-0 flex-1">
         <p className="text-[14px] font-semibold">푸시 알림 <span className={`ml-1 text-[12px] font-medium ${state === "on" ? "text-[#1aa260]" : "text-[#8b94a0]"}`}>{label}</span></p>
         <p className="mt-0.5 text-[12px] leading-[17px] text-[#8b94a0]">{state === "unsupported" ? "iPhone 은 홈 화면에 추가한 뒤 열면 받을 수 있어요" : "출석·퀴즈·받을 보상을 매일 아침 알려드려요"}</p>
@@ -84,10 +84,10 @@ export function PushToggle({ compact = false }: { compact?: boolean }) {
       {state === "on" ? (
         <div className="flex shrink-0 gap-1.5">
           <button type="button" disabled={busy} onClick={() => void test()} className="myb-press h-9 rounded-lg border border-[#dee2e9] px-3 text-[12px] font-bold">테스트</button>
-          <button type="button" disabled={busy} onClick={() => void disable()} className="myb-press h-9 rounded-lg bg-[#f2f3f5] px-3 text-[12px] font-bold text-[#5c6573]">끄기</button>
+          <button type="button" disabled={busy} onClick={() => void disable()} className="myb-press h-9 rounded-lg bg-[var(--color-bg-3)] px-3 text-[12px] font-bold text-[#5c6573]">끄기</button>
         </div>
       ) : (
-        <button type="button" disabled={busy || state === "unsupported" || state === "disabled" || state === "loading"} onClick={() => void enable()} className="myb-press h-9 shrink-0 rounded-lg bg-[#427cff] px-4 text-[13px] font-bold text-white disabled:opacity-40">켜기</button>
+        <button type="button" disabled={busy || state === "unsupported" || state === "disabled" || state === "loading"} onClick={() => void enable()} className="myb-press h-9 shrink-0 rounded-lg bg-[var(--color-myb)] px-4 text-[13px] font-bold text-white disabled:opacity-40">켜기</button>
       )}
     </div>
   );

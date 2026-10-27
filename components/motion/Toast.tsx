@@ -1,8 +1,9 @@
 "use client";
 
+import { PCoin } from "@/components/icons";
+
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
-/* eslint-disable @next/next/no-img-element */
 
 type ToastMsg = { id: number; text: string; icon?: "point" | "info" };
 type Ctx = { show: (text: string, icon?: ToastMsg["icon"]) => void };
@@ -36,9 +37,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <div
             key={t.id}
             role="status"
-            className={`myb-toast ${t.leaving ? "myb-toast-out" : "myb-toast-in"} pointer-events-auto flex w-fit items-center justify-center gap-[10px] rounded-[100px] bg-[#293a60] py-3 pl-3 pr-[26px] text-[14px] font-medium text-white`}
+            className={`myb-toast ${t.leaving ? "myb-toast-out" : "myb-toast-in"} pointer-events-auto flex w-fit items-center justify-center gap-[10px] rounded-[100px] bg-ink py-3 pl-3 pr-[26px] text-[14px] font-medium text-white`}
           >
-            <img src={t.icon === "info" ? "/myb/bh/ic_toast_info.webp" : "/myb/bh/ic_toast_point.webp"} width={30} height={30} alt="" className="mr-[10px] h-[30px] w-[30px] shrink-0" />
+            {t.icon === "info" ? <span className="mr-[10px] flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-white/15 text-[16px] font-extrabold">!</span> : <PCoin size={30} className="mr-[10px] shrink-0" />}
             {t.text}
           </div>
         ))}

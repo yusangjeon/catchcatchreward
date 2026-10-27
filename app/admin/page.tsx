@@ -45,11 +45,11 @@ export default async function AdminHome() {
       <section className="rounded-2xl bg-white p-5 shadow-sm">
         <div className="flex items-center justify-between">
           <h2 className="text-[16px] font-bold">배지별 유저 수 (세그먼트)</h2>
-          <Link href="/admin/badges" className="text-[13px] text-[#427cff]">자세히</Link>
+          <Link href="/admin/badges" className="text-[13px] text-[var(--color-myb)]">자세히</Link>
         </div>
         <ul className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-3">
           {badges.map((b) => (
-            <li key={b.code} className="flex items-center justify-between rounded-xl bg-[#f8f9fc] px-3 py-2 text-[14px]">
+            <li key={b.code} className="flex items-center justify-between rounded-xl bg-[var(--color-bg)] px-3 py-2 text-[14px]">
               <span>{b.emoji} {b.name}</span><b className="tabular-nums">{fmt(counts[b.code] ?? 0)}</b>
             </li>
           ))}

@@ -12,7 +12,7 @@ function parts(endsAt: string, now: number) {
 
 /** 벤핏허브 상단 "2 일 0 9 시간 2 3 분 남았어요" 칩 카운트다운. 1분 간격 갱신 */
 /** variant adjoe: 게임적립 브릿지(높이 75, 칩 27, 배경 white/5, 일 칩 white/10·숫자 칩 white/15) */
-export function Countdown({ endsAt, variant = "benefit" }: { endsAt: string; variant?: "benefit" | "adjoe" }) {
+export function Countdown({ endsAt, variant = "benefit", compact = false }: { endsAt: string; variant?: "benefit" | "adjoe"; compact?: boolean }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 15_000);
@@ -20,6 +20,7 @@ export function Countdown({ endsAt, variant = "benefit" }: { endsAt: string; var
   }, []);
   const { d, h, m } = parts(endsAt, now);
   const adjoe = variant === "adjoe";
+  if (compact) return <span className="text-[11px] font-semibold tabular-nums text-muted">{d}일 {h}시간 남음</span>;
   const chip = `flex ${adjoe ? "h-[27px]" : "h-[26px]"} items-center justify-center rounded-[6px] ${adjoe ? "bg-white/15" : "bg-white/20"} text-[16px] font-semibold tabular-nums text-white`;
   const unit = "text-[18px] font-semibold leading-[18px] text-white";
   return (

@@ -17,7 +17,7 @@ export default async function AdminGrant({ searchParams }: { searchParams: Promi
           <input name="stamps" type="number" min={0} defaultValue={0} placeholder="스탬프(+)" className={input} />
         </div>
         <input name="memo" placeholder="메모 (원장 memo, 유저 내역에 노출)" className={input} />
-        <button type="submit" className="h-10 rounded-lg bg-[#427cff] text-[14px] font-bold text-white">지급</button>
+        <button type="submit" className="h-10 rounded-lg bg-[var(--color-myb)] text-[14px] font-bold text-white">지급</button>
       </form>
       <p className="text-[12px] leading-5 text-[#8b94a0]">포인트는 원장 reason=admin_adjust 로 기록돼 유저 내역에 &quot;운영 조정&quot;으로 보여요. 스탬프는 sourceType=admin. 개발용 /api/dev/stamps 대신 이 화면을 쓰세요.</p>
     </div>

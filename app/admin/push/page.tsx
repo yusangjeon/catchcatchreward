@@ -25,13 +25,13 @@ export default async function AdminPush({ searchParams }: { searchParams: Promis
         <input name="title" required maxLength={60} placeholder="제목 (예: 오늘만 퀴즈 보상 2배!)" className={input} />
         <input name="body" required maxLength={140} placeholder="본문" className={input} />
         <input name="url" placeholder="열 경로 (기본 /)" className={input} />
-        <button type="submit" disabled={!pushEnabled()} className="h-10 rounded-lg bg-[#427cff] text-[14px] font-bold text-white disabled:opacity-40">구독자 전체에게 보내기</button>
+        <button type="submit" disabled={!pushEnabled()} className="h-10 rounded-lg bg-[var(--color-myb)] text-[14px] font-bold text-white disabled:opacity-40">구독자 전체에게 보내기</button>
       </form>
       <div className="overflow-x-auto rounded-2xl bg-white shadow-sm">
         <table className="w-full text-left text-[13px]">
-          <thead className="bg-[#f8f9fc] text-[12px] text-[#8b94a0]"><tr><th className="px-4 py-3">유저</th><th className="px-4 py-3">기기</th><th className="px-4 py-3">등록</th></tr></thead>
+          <thead className="bg-[var(--color-bg)] text-[12px] text-[#8b94a0]"><tr><th className="px-4 py-3">유저</th><th className="px-4 py-3">기기</th><th className="px-4 py-3">등록</th></tr></thead>
           <tbody>
-            {subs.slice(0, 100).map((s) => <tr key={s.id} className="border-t border-[#f1f3f8]"><td className="px-4 py-2 font-mono text-[12px]">{s.userId.slice(0, 8)}</td><td className="max-w-[360px] truncate px-4 py-2 text-[#5c6573]">{s.userAgent ?? "-"}</td><td className="px-4 py-2 tabular-nums">{s.createdAt.slice(0, 16).replace("T", " ")}</td></tr>)}
+            {subs.slice(0, 100).map((s) => <tr key={s.id} className="border-t border-[var(--color-bg-2)]"><td className="px-4 py-2 font-mono text-[12px]">{s.userId.slice(0, 8)}</td><td className="max-w-[360px] truncate px-4 py-2 text-[#5c6573]">{s.userAgent ?? "-"}</td><td className="px-4 py-2 tabular-nums">{s.createdAt.slice(0, 16).replace("T", " ")}</td></tr>)}
             {subs.length === 0 && <tr><td colSpan={3} className="px-4 py-6 text-center text-[#8b94a0]">구독 기기가 없어요</td></tr>}
           </tbody>
         </table>

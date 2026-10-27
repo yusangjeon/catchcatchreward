@@ -3,6 +3,7 @@ import "./globals.css";
 import { Shell } from "@/components/Shell";
 import { ToastProvider } from "@/components/motion/Toast";
 import { FxLayer } from "@/components/motion/FxLayer";
+import { RewardLayer } from "@/components/motion/RewardLayer";
 
 export const metadata: Metadata = {
   title: "캐치캐치리워드",
@@ -17,7 +18,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#427dff",
+  themeColor: "#ff5a2d",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastProvider>
           <Shell>{children}</Shell>
           <FxLayer />
+          <RewardLayer />
         </ToastProvider>
       </body>
     </html>

@@ -4,17 +4,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CheckIcon, CXCoin, PCoin } from "./icons";
-import { Lottie } from "./motion/Lottie";
 import { ToastOnMount } from "./motion/Toast";
 import { haptic, sfx } from "@/lib/fx";
 import { burst, confetti } from "@/lib/fxEngine";
+import { showReward } from "@/lib/reward";
 
 /* eslint-disable @next/next/no-img-element */
 import { SetGridCard } from "./SetCard";
 import { fmt } from "@/hooks/useHome";
 import type { PublicQuestion, SetPayload, SubmitResult } from "@/lib/types";
 
-const CONX_RATE = 3426.45; // 1 CONX 당 원 (표시용)
 
 export function QuizPlay({ setId }: { setId: string }) {
   const router = useRouter();
@@ -60,8 +59,11 @@ export function QuizPlay({ setId }: { setId: string }) {
       });
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "제출 실패");
-      setResult(j as SubmitResult);
-      haptic("jackpot"); sfx("win"); setTimeout(() => { confetti(150); burst("coins", window.innerWidth / 2, 260); }, 250);
+      const r = j as SubmitResult;
+      const total = r.points + r.bonus + r.starterBonus;
+      await showReward({ variant: "big", points: total, to: r.wallet.balance, from: r.wallet.balance - total });
+      setResult(r);
+      setTimeout(() => { confetti(120); burst("coins", window.innerWidth / 2, 260); }, 250);
     } catch (e) {
       setError(e instanceof Error ? e.message : "제출 실패");
     } finally {
@@ -75,24 +77,24 @@ export function QuizPlay({ setId }: { setId: string }) {
       <div className="bg-white px-[40px] pb-[36px]">
         <div className="relative flex h-[60px] items-center pt-2">
           <button type="button" onClick={() => (idx > 0 ? setIdx(idx - 1) : router.back())} aria-label="뒤로" className="-ml-1 p-1">
-            <img src="/myb/native/ic_back.png" alt="" className="h-[22px] w-[12px]" />
+            <img src="/brand/ic_back.svg" alt="" className="h-[22px] w-[12px]" />
           </button>
           <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pt-2 text-[17px] font-bold tabular-nums">
             {String(idx + 1).padStart(2, "0")} <span className="font-medium text-[#b8bfc9]">/ {String(total).padStart(2, "0")}</span>
           </p>
         </div>
         <span className="mt-[40px] inline-flex h-5 items-center gap-1 rounded-md bg-myb-soft px-2 text-[12px] font-semibold text-myb-dark">
-          <img src="/myb/native/ic_multiple_choice.png" alt="" className="h-[14px] w-[14px]" />
+          <img src="/brand/ic_list.svg" alt="" className="h-[14px] w-[14px]" />
           객관식
         </span>
         <h1 className="mt-[26px] whitespace-pre-line text-[22px] font-bold leading-[1.4]">{q.question}</h1>
-        <p className="mt-[10px] flex items-center gap-1.5 text-[13px] font-medium"><img src="/myb/native/ic_check_small.png" alt="" className="h-[13px] w-[13px]" /> 1개만 선택 가능해요.</p>
+        <p className="mt-[10px] flex items-center gap-1.5 text-[13px] font-medium"><img src="/brand/ic_check.svg" alt="" className="h-[13px] w-[13px]" /> 1개만 선택 가능해요.</p>
       </div>
 
       {/* 하단 파란 영역 */}
       <div className="flex flex-1 flex-col bg-myb px-[40px] pt-[38px] pb-28">
         <div className="flex items-center gap-3">
-          <img src="/myb/native/avatar_intj.png" alt="" className="h-[52px] w-[52px] rounded-full ring-[3px] ring-white" />
+          <img src="/brand/mascot_1.webp" alt="" className="h-[52px] w-[52px] rounded-full ring-[3px] ring-white" />
           <div>
             <p className="text-[13px] font-medium text-white">
               {data.persona.title} · <b className="font-extrabold">{data.persona.code}</b>
@@ -113,7 +115,7 @@ export function QuizPlay({ setId }: { setId: string }) {
           type="button"
           disabled={!picked || busy}
           onClick={() => void next()}
-          className={`h-[52px] w-full rounded-xl text-[15px] font-bold transition ${picked ? "bg-white text-myb-dark" : "bg-[#a9c3ff] text-white/80"}`}
+          className={`h-[52px] w-full rounded-xl text-[15px] font-bold transition ${picked ? "bg-white text-myb-dark" : "bg-[var(--color-myb-line)] text-white/80"}`}
         >
           {busy ? "제출 중…" : last ? "결과 보기" : "다음 질문으로"}
         </button>
@@ -174,25 +176,24 @@ function Radio({ on, className = "" }: { on: boolean; className?: string }) {
 }
 
 function RewardScreen({ result }: { result: SubmitResult }) {
-  const conx = (result.points / CONX_RATE).toFixed(2);
   return (
     <div className="min-h-dvh bg-white pb-32">
       <div className="flex h-[60px] items-center px-4 pt-2">
-        <Link href="/" aria-label="뒤로" className="p-1"><img src="/myb/native/ic_back.png" alt="" className="h-[22px] w-[12px]" /></Link>
+        <Link href="/" aria-label="뒤로" className="p-1"><img src="/brand/ic_back.svg" alt="" className="h-[22px] w-[12px]" /></Link>
       </div>
       <div className="mt-[20px] flex justify-center">
-        <span className="flex h-[42px] items-center gap-3 rounded-full bg-[#eef3ff] px-6 text-[13px] text-ink-2">
-          내 B포인트 <span className="flex items-center gap-1.5 text-[17px] font-extrabold text-ink"><PCoin size={20} />{fmt(result.wallet.balance)}</span>
+        <span className="flex h-[42px] items-center gap-3 rounded-full bg-[var(--color-myb-soft)] px-6 text-[13px] text-ink-2">
+          내 포인트 <span className="flex items-center gap-1.5 text-[17px] font-extrabold text-ink"><PCoin size={20} />{fmt(result.wallet.balance)}</span>
         </span>
       </div>
 
       {/* 코인 일러스트 — 원본 img_points_group.webp + Lottie confetti_pop(1회) */}
       <div className="relative mx-auto mt-[18px] flex h-[160px] w-[260px] items-center justify-center">
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2">
-          <Lottie src="/myb/lottie_confetti_pop.json" className="h-full w-full" />
+          
         </div>
         {/* 원본 보상 일러스트(코인 스택 + 뱃지 + 색종이) — 앱스토어 스크린샷 픽셀, 레퍼런스 약 150×235 */}
-        <img src="/myb/native/reward_hero.png" alt="" className="myb-pop-in myb-float relative h-[160px] w-[260px] object-contain" draggable={false} />
+        <img src="/brand/coins_hero.webp" alt="" className="myb-pop-in myb-float relative h-[160px] w-[260px] object-contain" draggable={false} />
       </div>
       <ToastOnMount text="포인트를 받았어요!" />
 
@@ -204,9 +205,9 @@ function RewardScreen({ result }: { result: SubmitResult }) {
 
       <div className="mx-5 mt-[30px] rounded-2xl border border-[#e3e8f0] p-[18px]">
         <div className="flex items-center justify-around text-[14px] text-ink-2">
-          <span className="flex items-center gap-3">B포인트 <span className="flex items-center gap-1.5 text-[20px] font-extrabold text-ink"><PCoin size={22} />{fmt(result.points)}</span></span>
+          <span className="flex items-center gap-3">포인트 <span className="flex items-center gap-1.5 text-[20px] font-extrabold text-ink"><PCoin size={22} />{fmt(result.points)}</span></span>
           <span className="h-7 w-px bg-line" />
-          <span className="flex items-center gap-3">CONX <span className="flex items-center gap-1.5 text-[20px] font-extrabold text-ink"><CXCoin size={22} />{conx}</span></span>
+          <span className="flex items-center gap-3">스탬프 <span className="flex items-center gap-1.5 text-[20px] font-extrabold text-ink"><CXCoin size={22} />+1</span></span>
         </div>
         {result.starterBonus > 0 && (
           <p className="mt-4 flex h-[42px] items-center justify-center gap-1.5 rounded-xl bg-[#fff6e5] text-[13px] text-[#9a5b00]">
@@ -214,7 +215,7 @@ function RewardScreen({ result }: { result: SubmitResult }) {
           </p>
         )}
         {result.bonus > 0 && (
-          <p className="mt-4 flex h-[42px] items-center justify-center gap-1.5 rounded-xl bg-[#eef3ff] text-[13px] text-ink-2">
+          <p className="mt-4 flex h-[42px] items-center justify-center gap-1.5 rounded-xl bg-[var(--color-myb-soft)] text-[13px] text-ink-2">
             랜덤 보상으로 <PCoin size={18} /> <b className="text-[16px] font-extrabold text-myb-dark">+{result.bonus}</b> 더 받았어요
           </p>
         )}
@@ -234,7 +235,7 @@ function RewardScreen({ result }: { result: SubmitResult }) {
           <h2 className="text-[19px] font-bold">다른 사람들은 어떻게 골랐을까요?</h2>
           <ul className="mt-4 flex flex-col gap-4">
             {result.stats.map((st, i) => (
-              <li key={i} className="rounded-2xl bg-[#f4f6fa] p-4">
+              <li key={i} className="rounded-2xl bg-[var(--color-bg-2)] p-4">
                 <p className="text-[14px] font-semibold leading-[1.4]">{st.question}</p>
                 <ul className="mt-3 flex flex-col gap-2">
                   {st.options.map((o) => (
@@ -265,7 +266,7 @@ function RewardScreen({ result }: { result: SubmitResult }) {
       )}
 
       <div className="fixed bottom-0 left-1/2 z-20 flex w-full max-w-[430px] -translate-x-1/2 gap-3 bg-white/90 px-5 pt-3 backdrop-blur" style={{ paddingBottom: "max(20px, env(safe-area-inset-bottom))" }}>
-        <Link href="/quiz" className="flex h-[52px] flex-1 items-center justify-center rounded-xl bg-[#eef3ff] text-[16px] font-bold text-myb-dark">둘러보기</Link>
+        <Link href="/quiz" className="flex h-[52px] flex-1 items-center justify-center rounded-xl bg-[var(--color-myb-soft)] text-[16px] font-bold text-myb-dark">둘러보기</Link>
         <Link href="/" className="flex h-[52px] flex-1 items-center justify-center rounded-xl bg-myb text-[16px] font-bold text-white">계속하기</Link>
       </div>
     </div>

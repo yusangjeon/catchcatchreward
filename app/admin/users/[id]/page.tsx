@@ -38,7 +38,7 @@ export default async function AdminUserDetail({ params }: { params: Promise<{ id
           <p className="mt-2 text-[14px]">{badges.length ? badges.map((b) => `${byCode.get(b.badgeCode)?.emoji ?? ""} ${byCode.get(b.badgeCode)?.name ?? b.badgeCode}`).join(" · ") : <span className="text-[#b0b8c1]">배지 없음</span>}</p>
           <ul className="mt-3 flex flex-col gap-1.5">
             {topTags.map(([tag, score]) => (
-              <li key={tag} className="flex items-center gap-2 text-[12px]"><span className="w-24 font-mono">{tag}</span><div className="h-2 flex-1 overflow-hidden rounded-full bg-[#eef0f4]"><div className="h-full rounded-full bg-[#427cff]" style={{ width: `${Math.min(100, score * 10)}%` }} /></div><span className="w-6 text-right tabular-nums">{score}</span></li>
+              <li key={tag} className="flex items-center gap-2 text-[12px]"><span className="w-24 font-mono">{tag}</span><div className="h-2 flex-1 overflow-hidden rounded-full bg-[#eef0f4]"><div className="h-full rounded-full bg-[var(--color-myb)]" style={{ width: `${Math.min(100, score * 10)}%` }} /></div><span className="w-6 text-right tabular-nums">{score}</span></li>
             ))}
             {topTags.length === 0 && <li className="text-[12px] text-[#b0b8c1]">응답 없음</li>}
           </ul>
@@ -58,14 +58,14 @@ export default async function AdminUserDetail({ params }: { params: Promise<{ id
       </div>
       <section className="overflow-x-auto rounded-2xl bg-white shadow-sm">
         <table className="w-full text-left text-[13px]">
-          <thead className="bg-[#f8f9fc] text-[12px] text-[#8b94a0]"><tr><th className="px-4 py-3">시각</th><th className="px-4 py-3">구분</th><th className="px-4 py-3">메모</th><th className="px-4 py-3 text-right">포인트</th></tr></thead>
+          <thead className="bg-[var(--color-bg)] text-[12px] text-[#8b94a0]"><tr><th className="px-4 py-3">시각</th><th className="px-4 py-3">구분</th><th className="px-4 py-3">메모</th><th className="px-4 py-3 text-right">포인트</th></tr></thead>
           <tbody>
             {ledger.map((e) => (
-              <tr key={e.id} className="border-t border-[#f1f3f8]">
+              <tr key={e.id} className="border-t border-[var(--color-bg-2)]">
                 <td className="px-4 py-2 text-[#5c6573]">{dt(e.createdAt)}</td>
                 <td className="px-4 py-2">{REASON[e.reason] ?? e.reason}</td>
                 <td className="px-4 py-2 text-[#8b94a0]">{e.memo ?? e.refType ?? ""}</td>
-                <td className={`px-4 py-2 text-right tabular-nums font-semibold ${e.delta >= 0 ? "text-[#427cff]" : "text-[#ff3939]"}`}>{e.delta >= 0 ? "+" : ""}{fmt(e.delta)}</td>
+                <td className={`px-4 py-2 text-right tabular-nums font-semibold ${e.delta >= 0 ? "text-[var(--color-myb)]" : "text-[#ff3939]"}`}>{e.delta >= 0 ? "+" : ""}{fmt(e.delta)}</td>
               </tr>
             ))}
             {ledger.length === 0 && <tr><td colSpan={4} className="px-4 py-4 text-center text-[#b0b8c1]">원장 없음</td></tr>}

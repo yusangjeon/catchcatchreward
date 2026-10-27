@@ -14,11 +14,11 @@ export function SetCard({ s, size = 145 }: { s: SetCardT; size?: number }) {
         <img src={s.imageUrl} alt="" className={`h-full w-full object-cover ${s.done ? "opacity-50" : ""}`} loading="lazy" />
         {s.todayOnly && (
           <div className="absolute inset-x-0 top-0 flex h-[26px] items-center justify-between bg-myb px-2 text-[11px] font-bold text-white">
-            <span className="flex items-center gap-1"><img src="/myb/native/ic_today_clock.png" alt="" className="h-[15px] w-[15px]" /> 오늘만</span>
+            <span className="flex items-center gap-1"><img src="/brand/ic_clock.svg" alt="" className="h-[15px] w-[15px]" /> 오늘만</span>
             <span className="tabular-nums">00:00:00</span>
           </div>
         )}
-        {s.targeted && !s.todayOnly && <span className="absolute left-2 top-2 rounded-full bg-[#6d4cf2] px-2 py-0.5 text-[10px] font-bold text-white">내 취향 맞춤</span>}
+        {s.targeted && !s.todayOnly && <span className="absolute left-2 top-2 rounded-full bg-[#ff8a5c] px-2 py-0.5 text-[10px] font-bold text-white">내 취향 맞춤</span>}
         {s.done && <span className="absolute inset-x-0 bottom-0 bg-black/55 py-1 text-center text-[12px] font-bold text-white">참여 완료</span>}
         <HeartIcon size={22} className="absolute bottom-2 right-2 text-white drop-shadow" />
       </div>
@@ -35,7 +35,7 @@ export function SetGridCard({ s }: { s: SetCardT }) {
     <Link href={`/quiz/${s.id}`} className="block">
       <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-bg-2">
         <img src={s.imageUrl} alt="" className={`h-full w-full object-cover ${s.done ? "opacity-50" : ""}`} loading="lazy" />
-        {s.targeted && <span className="absolute left-2 top-2 rounded-full bg-[#6d4cf2] px-2 py-0.5 text-[10px] font-bold text-white">내 취향 맞춤</span>}
+        {s.targeted && <span className="absolute left-2 top-2 rounded-full bg-[#ff8a5c] px-2 py-0.5 text-[10px] font-bold text-white">내 취향 맞춤</span>}
         {s.done && <span className="absolute inset-x-0 bottom-0 bg-black/55 py-1 text-center text-[12px] font-bold text-white">참여 완료</span>}
       </div>
       <p className="mt-2.5 line-clamp-2 text-[14px] font-medium leading-[1.4]">{s.title}</p>

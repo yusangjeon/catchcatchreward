@@ -13,7 +13,7 @@ import type { Product } from "@/lib/exchange/products";
 /* eslint-disable @next/next/no-img-element */
 
 const STATUS: Record<string, { label: string; cls: string }> = {
-  requested: { label: "신청 완료", cls: "bg-[#f0f4ff] text-[#427cff]" },
+  requested: { label: "신청 완료", cls: "bg-[var(--color-myb-soft)] text-[var(--color-myb)]" },
   processing: { label: "처리 중", cls: "bg-[#fff4e0] text-[#ff9500]" },
   done: { label: "발송 완료", cls: "bg-[#e7faf5] text-[#00b795]" },
   rejected: { label: "반려·환불", cls: "bg-[#ffecf1] text-[#ff3d71]" },
@@ -53,17 +53,17 @@ export default function ExchangePage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
-      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center justify-between bg-[#f8f9fc] px-6">
+    <div className="min-h-dvh bg-[var(--color-bg)] pb-10 text-[#191f28]">
+      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center justify-between bg-[var(--color-bg)] px-6">
         <button type="button" onClick={() => router.back()} aria-label="뒤로" className="flex h-7 w-7 items-center justify-center">
-          <img src="/myb/shop/ic_left.png" width={28} height={28} alt="" className="h-7 w-7" />
+          <img src="/brand/ic_left.svg" width={28} height={28} alt="" className="h-7 w-7" />
         </button>
         <h1 className="text-[18px] font-semibold">포인트 교환</h1>
         <span className="flex items-center gap-[6px]"><PCoin size={18} /><span className="text-[18px] font-semibold leading-[18px] text-[#33363f]"><NumberFlow value={balance} /></span></span>
       </header>
 
       <div className="flex flex-col gap-6 px-6 pt-[64px]">
-        <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
+        <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           <p className="text-[14px] text-[#5c6573]">교환 가능 포인트</p>
           <p className="mt-1 flex items-center gap-2 text-[26px] font-extrabold"><PCoin size={26} /><NumberFlow value={balance} /></p>
           <p className="mt-2 text-[12px] leading-[17px] text-[#8b94a0]">{fmt(data?.minRedeem ?? 1000)}P부터 교환할 수 있어요. 신청 즉시 포인트가 차감되고, 기프티콘은 영업일 3일 내 문자로 발송돼요.</p>
@@ -88,7 +88,7 @@ export default function ExchangePage() {
         <section className="rounded-[20px] bg-white p-5">
           <h2 className="text-[16px] font-semibold">내 교환 내역</h2>
           {data && data.redemptions.length === 0 && <p className="mt-3 text-[14px] text-[#8b94a0]">아직 교환 신청이 없어요.</p>}
-          <ul className="mt-3 flex flex-col divide-y divide-[#f1f3f8]">
+          <ul className="mt-3 flex flex-col divide-y divide-[var(--color-bg-2)]">
             {(data?.redemptions ?? []).map((r) => (
               <li key={r.id} className="flex items-center justify-between py-3">
                 <div className="min-w-0">
@@ -100,7 +100,7 @@ export default function ExchangePage() {
             ))}
           </ul>
         </section>
-        <Link href="/history" className="text-center text-[14px] font-medium text-[#427cff]">포인트 전체 내역 보기 →</Link>
+        <Link href="/history" className="text-center text-[14px] font-medium text-[var(--color-myb)]">포인트 전체 내역 보기 →</Link>
       </div>
 
       {pick && (
@@ -114,11 +114,11 @@ export default function ExchangePage() {
                 <p className="mt-1 flex items-center gap-1 text-[18px] font-extrabold"><PCoin size={18} />{fmt(pick.points)}</p>
               </div>
             </div>
-            <div className="mt-5 rounded-xl bg-[#f8f9fc] p-4 text-[13px] leading-[19px] text-[#5c6573]">
+            <div className="mt-5 rounded-xl bg-[var(--color-bg)] p-4 text-[13px] leading-[19px] text-[#5c6573]">
               <p className="flex justify-between"><span>보유 포인트</span><b className="text-[#191f28]">{fmt(balance)}P</b></p>
               <p className="mt-1 flex justify-between"><span>교환 후 잔액</span><b className={balance - pick.points < 0 ? "text-[#ff3939]" : "text-[#191f28]"}>{fmt(balance - pick.points)}P</b></p>
             </div>
-            <button type="button" disabled={busy || balance < pick.points} onClick={() => void confirm()} className={`myb-press mt-5 h-[52px] w-full rounded-xl text-[16px] font-bold text-white ${balance < pick.points ? "bg-[#ced5e0]" : "bg-[#427cff]"}`}>
+            <button type="button" disabled={busy || balance < pick.points} onClick={() => void confirm()} className={`myb-press mt-5 h-[52px] w-full rounded-xl text-[16px] font-bold text-white ${balance < pick.points ? "bg-[#ced5e0]" : "bg-[var(--color-myb)]"}`}>
               {balance < pick.points ? `${fmt(pick.points - balance)}P 부족해요` : busy ? "신청 중…" : "교환 신청하기"}
             </button>
           </div>

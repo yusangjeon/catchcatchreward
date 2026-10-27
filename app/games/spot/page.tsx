@@ -3,19 +3,19 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
-import { Lottie } from "@/components/motion/Lottie";
 import { useToast } from "@/components/motion/Toast";
 import { fmt } from "@/hooks/useHome";
 import { PCoin } from "@/components/icons";
 import { haptic, sfx } from "@/lib/fx";
 import { burst, confetti, flyCoins } from "@/lib/fxEngine";
+import { showReward } from "@/lib/reward";
 import type { SpotPayload } from "@/lib/games/service";
 
 /* eslint-disable @next/next/no-img-element */
 
 interface Circle { id: string; x: number; y: number; r: number }
 interface Token { id: string; token: string }
-interface Result { found: number; total: number; points: number; all: boolean; missed: Circle[]; left: number; speedBonus: number; seconds: number }
+interface Result { found: number; total: number; points: number; all: boolean; missed: Circle[]; left: number; speedBonus: number; seconds: number; wallet?: { balance: number; stamps: number } }
 interface Float { k: number; x: number; y: number; text: string; ok: boolean }
 type Mark = Circle & { kind: "found" | "missed" | "hint" };
 
@@ -89,6 +89,7 @@ export default function SpotPage() {
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "제출 실패");
       const r = j as Result;
+      if (r.points > 0) await showReward({ variant: "big", points: r.points, to: r.wallet?.balance ?? r.points, title: r.all ? "완주 보상 지급!" : "보상 지급!", subtitle: r.all ? `차이 ${r.total}개를 모두 찾았어요 🎉` : `${r.found}/${r.total} 찾았어요`, holdMs: 2200 });
       setResult(r);
       setMarks((m) => [...m.filter((x) => x.kind !== "hint"), ...r.missed.map((c) => ({ ...c, kind: "missed" as const }))]);
       setPhase("done");
@@ -191,7 +192,7 @@ export default function SpotPage() {
   const pct = data ? (left / data.limitSec) * 100 : 100;
   const stars = result ? (result.all ? (result.speedBonus ? 3 : 2) : result.found >= 3 ? 1 : 0) : 0;
   const renderImage = (src: string, label: string, blur: boolean, top: boolean) => (
-    <div className={`relative mx-auto overflow-hidden rounded-[14px] bg-[#e5e8ee] ${shake ? "spot-shake" : ""}`} style={dim ? { width: dim.w, height: dim.h, boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" } : { aspectRatio: "1024 / 688", boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }} onClick={tap}>
+    <div className={`relative mx-auto overflow-hidden rounded-[14px] bg-[#e5e8ee] ${shake ? "spot-shake" : ""}`} style={dim ? { width: dim.w, height: dim.h, boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" } : { aspectRatio: "1024 / 688", boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }} onClick={tap}>
       <img src={src} alt={label} draggable={false} onLoad={() => setImgReady((n) => n + 1)} className={`block h-full w-full select-none transition-[filter] duration-300 ${blur ? "blur-[6px]" : ""}`} />
       {marks.map((m) => (
         <svg key={m.kind + m.id} viewBox="0 0 100 100" className="pointer-events-none absolute overflow-visible" style={{ left: `${(m.x - m.r) * 100}%`, top: `${(m.y - m.r * 1024 / 688) * 100}%`, width: `${m.r * 2 * 100}%`, aspectRatio: "1" }}>
@@ -216,21 +217,21 @@ export default function SpotPage() {
         <span key={f.k} className={`spot-float pointer-events-none absolute whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-extrabold text-white shadow-md ${f.ok ? "bg-[#22c55e]" : "bg-[#ff3b6b]"}`} style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%` }}>{f.text}</span>
       ))}
       {flash && <span className="spot-flash pointer-events-none absolute inset-0 bg-[#ff3b6b]" />}
-      <span className={`absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[11px] font-bold text-white ${top ? "bg-black/45" : "bg-[#427cff]"}`}>{label}</span>
+      <span className={`absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[11px] font-bold text-white ${top ? "bg-black/45" : "bg-[var(--color-myb)]"}`}>{label}</span>
     </div>
   );
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-[#f8f9fc] text-[#191f28]">
-      <GameHeader title="틀린그림 찾기" right={phase === "play" ? <span className={`text-[22px] font-extrabold tabular-nums ${left <= 10 ? "text-[#ff3939]" : "text-[#427cff]"}`}>{left}</span> : null} />
+    <div className="flex h-dvh flex-col overflow-hidden bg-[var(--color-bg)] text-[#191f28]">
+      <GameHeader title="틀린그림 찾기" right={phase === "play" ? <span className={`text-[22px] font-extrabold tabular-nums ${left <= 10 ? "text-[#ff3939]" : "text-[var(--color-myb)]"}`}>{left}</span> : null} />
       <div className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-3 pt-[52px]">
         {/* 상태 줄: 레벨 칩 · 찾은 개수 5개 · 타이머 바 */}
         <div className="flex shrink-0 items-center justify-between px-0.5">
-          <span className="rounded-full bg-[#e8f1ff] px-2.5 py-1 text-[12px] font-bold text-[#427cff]">LV {data ? data.level.index + 1 : "-"}<span className="font-medium text-[#9fb6ff]">/3</span></span>
+          <span className="rounded-full bg-[var(--color-myb-soft)] px-2.5 py-1 text-[12px] font-bold text-[var(--color-myb)]">LV {data ? data.level.index + 1 : "-"}<span className="font-medium text-[var(--color-myb-line)]">/3</span></span>
           <div className="flex items-center gap-2">{Array.from({ length: total }).map((_, i) => <span key={i} ref={(el) => { dots.current[i] = el; }} className={`flex h-[20px] w-[20px] items-center justify-center rounded-full border-2 text-[11px] font-black text-white transition-all duration-300 ${i < found ? "border-[#22c55e] bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,.6)]" : "border-[#dee2e9] bg-white"}`}>{i < found ? "✓" : ""}</span>)}</div>
           <span className="w-[52px] text-right text-[12px] font-semibold text-[#8b94a0]">{data ? data.level.name : ""}</span>
         </div>
-        <div className="h-1 w-full shrink-0 overflow-hidden rounded-full bg-[#e5e8ee]"><div className="h-full rounded-full transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%`, background: left <= 10 ? "#ff3939" : "linear-gradient(90deg,#427cff,#22d3ee)" }} /></div>
+        <div className="h-1 w-full shrink-0 overflow-hidden rounded-full bg-[#e5e8ee]"><div className="h-full rounded-full transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%`, background: left <= 10 ? "#ff3939" : "linear-gradient(90deg,var(--color-myb),var(--color-gold))" }} /></div>
 
         {data ? (
           <div ref={area} className="relative flex min-h-0 flex-1 flex-col justify-center gap-2">
@@ -238,13 +239,13 @@ export default function SpotPage() {
             {renderImage(data.level.b, "여기서 찾기", phase === "idle" || phase === "count", false)}
             {phase === "count" && (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                <span key={count} className="spot-count flex h-[120px] w-[120px] items-center justify-center rounded-full bg-[#427cff] text-[64px] font-black text-white shadow-[0_12px_40px_rgba(66,124,255,.5)]">{count}</span>
+                <span key={count} className="spot-count flex h-[120px] w-[120px] items-center justify-center rounded-full bg-[var(--color-myb)] text-[64px] font-black text-white shadow-[0_12px_40px_rgba(255,90,45,.5)]">{count}</span>
               </div>
             )}
             {phase === "idle" && (
               <div className="absolute inset-0 flex items-center justify-center">
                 {data.left > 0 ? (
-                  <button type="button" onClick={start} disabled={imgReady < 2} className="myb-press flex h-14 items-center gap-2 rounded-full bg-[#427cff] px-8 text-[17px] font-extrabold text-white shadow-[0_8px_30px_rgba(66,124,255,.45)] disabled:opacity-60">
+                  <button type="button" onClick={start} disabled={imgReady < 2} className="myb-press flex h-14 items-center gap-2 rounded-full bg-[var(--color-myb)] px-8 text-[17px] font-extrabold text-white shadow-[0_8px_30px_rgba(255,90,45,.45)] disabled:opacity-60">
                     {imgReady < 2 ? "준비 중…" : "▶ 시작"}
                   </button>
                 ) : (
@@ -252,7 +253,7 @@ export default function SpotPage() {
                 )}
               </div>
             )}
-            {result?.all && <div className="pointer-events-none absolute inset-0 flex items-center justify-center"><Lottie src="/myb/lottie_confetti_pop.json" className="h-[300px] w-[300px]" /></div>}
+            {result?.all && <div className="pointer-events-none absolute inset-0 flex items-center justify-center"></div>}
           </div>
         ) : (
           <div ref={area} className="flex min-h-0 flex-1 flex-col gap-2"><div className="animate-pulse rounded-[14px] bg-[#e5e8ee]" style={{ aspectRatio: "1024 / 688" }} /><div className="animate-pulse rounded-[14px] bg-[#e5e8ee]" style={{ aspectRatio: "1024 / 688" }} /></div>
@@ -275,7 +276,7 @@ export default function SpotPage() {
           {phase === "idle" && data && (
             <div className="flex items-center gap-2">
               {data.today.map((t) => (
-                <span key={t.index} className={`flex h-8 items-center gap-1 rounded-full px-3 text-[12px] font-bold ${t.status === "done" ? "bg-[#e9f7ef] text-[#1aa260]" : t.status === "current" ? "bg-[#427cff] text-white" : "bg-[#eef0f4] text-[#b0b8c1]"}`}>
+                <span key={t.index} className={`flex h-8 items-center gap-1 rounded-full px-3 text-[12px] font-bold ${t.status === "done" ? "bg-[#e9f7ef] text-[#1aa260]" : t.status === "current" ? "bg-[var(--color-myb)] text-white" : "bg-[#eef0f4] text-[#b0b8c1]"}`}>
                   {t.status === "done" ? (t.found === data.total ? "🏆" : "✓") : t.status === "current" ? "▶" : "🔒"} {t.index + 1}
                 </span>
               ))}
@@ -291,12 +292,12 @@ export default function SpotPage() {
           <div className="myb-modal-in fixed left-1/2 top-1/2 z-[1000] w-[calc(100%-56px)] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-[24px] bg-white px-6 pb-6 pt-7 text-center">
             <p className="flex items-center justify-center gap-2 text-[38px] leading-none">{[0, 1, 2].map((i) => <span key={i} className={i < stars ? "spot-star text-[#ffb400] drop-shadow-[0_2px_6px_rgba(255,180,0,.5)]" : "text-[#e5e8ee]"} style={{ animationDelay: `${0.25 + i * 0.18}s` }}>★</span>)}</p>
             <p className="mt-2 text-[24px] font-extrabold">{result.all ? "완벽해요!" : `${result.found}/${result.total} 찾았어요`}</p>
-            <p className="mt-2 flex items-center justify-center gap-1 text-[20px] font-extrabold text-[#427cff]"><PCoin size={20} />+{fmt(result.points)}</p>
+            <p className="mt-2 flex items-center justify-center gap-1 text-[20px] font-extrabold text-[var(--color-myb)]"><PCoin size={20} />+{fmt(result.points)}</p>
             <p className="mt-1 text-[12px] text-[#8b94a0]">{result.seconds}초{result.speedBonus ? ` · ⚡ 스피드 +${result.speedBonus}P` : ""}{!result.all ? " · 놓친 곳은 분홍 점선" : ""}</p>
             <div className="mt-5 grid grid-cols-2 gap-2">
               <button type="button" onClick={() => router.push("/games")} className="myb-press h-12 rounded-xl border border-[#dee2e9] text-[14px] font-bold">나가기</button>
               {result.left > 0 ? (
-                <button type="button" onClick={nextLevel} className="myb-press h-12 rounded-xl bg-[#427cff] text-[14px] font-bold text-white">다음 레벨</button>
+                <button type="button" onClick={nextLevel} className="myb-press h-12 rounded-xl bg-[var(--color-myb)] text-[14px] font-bold text-white">다음 레벨</button>
               ) : (
                 <button type="button" onClick={() => router.push("/wallet")} className="myb-press h-12 rounded-xl bg-[#191f28] text-[14px] font-bold text-white">지갑 보기</button>
               )}

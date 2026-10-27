@@ -32,7 +32,7 @@ export default function QuizTabPage() {
       <header className="flex h-[55px] items-center justify-between px-5">
         <h1 className="text-[22px] font-bold">퀴즈 <span className="font-medium text-[#b0b8c1]">채널</span></h1>
         <div className="flex items-center gap-4">
-          <Link href="/history" aria-label="내역"><img src="/myb/native/ic_clock_gray.png" alt="" className="h-[26px] w-[26px] opacity-70" /></Link>
+          <Link href="/history" aria-label="내역"><img src="/brand/ic_clock.svg" alt="" className="h-[26px] w-[26px] opacity-70" /></Link>
           <HeartIcon size={26} className="text-[#c5cbd3]" />
         </div>
       </header>
@@ -75,7 +75,7 @@ export default function QuizTabPage() {
                 <Link href={`/quiz/${s.id}`} className="flex items-start gap-3">
                   <span className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[14px] bg-bg-2">
                     <img src={s.imageUrl} alt="" className={`h-full w-full object-cover ${s.done ? "opacity-50" : ""}`} loading="lazy" />
-                    <span className="absolute left-1 top-1 rounded-full bg-[#8e5cf0] px-1.5 py-0.5 text-[9px] font-bold text-white">{g?.name.slice(0, 4)}</span>
+                    <span className="absolute left-1 top-1 rounded-full bg-[#ff8a5c] px-1.5 py-0.5 text-[9px] font-bold text-white">{g?.name.slice(0, 4)}</span>
                   </span>
                   <span className="min-w-0 flex-1">
                     <p className="line-clamp-2 text-[15px] font-medium leading-[1.4]">{s.title}</p>

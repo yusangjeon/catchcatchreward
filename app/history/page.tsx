@@ -15,7 +15,7 @@ const REASON: Record<LedgerEntry["reason"], string> = {
   quiz_answer: "퀴즈 보상",
   quiz_bonus: "랜덤 보너스",
   mission: "미션",
-  rush: "비포인트 러쉬",
+  rush: "캐치 러쉬",
   store_mission: "매장 미션",
   roulette: "룰렛 당첨",
   redeem: "포인트 교환",
@@ -32,10 +32,10 @@ export default function HistoryPage() {
   }, []);
 
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
-      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center justify-between bg-[#f8f9fc] px-6">
+    <div className="min-h-dvh bg-[var(--color-bg)] pb-10 text-[#191f28]">
+      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center justify-between bg-[var(--color-bg)] px-6">
         <button type="button" onClick={() => router.back()} aria-label="뒤로" className="flex h-7 w-7 items-center justify-center">
-          <img src="/myb/shop/ic_left.png" width={28} height={28} alt="" className="h-7 w-7" />
+          <img src="/brand/ic_left.svg" width={28} height={28} alt="" className="h-7 w-7" />
         </button>
         <h1 className="text-[18px] font-semibold">포인트 내역</h1>
         <span className="flex items-center gap-[6px]"><PCoin size={18} /><span className="text-[18px] font-semibold leading-[18px] text-[#33363f]">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span></span>
@@ -43,14 +43,14 @@ export default function HistoryPage() {
       <div className="px-6 pt-[64px]">
         <section className="rounded-[20px] bg-white p-5">
           {data && data.entries.length === 0 && <p className="text-[14px] text-[#8b94a0]">아직 내역이 없어요. 퀴즈를 풀면 쌓여요.</p>}
-          <ul className="flex flex-col divide-y divide-[#f1f3f8]">
+          <ul className="flex flex-col divide-y divide-[var(--color-bg-2)]">
             {(data?.entries ?? []).map((e) => (
               <li key={e.id} className="flex items-center justify-between py-3">
                 <div className="min-w-0">
                   <p className="truncate text-[14px] font-medium">{e.memo ?? REASON[e.reason]}</p>
                   <p className="text-[12px] text-[#b0b8c1]">{REASON[e.reason]} · {new Date(e.createdAt).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
                 </div>
-                <span className={`shrink-0 text-[15px] font-bold tabular-nums ${e.delta < 0 ? "text-[#ff3939]" : "text-[#427cff]"}`}>{e.delta > 0 ? "+" : ""}{fmt(e.delta)}P</span>
+                <span className={`shrink-0 text-[15px] font-bold tabular-nums ${e.delta < 0 ? "text-[#ff3939]" : "text-[var(--color-myb)]"}`}>{e.delta > 0 ? "+" : ""}{fmt(e.delta)}P</span>
               </li>
             ))}
           </ul>

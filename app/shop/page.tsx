@@ -10,9 +10,9 @@ import type { Merchant, ShopPayload } from "@/lib/shop/types";
 
 /**
  * 쇼핑적립 — 마이비 shop.myb.im 메인 웹뷰 오프라인 렌더 DOM 좌표 복제(390 기준, 상태바 45px 제외).
- * 헤더 60 · 추천 배너 74 · 적립 예정 카드 137 · 즐겨찾기 70원 · 2배 배너 78 · 추천 카드 167×122 · 전체 카드 167×126 · 유의사항 #f2f3f5
+ * 헤더 60 · 추천 배너 74 · 적립 예정 카드 137 · 즐겨찾기 70원 · 2배 배너 78 · 추천 카드 167×122 · 전체 카드 167×126 · 유의사항 var(--color-bg-3)
  */
-const SHADOW = "0 5px 16px 0 rgba(0, 43, 141, 0.1)";
+const SHADOW = "0 5px 16px 0 rgba(40, 24, 14, 0.09)";
 
 export default function ShopPage() {
   const router = useRouter();
@@ -46,7 +46,7 @@ export default function ShopPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] text-[#191f28]">
+    <div className="min-h-dvh bg-[var(--color-bg)] text-[#191f28]">
       {/* 헤더 60 (원본 105 = 상태바 45 + 60) */}
       <header className="fixed left-1/2 top-0 z-10 flex h-[60px] w-full max-w-[430px] -translate-x-1/2 items-center justify-center bg-white py-4">
         <button type="button" onClick={() => router.back()} aria-label="뒤로" className="flex h-7 w-[60px] items-center justify-center">
@@ -60,7 +60,7 @@ export default function ShopPage() {
         {/* 오늘의 쇼핑 추천 배너 342×74 */}
         {bannerOpen && (
           <div className="mb-[14px] px-6">
-            <Link href={`/shop/${data?.topBanner.merchantId ?? "coupang_pincrux_group"}`} className="relative flex h-[74px] items-center justify-center gap-[10px] rounded-[14px] bg-[#f0f4ff]">
+            <Link href={`/shop/${data?.topBanner.merchantId ?? "coupang_pincrux_group"}`} className="relative flex h-[74px] items-center justify-center gap-[10px] rounded-[14px] bg-[var(--color-myb-soft)]">
               <img src={data?.topBanner.image ?? "/myb/res/img_shopping_round_coupang.png"} width={48} height={48} alt="" className="h-12 w-12 rounded-full" />
               <div className="flex w-[252px] flex-col justify-center gap-[7px]">
                 <p className="text-[14px] leading-[16.1px] text-[#5c657c]">{data?.topBanner.title ?? "오늘의 쇼핑 추천"}</p>
@@ -130,7 +130,7 @@ export default function ShopPage() {
                     </div>
                     <p className="mb-1 h-[14px] w-full overflow-hidden whitespace-nowrap text-center text-[12px] font-medium leading-[14px] text-[#8b94a0]">{m.name}</p>
                     <p className="flex h-4 items-center justify-center gap-1 text-[14px] font-semibold leading-4 text-[#33363f]">
-                      최대 <span className="font-bold text-[#427cff]">{m.rate} %</span>
+                      최대 <span className="font-bold text-[var(--color-myb)]">{m.rate} %</span>
                     </p>
                   </Link>
                 );
@@ -144,12 +144,12 @@ export default function ShopPage() {
           <div className="flex items-center justify-between px-6">
             <h2 className="text-[20px] font-medium leading-6">🛍️ 오늘 여기서 쇼핑 어때요?</h2>
           </div>
-          <div className="relative mx-6 mt-4 h-[78px] overflow-hidden rounded-xl bg-[#f0f4ff]">
+          <div className="relative mx-6 mt-4 h-[78px] overflow-hidden rounded-xl bg-[var(--color-myb-soft)]">
             <img src="/myb/shop/img_welcome_2x.png" width={40} height={40} alt="" className="absolute left-3 top-[19px] h-10 w-10 object-contain" />
             <span className="absolute left-[33px] top-[46px] flex h-[15px] w-6 items-center justify-center whitespace-nowrap rounded-[40px] px-[6px] py-[2px] text-[9px] font-black text-white" style={{ background: "linear-gradient(to left, rgb(66, 195, 255), rgb(66, 124, 255))" }}>2X</span>
             <div className="absolute left-[67px] top-1/2 flex w-[261px] -translate-y-1/2 flex-col gap-2">
               <p className="whitespace-nowrap text-[15px] font-bold leading-[15px] tracking-[-0.3px] text-[#191f28]">
-                <span className="text-[#427cff]">웰컴 2배 적립 혜택</span> ✨
+                <span className="text-[var(--color-myb)]">웰컴 2배 적립 혜택</span> ✨
               </p>
               <p className="text-[14px] font-medium leading-[18.2px] tracking-[-0.14px] text-[#5c6573]">지금 보이는 적립 혜택을 2배로 적립해드려요!</p>
             </div>
@@ -178,7 +178,7 @@ export default function ShopPage() {
         </div>
 
         {/* 쇼핑적립 유의사항 */}
-        <div className="mt-10 flex items-center justify-center bg-[#f2f3f5]">
+        <div className="mt-10 flex items-center justify-center bg-[var(--color-bg-3)]">
           <div className="flex w-full flex-col gap-[15px] px-5 pb-[100px] pt-8">
             <p className="text-[14px] font-medium leading-[16.1px] text-[#191f28]">쇼핑적립 유의사항</p>
             <ul className="flex list-disc flex-col gap-2 pl-5 text-[13px] font-medium leading-[14.95px] text-[#8b94a0]">
@@ -213,7 +213,7 @@ export default function ShopPage() {
                     </Link>
                     <div className="absolute left-1/2 top-[-22px] flex h-8 -translate-x-1/2 items-center justify-center gap-[10px] whitespace-nowrap rounded-[99px] bg-white px-[10px]" style={{ boxShadow: SHADOW }}>
                       <p className="text-[15px] leading-[15px]">
-                        <span className="font-bold text-[#427cff]">🚨 10월까지만</span>
+                        <span className="font-bold text-[var(--color-myb)]">🚨 10월까지만</span>
                         <span className="font-medium"> 누릴 수 있어요! 🚨</span>
                       </p>
                     </div>
@@ -228,10 +228,10 @@ export default function ShopPage() {
   );
 }
 
-/** 추천 영역 일반 카드 167×122: white r14 border #f2f3f5 shadow padding 16 gap 12 */
+/** 추천 영역 일반 카드 167×122: white r14 border var(--color-bg-3) shadow padding 16 gap 12 */
 function RecommendCard({ m }: { m: Merchant }) {
   return (
-    <Link href={`/shop/${m.id}`} className="myb-press relative flex h-[122px] flex-col gap-3 rounded-[14px] border border-[#f2f3f5] bg-white p-4" style={{ boxShadow: SHADOW }}>
+    <Link href={`/shop/${m.id}`} className="myb-press relative flex h-[122px] flex-col gap-3 rounded-[14px] border border-[var(--color-bg-3)] bg-white p-4" style={{ boxShadow: SHADOW }}>
       {m.isNew && <NewTag />}
       <div className="flex h-8 items-center justify-center">
         <img src={m.logo} alt={m.name} className="max-h-8 max-w-[133px] object-contain" />

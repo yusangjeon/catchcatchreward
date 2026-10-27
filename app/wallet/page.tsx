@@ -7,39 +7,28 @@ import { useState } from "react";
 import { useHome, fmt } from "@/hooks/useHome";
 import { ChevronRight, CXCoin, PCoin, PCoinPink, PXCoin } from "@/components/icons";
 
-const Info = () => <img src="/myb/native/ic_info.png" alt="안내" className="h-[16px] w-[16px]" />;
 import { NumberFlow } from "@/components/motion/NumberFlow";
+import { PRODUCTS as EX } from "@/lib/exchange/products";
 
-const CONX_RATE = 3426.45;
+const Info = () => <img src="/brand/ic_info.svg" alt="안내" className="h-[16px] w-[16px]" />;
 const TABS = ["자산", "상품 구매", "뱃지"] as const;
 
-/** 브랜드 원형·상품 타일 — 앱스토어 스크린샷(상품 구매 탭) 원본 픽셀. 화면 밖이던 상품은 이모지 유지 */
-const BRANDS = [
-  { name: "전체", img: "/myb/native/brand_all.png" },
-  { name: "배달의민족", img: "/myb/native/brand_baemin.png", pad: true },
-  { name: "마이비", img: "/myb/native/brand_myb.png", pad: true },
-  { name: "MGC", img: "/myb/native/brand_mgc.png" },
-  { name: "DUNKIN", img: "/myb/native/brand_dunkin.png", pad: true },
-  { name: "스타벅스", img: "", bg: "bg-[#00704a] text-white", label: "★" },
+/** 상품 카테고리 원형 */
+const BRANDS: { name: string; img?: string; label?: string; bg?: string; pad?: boolean }[] = [
+  { name: "전체", img: "/brand/gift.webp", pad: true },
+  { name: "카페", label: "☕", bg: "bg-[#fff4d6]" },
+  { name: "편의점", label: "🏪", bg: "bg-[#eef7ff]" },
+  { name: "상품권", img: "/brand/ticket.webp", pad: true },
+  { name: "포인트", img: "/brand/coins.webp", pad: true },
+  { name: "금", img: "/brand/gold.webp", pad: true },
 ];
-const PRODUCTS = [
-  // grid-flow-col(2행) 이므로 [1행, 2행] 쌍 순서로 나열
-  { name: "한국거래소 금 투자", p: null, cx: null, img: "/myb/native/tile_gold.png" },
-  { name: "현금 15,000원", p: 18000, cx: 903, img: "/products/cash_15000.webp" },
-  { name: "마이비 포인트적금", p: null, cx: null, img: "/myb/native/tile_savings.png" },
-  { name: "아이스 카페 아메리카노 T", p: 6956, cx: 349.11, img: "/myb/native/tile_americano.png" },
-  { name: "네이버페이 포인트 10,000원", p: 12000, cx: 602, img: "/myb/native/tile_npay.png" },
-  { name: "신세계 상품권 10,000원", p: 14900, cx: 787.9, img: "/myb/native/tile_ssg.png" },
-  { name: "포테이토 피자 스몰 세트", p: 9900, cx: 497, img: "/products/pizza_small_set.webp" },
-  { name: "빙그레 바나나우유 240ML", p: 1900, cx: 95.3, img: "/products/banana_milk.webp" },
-  { name: "뿌링클+콜라 1.25L", p: 24900, cx: 1249, img: "/products/bburinkle_cola.webp" },
-];
+const PRODUCTS = EX.map((p) => ({ name: p.name, p: p.points as number | null, img: p.img }));
 
 export default function WalletPage() {
   const { data } = useHome();
   const [tab, setTab] = useState<(typeof TABS)[number]>("자산");
   const balance = data?.wallet.balance ?? 0;
-  const conx = (balance / CONX_RATE).toFixed(3);
+  const stampCount = data?.wallet.stamps ?? 0;
 
   return (
     <div className="px-5 pt-[24px]">
@@ -54,7 +43,7 @@ export default function WalletPage() {
             onClick={() => setTab(t)}
             className={`flex items-center justify-center gap-1.5 rounded-xl text-[13px] ${tab === t ? "bg-white font-bold shadow-sm" : "font-medium text-ink-2"}`}
           >
-            {t === "상품 구매" && <img src="/myb/native/ic_gift_blue.png" alt="" className={`h-[14px] w-[16px] ${tab === t ? "" : "grayscale"}`} />}
+            {t === "상품 구매" && <img src="/brand/gift.webp" alt="" className={`h-[16px] w-[16px] object-contain ${tab === t ? "" : "grayscale"}`} />}
             {t}
           </button>
         ))}
@@ -67,38 +56,38 @@ export default function WalletPage() {
             <p className="flex items-center gap-2"><PXCoin size={30} /><span className="text-[26px] font-extrabold tabular-nums"><NumberFlow value={balance} /> 원</span></p>
             <Link href="/history" className="flex items-center text-[13px] text-muted">내역 <ChevronRight size={15} /></Link>
           </div>
-          <div className="mt-[14px] flex h-[42px] items-center justify-between rounded-xl border border-[#e3e8f0] px-3 text-[12px]">
-            <span className="flex items-center gap-2"><CXCoin size={18} /> 1 CONX당 <b className="text-red">{fmt(CONX_RATE)}원</b>이에요. <span className="text-red">▲</span></span>
-            <span className="flex items-center gap-1 text-[11px] text-muted"><img src="/myb/native/ic_clock_gray.png" alt="" className="h-[13px] w-[13px]" /> 15분전</span>
-          </div>
-
-          <h2 className="mt-[46px] flex items-center gap-1.5 text-[17px] font-bold">내 자산 <Info /></h2>
-          <AssetRow icon={<PCoin size={22} />} name="B포인트" value={fmt(balance)} />
-          <AssetRow icon={<CXCoin size={22} />} name="CONX" value={conx} />
-
-          <Link href="/shop" className="mt-[30px] flex h-[46px] items-center justify-between rounded-xl bg-[#fff0f6] px-4 text-[13px]">
-            <span className="flex items-center gap-1.5"><img src="/myb/native/ic_shopping_bag_pink.png" alt="" className="h-[18px] w-[16px] object-contain" /> 쇼핑적립 예정 포인트</span>
-            <span className="flex items-center gap-1 text-[16px] font-extrabold"><PCoinPink size={16} />5,298 <ChevronRight size={15} className="text-muted" /></span>
+          <Link href="/roulette" className="mt-[14px] flex h-[42px] items-center justify-between rounded-xl border border-line px-3 text-[12px]">
+            <span className="flex items-center gap-2"><CXCoin size={18} /> 스탬프 <b className="text-myb-dark">{stampCount}개</b> · 10개 모으면 무료 룰렛 1회</span>
+            <span className="flex items-center gap-1 text-[11px] text-muted">룰렛 <ChevronRight size={14} /></span>
           </Link>
 
-          <div className="mt-2 flex h-[84px] items-center justify-between rounded-2xl border border-[#e3e8f0] px-4">
+          <h2 className="mt-[46px] flex items-center gap-1.5 text-[17px] font-bold">내 자산 <Info /></h2>
+          <AssetRow icon={<PCoin size={22} />} name="포인트" value={fmt(balance)} />
+          <AssetRow icon={<CXCoin size={22} />} name="룰렛 스탬프" value={`${stampCount}개`} />
+
+          <Link href="/shop" className="mt-[30px] flex h-[46px] items-center justify-between rounded-xl bg-[#fff0f6] px-4 text-[13px]">
+            <span className="flex items-center gap-1.5"><img src="/brand/qm_shop.webp" alt="" className="h-[18px] w-[18px] object-contain" /> 쇼핑 방문 적립</span>
+            <span className="flex items-center gap-1 text-[14px] font-extrabold"><PCoinPink size={16} />하루 5P <ChevronRight size={15} className="text-muted" /></span>
+          </Link>
+
+          <Link href="/exchange" className="mt-2 flex h-[84px] items-center justify-between rounded-2xl border border-line px-4">
             <div>
-              <p className="flex items-center gap-2 text-[14px] font-bold text-[#e3a300]">
-                <span className="rounded-full border border-[#e3a300] px-2 py-0.5 text-[11px]">진행중</span> 트레저러 금 투자
+              <p className="flex items-center gap-2 text-[14px] font-bold text-[#c98a00]">
+                <span className="rounded-full border border-[#e3a300] px-2 py-0.5 text-[11px]">교환</span> 포인트로 상품 교환
               </p>
-              <p className="mt-1.5 flex items-center gap-1 whitespace-nowrap text-[18px] font-extrabold"><img src="/myb/native/ic_gold_bars.png" alt="" className="h-[20px] w-[24px] object-contain" /> 63,383원 <span className="ml-1 text-[12px] font-medium text-ink-2">총 손익</span> <span className="text-[13px] text-red">▲ 20,474 (48%)</span></p>
+              <p className="mt-1.5 flex items-center gap-1 whitespace-nowrap text-[18px] font-extrabold"><img src="/brand/ticket.webp" alt="" className="h-[22px] w-[22px] object-contain" /> {fmt(balance)}P <span className="ml-1 text-[12px] font-medium text-ink-2">최소 1,000P부터</span></p>
             </div>
             <ChevronRight className="text-muted" />
-          </div>
-          <Link href="/roulette" className="mt-3 flex items-center justify-between rounded-2xl border border-[#9fd3e6] px-4 py-4">
+          </Link>
+          <Link href="/roulette" className="mt-3 flex items-center justify-between rounded-2xl border border-myb-line px-4 py-4">
             <div>
               <p className="flex items-center gap-2 text-[14px] font-bold text-myb-dark">
-                <span className="rounded-full border border-myb-dark px-2 py-0.5 text-[11px]">예치 중</span> B포인트 적금
+                <span className="rounded-full border border-myb-dark px-2 py-0.5 text-[11px]">모으는 중</span> 스탬프 적금
               </p>
               <p className="mt-1.5 text-[13px] text-muted">스탬프 {data?.wallet.stamps ?? 0}개 · 10개 모으면 룰렛 1회 <ChevronRight size={12} className="inline text-muted" /></p>
-              <div className="mt-2 h-1.5 w-40 overflow-hidden rounded-full bg-[#e3e8f0]"><div className="myb-progress h-full rounded-full bg-myb" style={{ width: `${Math.min(100, ((data?.wallet.stamps ?? 0) % 10) * 10)}%` }} /></div>
+              <div className="mt-2 h-1.5 w-40 overflow-hidden rounded-full bg-line"><div className="myb-progress h-full rounded-full bg-myb" style={{ width: `${Math.min(100, ((data?.wallet.stamps ?? 0) % 10) * 10)}%` }} /></div>
             </div>
-            <img src="/myb/native/img_savings_safe.png" alt="" className="h-[56px] w-[86px] object-contain" />
+            <img src="/brand/piggy.webp" alt="" className="h-[56px] w-[86px] object-contain" />
           </Link>
         </section>
       )}
@@ -108,22 +97,22 @@ export default function WalletPage() {
           <h2 className="mt-[34px] text-[18px] font-bold">인기 브랜드 상품을 모아봤어요</h2>
           <div className="no-scrollbar mt-[18px] flex gap-[14px] overflow-x-auto">
             {BRANDS.map((b, i) => (
-              <span key={b.name} className={`flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#e3e8f0] bg-white text-center text-[9px] font-extrabold shadow-sm ${b.bg ?? ""} ${i === 0 ? "ring-2 ring-myb ring-offset-2" : ""}`}>
-                {b.img ? <img src={b.img} alt={b.name} className={b.pad ? "h-auto w-[44px] object-contain" : "h-full w-full object-cover"} /> : b.label}
+              <span key={b.name} className={`flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-white text-center text-[9px] font-extrabold shadow-sm ${b.bg ?? ""} ${i === 0 ? "ring-2 ring-myb ring-offset-2" : ""}`}>
+                {b.img ? <img src={b.img} alt={b.name} className={b.pad ? "h-[38px] w-[38px] object-contain" : "h-full w-full object-cover"} /> : <span className="text-[24px]">{b.label}</span>}
               </span>
             ))}
           </div>
           <div className="no-scrollbar mt-[22px] grid grid-flow-col grid-rows-2 gap-x-[10px] gap-y-6 overflow-x-auto [grid-auto-columns:100px]">
             {PRODUCTS.map((p) => (
               <Link key={p.name} href={p.p === null ? "/wallet" : "/exchange"} className="block w-[100px]">
-                {"img" in p && p.img ? <img src={p.img} alt="" className="aspect-square w-full rounded-xl object-cover" /> : <div className={`flex aspect-square items-center justify-center rounded-xl text-[40px] ${"bg" in p ? p.bg : ""}`} aria-hidden>{"emoji" in p ? String(p.emoji) : ""}</div>}
+                <img src={p.img} alt="" className="aspect-square w-full rounded-xl object-cover" />
                 <p className="mt-2.5 line-clamp-2 text-[12px] leading-snug">{p.name}</p>
                 {p.p === null ? (
                   <p className="mt-1.5 flex items-center gap-1 text-[13px] font-bold"><PCoin size={14} />무제한</p>
                 ) : (
                   <>
                     <p className="mt-1.5 flex items-center gap-1 text-[13px] font-bold"><PCoin size={14} />{fmt(p.p)}</p>
-                    <p className="mt-0.5 flex items-center gap-1 text-[13px] font-bold"><CXCoin size={14} />{fmt(p.cx!)}</p>
+
                   </>
                 )}
               </Link>
@@ -139,7 +128,7 @@ export default function WalletPage() {
           {data && data.badges.length > 0 ? (
             <ul className="mt-5 grid grid-cols-3 gap-4">
               {data.badges.map((b) => (
-                <li key={b.code} className="flex flex-col items-center rounded-2xl border border-[#e3e8f0] p-4 text-center">
+                <li key={b.code} className="flex flex-col items-center rounded-2xl border border-line p-4 text-center">
                   <span className="text-[40px]" aria-hidden>{b.emoji}</span>
                   <span className="mt-2 text-[14px] font-bold">{b.name}</span>
                 </li>
@@ -153,7 +142,7 @@ export default function WalletPage() {
               <h3 className="mt-8 text-[16px] font-bold">다음 뱃지까지</h3>
               <ul className="mt-3 flex flex-col gap-3">
                 {data.badgeProgress.filter((b) => !b.earned).sort((a, b) => b.current / b.min - a.current / a.min).map((b) => (
-                  <li key={b.code} className="flex items-center gap-3 rounded-2xl border border-[#e3e8f0] px-4 py-3">
+                  <li key={b.code} className="flex items-center gap-3 rounded-2xl border border-line px-4 py-3">
                     <span className="text-[28px] grayscale" aria-hidden>{b.emoji}</span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between text-[14px]">

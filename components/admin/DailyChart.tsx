@@ -26,7 +26,7 @@ export function DailyChart({ title, rows, unit }: { title: string; rows: { label
           return (
             <g key={r.label}>
               <title>{`${r.label} · ${fmt(r.value)}${unit}`}</title>
-              <rect x={x} y={y} width={bw} height={h} rx={h > 0 ? 3 : 0} fill={last ? "#427cff" : "#9fbcff"} />
+              <rect x={x} y={y} width={bw} height={h} rx={h > 0 ? 3 : 0} fill={last ? "var(--color-myb)" : "var(--color-myb-line)"} />
               {show && <text x={x + bw / 2} y={y - 5} textAnchor="middle" fontSize={11} fill="#5c6573" className="tabular-nums">{fmt(r.value)}</text>}
               {(i % 2 === n % 2 || last) && <text x={x + bw / 2} y={H - 7} textAnchor="middle" fontSize={10} fill="#8b94a0">{r.label}</text>}
             </g>

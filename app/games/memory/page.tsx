@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
-import { Lottie } from "@/components/motion/Lottie";
 import { useToast } from "@/components/motion/Toast";
 import { haptic, sfx } from "@/lib/fx";
 import { burstAtPointer, confetti } from "@/lib/fxEngine";
@@ -12,8 +11,8 @@ import type { GamesPayload } from "@/lib/games/service";
 
 /* eslint-disable @next/next/no-img-element */
 
-/** 브랜드 원형 로고(쇼핑적립 제휴사) 16종 중 8쌍 */
-const LOGOS = ["coupang", "gmarket", "auction", "ssg", "emart", "11street", "ali", "kyobo", "gsshop", "himart", "trip", "agoda", "yanolja", "wconcept", "house", "lotteshopping"].map((k) => `/myb/res/img_shopping_round_${k}.${["coupang", "gmarket", "auction", "ssg", "emart", "11street", "ali", "kyobo", "gsshop", "trip", "yanolja", "lotteshopping", "agoda"].includes(k) ? "png" : "webp"}`);
+/** 카드 그림 — 브랜드 아이콘 16종 중 8쌍 */
+const LOGOS = ["qm_attend", "qm_games", "qm_honey", "qm_invite", "qm_shop", "qm_store", "qm_roulette", "bell", "piggy", "gold", "badge", "ticket", "gift", "trophy", "coins", "mascot_4"].map((k) => `/brand/${k}.webp`);
 function shuffle<T>(a: T[]): T[] {
   const b = [...a];
   for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; }
@@ -86,8 +85,8 @@ export default function MemoryPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
-      <GameHeader title="브랜드 짝 맞추기" right={started ? <span className="text-[#427cff]">{moves}회 · {sec}s</span> : left === 0 ? <span>오늘 완료</span> : null} />
+    <div className="min-h-dvh bg-[var(--color-bg)] pb-10 text-[#191f28]">
+      <GameHeader title="브랜드 짝 맞추기" right={started ? <span className="text-[var(--color-myb)]">{moves}회 · {sec}s</span> : left === 0 ? <span>오늘 완료</span> : null} />
       <div className="flex flex-col gap-4 px-5 pt-[64px]">
         <div className="flex items-center justify-between text-[13px] text-[#5c6573]">
           <p>같은 브랜드 2장을 찾아 8쌍을 맞추세요</p>
@@ -99,21 +98,21 @@ export default function MemoryPage() {
             return (
               <button key={i} type="button" onClick={() => flip(i)} aria-label={`카드 ${i + 1}`} className="aspect-square [perspective:600px]">
                 <span className={`relative block h-full w-full transition-transform duration-300 [transform-style:preserve-3d] ${up ? "[transform:rotateY(180deg)]" : ""}`}>
-                  <span className="absolute inset-0 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#427cff] to-[#6d4cf2] [backface-visibility:hidden]"><img src="/icons/icon-192.png" alt="" className="h-7 w-7 rounded-md opacity-90" /></span>
-                  <span className={`absolute inset-0 flex items-center justify-center rounded-xl bg-white p-2 [backface-visibility:hidden] [transform:rotateY(180deg)] ${matched.has(i) ? "ring-2 ring-[#22c55e]" : ""}`} style={{ boxShadow: "0 2px 8px rgba(0,43,141,.08)" }}>{c && <img src={c} alt="" className="h-full w-full rounded-full object-contain" />}</span>
+                  <span className="absolute inset-0 flex items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-myb)] to-[#ff8a5c] [backface-visibility:hidden]"><img src="/icons/icon-192.png" alt="" className="h-7 w-7 rounded-md opacity-90" /></span>
+                  <span className={`absolute inset-0 flex items-center justify-center rounded-xl bg-white p-2 [backface-visibility:hidden] [transform:rotateY(180deg)] ${matched.has(i) ? "ring-2 ring-[#22c55e]" : ""}`} style={{ boxShadow: "0 2px 8px rgba(40,24,14,.08)" }}>{c && <img src={c} alt="" className="h-full w-full rounded-full object-contain" />}</span>
                 </span>
               </button>
             );
           })}
-          {done && done.points > 0 && <div className="pointer-events-none absolute inset-0 flex items-center justify-center"><Lottie src="/myb/lottie_confetti_pop.json" className="h-[320px] w-[320px]" /></div>}
+          {done && done.points > 0 && <div className="pointer-events-none absolute inset-0 flex items-center justify-center"></div>}
         </div>
-        {!started && <button type="button" disabled={left === 0} onClick={start} className="myb-press h-[52px] rounded-xl bg-[#427cff] text-[16px] font-bold text-white disabled:opacity-40">{left === 0 ? "오늘은 다 했어요. 내일 다시!" : "시작하기"}</button>}
+        {!started && <button type="button" disabled={left === 0} onClick={start} className="myb-press h-[52px] rounded-xl bg-[var(--color-myb)] text-[16px] font-bold text-white disabled:opacity-40">{left === 0 ? "오늘은 다 했어요. 내일 다시!" : "시작하기"}</button>}
         {done && (
-          <div className="rounded-[20px] bg-white p-5 text-center" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
+          <div className="rounded-[20px] bg-white p-5 text-center" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
             <p className="text-[20px] font-extrabold">{moves}회 · {sec}초 만에 완료 🎉</p>
-            <p className="mt-1 text-[14px] font-bold text-[#427cff]">+{fmt(done.points)}P</p>
+            <p className="mt-1 text-[14px] font-bold text-[var(--color-myb)]">+{fmt(done.points)}P</p>
             <p className="mt-1 text-[12px] text-[#8b94a0]">16회 이내 15P · 24회 이내 10P · 완주 5P</p>
-            <button type="button" onClick={() => router.push("/games")} className="myb-press mt-4 h-11 w-full rounded-xl bg-[#427cff] text-[14px] font-bold text-white">다른 게임 하러 가기</button>
+            <button type="button" onClick={() => router.push("/games")} className="myb-press mt-4 h-11 w-full rounded-xl bg-[var(--color-myb)] text-[14px] font-bold text-white">다른 게임 하러 가기</button>
           </div>
         )}
       </div>
