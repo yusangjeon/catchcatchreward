@@ -101,5 +101,10 @@ export interface Repo {
   findProfile(idOrAnonKey: string): Promise<Profile | null>;
   /** 관리자 유저 목록(최신순, limit) */
   listProfiles(limit?: number): Promise<Profile[]>;
+  /** 세그먼트 인사이트용: 전체 유저 배지·태그 점수 */
+  listAllUserBadges(): Promise<{ userId: string; badgeCode: string }[]>;
+  listAllTagScores(): Promise<{ userId: string; tag: string; score: number }[]>;
+  /** 최근 N일(KST dayKey) 일별 지표 */
+  dailyStats(dayKeys: string[]): Promise<{ dayKey: string; completions: number; pointsIssued: number; newUsers: number; attendance: number }[]>;
   adminStats(dayKey: string): Promise<AdminStats>;
 }

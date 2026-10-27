@@ -28,7 +28,7 @@ export default async function AdminUsers() {
           <tbody>
             {rows.map(({ p, balance, stamps, badges, invites, completions }) => (
               <tr key={p.id} className="border-t border-[#f1f3f8]">
-                <td className="px-4 py-3 font-mono text-[12px]"><Link href={`/admin/grant?target=${p.id}`} className="text-[#427cff]">{p.id.slice(0, 8)}…</Link></td>
+                <td className="px-4 py-3 font-mono text-[12px]"><Link href={`/admin/users/${p.id}`} className="text-[#427cff]">{p.id.slice(0, 8)}…</Link></td>
                 <td className="px-4 py-3 text-[12px] text-[#5c6573]">{new Date(p.createdAt).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
                 <td className="px-4 py-3 tabular-nums">{fmt(balance)}P</td>
                 <td className="px-4 py-3 tabular-nums">{stamps}</td>

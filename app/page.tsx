@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useHome, fmt } from "@/hooks/useHome";
 import { useToast } from "@/components/motion/Toast";
 import { ChevronRight, PCoin } from "@/components/icons";
@@ -27,6 +28,32 @@ export default function HomePage() {
   const { data, error, reload } = useHome();
   const { show } = useToast();
   const sets = data?.sets ?? [];
+  const [welcome, setWelcome] = useState(false);
+  const [installHint, setInstallHint] = useState(false);
+
+  // 가입 보너스 웰컴 시트(1회) · PWA 설치 힌트(모바일 브라우저, 닫으면 다시 안 띄움)
+  useEffect(() => {
+    if (!data) return;
+    try {
+      if (data.welcome.justNow && !localStorage.getItem("ccr_welcome")) {
+        setWelcome(true);
+        localStorage.setItem("ccr_welcome", "1");
+      }
+      const standalone = window.matchMedia("(display-mode: standalone)").matches || ("standalone" in navigator && (navigator as unknown as { standalone?: boolean }).standalone === true);
+      const mobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+      if (!standalone && mobile && !localStorage.getItem("ccr_install_hint")) setInstallHint(true);
+    } catch {
+      /* 저장소 접근 불가 */
+    }
+  }, [data]);
+  function closeInstallHint() {
+    setInstallHint(false);
+    try {
+      localStorage.setItem("ccr_install_hint", "1");
+    } catch {
+      /* noop */
+    }
+  }
 
   /** 출석체크: 1일 1회 10P + 스탬프 1 (마이비 러쉬 스탬프 미션과 동일 보상) */
   async function attend() {
@@ -144,6 +171,29 @@ export default function HomePage() {
       </section>
 
       {error && <p className="py-3 text-center text-xs text-red">연결 오류: {error}</p>}
+
+      {installHint && (
+        <div className="fixed bottom-[92px] left-1/2 z-30 flex w-[calc(100%-32px)] max-w-[398px] -translate-x-1/2 items-center gap-3 rounded-2xl bg-[#191f28] px-4 py-3 text-white shadow-lg">
+          <img src="/icons/icon-192.png" alt="" className="h-9 w-9 rounded-lg" />
+          <p className="flex-1 text-[12px] leading-[17px]">브라우저 메뉴에서 <b>홈 화면에 추가</b>하면 앱처럼 전체화면으로 열려요</p>
+          <button type="button" onClick={closeInstallHint} aria-label="닫기" className="text-[18px] leading-none text-white/70">×</button>
+        </div>
+      )}
+
+      {welcome && data && (
+        <>
+          <div className="myb-fade-in fixed inset-0 z-[999] bg-black/60" onClick={() => setWelcome(false)} />
+          <div className="myb-modal-in fixed bottom-0 left-1/2 z-[1000] w-full max-w-[430px] -translate-x-1/2 rounded-t-[24px] bg-white px-6 pb-8 pt-7 text-center">
+            <img src="/myb/bh/img_bpointrush_visual.webp" alt="" className="mx-auto h-[120px] w-[120px]" />
+            <p className="mt-2 text-[22px] font-extrabold">환영해요! 가입 보너스 <span className="text-myb">{fmt(data.welcome.points)}P</span></p>
+            <p className="mt-2 text-[13px] leading-[19px] text-muted">
+              {data.starter.active ? `지금부터 ${Math.max(1, Math.ceil((new Date(data.starter.endsAt).getTime() - Date.now()) / 86400_000))}일 동안 퀴즈 보상이 2배예요.` : "취향 퀴즈 풀고 포인트 받아보세요."}<br />
+              매일 출석하고 러쉬 미션으로 스탬프를 모으면 룰렛도 돌릴 수 있어요.
+            </p>
+            <button type="button" onClick={() => setWelcome(false)} className="myb-press mt-5 h-[52px] w-full rounded-xl bg-myb text-[16px] font-bold text-white">퀴즈 풀러 가기</button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -307,6 +307,27 @@ export const memoryRepo: Repo = {
   async listProfiles(limit = 200) {
     return [...store().profiles.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, limit);
   },
+  async listAllUserBadges() {
+    const out: { userId: string; badgeCode: string }[] = [];
+    for (const [userId, list] of store().userBadges) for (const b of list) out.push({ userId, badgeCode: b.badgeCode });
+    return out;
+  },
+  async listAllTagScores() {
+    const out: { userId: string; tag: string; score: number }[] = [];
+    for (const [userId, m] of store().tagScores) for (const [tag, score] of m) out.push({ userId, tag, score });
+    return out;
+  },
+  async dailyStats(dayKeys) {
+    const s = store();
+    const key = (iso: string) => new Date(new Date(iso).getTime() + 9 * 3600_000).toISOString().slice(0, 10);
+    return dayKeys.map((dayKey) => ({
+      dayKey,
+      completions: s.completions.filter((c) => c.dayKey === dayKey).length,
+      pointsIssued: s.ledger.filter((e) => e.delta > 0 && key(e.createdAt) === dayKey).reduce((a, e) => a + e.delta, 0),
+      newUsers: [...s.profiles.values()].filter((p) => key(p.createdAt) === dayKey).length,
+      attendance: s.stamps.filter((st) => st.sourceType === "attendance" && st.sourceId === dayKey).length,
+    }));
+  },
   async adminStats(dayKey) {
     const s = store();
     return {

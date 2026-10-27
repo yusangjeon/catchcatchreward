@@ -13,6 +13,7 @@ const RANDOM_BONUS = [0, 0, 0, 10, 10, 20, 30];
 export const HONEY_PER_DAY = 8;
 
 /** 스타터팩(마이비 isEnableStarterPack · beginnerEndAt = 가입일+3일 23:59 KST): 기간 내 퀴즈 세트 보상 2배 */
+export const SIGNUP_POINTS = 300; // 첫 방문 가입 보너스(마이비 welcomePopup 구조)
 export const STARTER_DAYS = 3;
 export const STARTER_MULTIPLIER = 2;
 export function starterOf(createdAt: string): { active: boolean; endsAt: string; multiplier: number } {
@@ -41,6 +42,14 @@ const PERSONA_TITLES: [tag: string, title: string, emojis: string][] = [
   ["late_night", "밤을 지배하는 올빼미", "🦉🍜🌃"],
   ["music", "플레이리스트 큐레이터", "🎧🎵✨"],
   ["game", "전략가 게이머", "🎮🧠⚔️"],
+  ["travel", "길 위의 탐험가", "✈️🗺️📸"],
+  ["pet", "다정한 집사", "🐶🐱💕"],
+  ["beauty", "셀프케어 전문가", "💄✨🪞"],
+  ["fashion", "트렌드 세터", "👗🧥👟"],
+  ["saving", "미래를 사는 투자자", "📈💰🏦"],
+  ["dining_out", "맛집 지도 제작자", "🍽️🗺️⭐"],
+  ["car", "주말 드라이버", "🚗🌊🛣️"],
+  ["health", "밸런스 지킴이", "🥗💧🧘"],
 ];
 
 function persona(scores: Record<string, number>): Persona {
@@ -110,13 +119,17 @@ function toPublic(q: Quiz): PublicQuestion {
 // ───────── 조회 ─────────
 export async function getHome(userId: string): Promise<HomePayload> {
   const repo = getRepo();
+  // 가입 보너스: 원장에 signup 이 없으면 1회 지급
+  const ledger = await repo.listLedger(userId, 200);
+  const justNow = !ledger.some((e) => e.reason === "signup");
+  if (justNow) await repo.addLedger({ userId, delta: SIGNUP_POINTS, reason: "signup", refType: "signup", memo: "가입 보너스" });
   const [sets, w, badges, scores, done, rush, profile] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId), repo.listCompletions(userId), rushSummary(userId), repo.findProfile(userId)]);
   const attendedToday = await repo.hasStamp(userId, "attendance", kstDayKey());
   const earned = new Set(badges.map((b) => b.code));
   const badgeProgress = (await repo.listBadges()).map((b) => ({
     code: b.code, name: b.name, emoji: b.emoji, description: b.description, current: Math.min(scores[b.rule.tag] ?? 0, b.rule.min), min: b.rule.min, earned: earned.has(b.code),
   }));
-  return { wallet: w, honey: honeyLeft(done), honeyMax: HONEY_PER_DAY, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday, starter: starterOf(profile?.createdAt ?? new Date(0).toISOString()), badgeProgress };
+  return { wallet: w, honey: honeyLeft(done), honeyMax: HONEY_PER_DAY, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday, starter: starterOf(profile?.createdAt ?? new Date(0).toISOString()), badgeProgress, welcome: { justNow, points: SIGNUP_POINTS } };
 }
 
 export async function getSetPayload(userId: string, setId: string): Promise<SetPayload> {

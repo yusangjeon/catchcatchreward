@@ -2,11 +2,13 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/admin/auth";
 import { getRepo } from "@/lib/db";
 import { kstDayKey } from "@/lib/time";
+import { DailyChart } from "@/components/admin/DailyChart";
 
 export default async function AdminHome() {
   await requireAdmin();
   const repo = getRepo();
-  const [stats, badges, counts, prizes] = await Promise.all([repo.adminStats(kstDayKey()), repo.listBadges(), repo.countUserBadges(), repo.listPrizes()]);
+  const days = Array.from({ length: 14 }, (_, i) => kstDayKey(new Date(Date.now() - (13 - i) * 86400_000)));
+  const [stats, badges, counts, prizes, daily] = await Promise.all([repo.adminStats(kstDayKey()), repo.listBadges(), repo.countUserBadges(), repo.listPrizes(), repo.dailyStats(days)]);
   const total = prizes.reduce((s, p) => s + p.weight, 0) || 1;
   const ev = prizes.reduce((s, p) => s + (p.kind === "none" ? 0 : p.value) * (p.weight / total), 0);
   const fmt = (n: number) => n.toLocaleString("ko-KR");
@@ -33,6 +35,12 @@ export default async function AdminHome() {
             <p className="mt-1 text-[22px] font-bold tabular-nums">{v}</p>
           </div>
         ))}
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        <DailyChart title="일별 퀴즈 세트 완료" rows={daily.map((d) => ({ label: d.dayKey.slice(5), value: d.completions }))} unit="건" />
+        <DailyChart title="일별 적립 포인트" rows={daily.map((d) => ({ label: d.dayKey.slice(5), value: d.pointsIssued }))} unit="P" />
+        <DailyChart title="일별 신규 유저" rows={daily.map((d) => ({ label: d.dayKey.slice(5), value: d.newUsers }))} unit="명" />
+        <DailyChart title="일별 출석" rows={daily.map((d) => ({ label: d.dayKey.slice(5), value: d.attendance }))} unit="명" />
       </div>
       <section className="rounded-2xl bg-white p-5 shadow-sm">
         <div className="flex items-center justify-between">

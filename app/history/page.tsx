@@ -10,6 +10,7 @@ import type { LedgerEntry, Wallet } from "@/lib/types";
 /* eslint-disable @next/next/no-img-element */
 
 const REASON: Record<LedgerEntry["reason"], string> = {
+  signup: "가입 보너스",
   quiz_answer: "퀴즈 보상",
   quiz_bonus: "랜덤 보너스",
   mission: "미션",

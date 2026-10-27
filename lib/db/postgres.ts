@@ -304,6 +304,28 @@ export function createPostgresRepo(url: string): Repo {
     async listProfiles(limit = 200) {
       return (await sql<ProfileRow[]>`select * from profiles order by created_at desc limit ${limit}`).map(toProfile);
     },
+    async listAllUserBadges() {
+      const rows = await sql<{ user_id: string; badge_code: string }[]>`select user_id, badge_code from user_badges`;
+      return rows.map((r) => ({ userId: r.user_id, badgeCode: r.badge_code }));
+    },
+    async listAllTagScores() {
+      const rows = await sql<{ user_id: string; tag: string; score: number }[]>`select user_id, tag, score from user_tag_scores`;
+      return rows.map((r) => ({ userId: r.user_id, tag: r.tag, score: r.score }));
+    },
+    async dailyStats(dayKeys) {
+      if (dayKeys.length === 0) return [];
+      const rows = await sql<{ day_key: string; completions: number; points: number; new_users: number; attendance: number }[]>`
+        select d.day_key,
+          (select count(*) from set_completions c where c.day_key = d.day_key)::int as completions,
+          (select coalesce(sum(delta), 0) from point_ledger l where l.delta > 0 and to_char(l.created_at at time zone 'Asia/Seoul', 'YYYY-MM-DD') = d.day_key)::int as points,
+          (select count(*) from profiles p where to_char(p.created_at at time zone 'Asia/Seoul', 'YYYY-MM-DD') = d.day_key)::int as new_users,
+          (select count(*) from stamps s where s.source_type = 'attendance' and s.source_id = d.day_key)::int as attendance
+        from unnest(${sql.array(dayKeys)}::text[]) as d(day_key)`;
+      return dayKeys.map((dayKey) => {
+        const r = rows.find((x) => x.day_key === dayKey);
+        return { dayKey, completions: r?.completions ?? 0, pointsIssued: r?.points ?? 0, newUsers: r?.new_users ?? 0, attendance: r?.attendance ?? 0 };
+      });
+    },
     async adminStats(dayKey) {
       const [a] = await sql<{ users: number; today: number; issued: number; redeemed: number; stamps: number; spins: number; red: number; store: number; refs: number; rush: number }[]>`
         select

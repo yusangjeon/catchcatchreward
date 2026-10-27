@@ -8,6 +8,13 @@ export const SEED_BADGES: Badge[] = [
   { code: "home_body", name: "집순이·집돌이", description: "집에서 보내는 선택지를 3번 이상 골랐어요", emoji: "🏠", rule: { tag: "home", min: 3 } },
   { code: "smart_shopper", name: "알뜰쇼퍼", description: "가성비 선택지를 3번 이상 골랐어요", emoji: "🛒", rule: { tag: "value", min: 3 } },
   { code: "fitness", name: "운동러", description: "운동 선택지를 3번 이상 골랐어요", emoji: "💪", rule: { tag: "fitness", min: 3 } },
+  { code: "traveler", name: "여행러", description: "여행·나들이 선택지를 3번 이상 골랐어요", emoji: "✈️", rule: { tag: "travel", min: 3 } },
+  { code: "pet_lover", name: "반려인", description: "반려동물 선택지를 2번 이상 골랐어요", emoji: "🐶", rule: { tag: "pet", min: 2 } },
+  { code: "beauty", name: "뷰티러버", description: "뷰티·스킨케어 선택지를 3번 이상 골랐어요", emoji: "💄", rule: { tag: "beauty", min: 3 } },
+  { code: "fashionista", name: "패션피플", description: "패션 선택지를 3번 이상 골랐어요", emoji: "👗", rule: { tag: "fashion", min: 3 } },
+  { code: "investor", name: "재테크러", description: "저축·투자 선택지를 3번 이상 골랐어요", emoji: "📈", rule: { tag: "saving", min: 3 } },
+  { code: "foodie", name: "맛집탐험가", description: "외식·맛집 선택지를 3번 이상 골랐어요", emoji: "🍽️", rule: { tag: "dining_out", min: 3 } },
+  { code: "car_owner", name: "드라이버", description: "자동차 선택지를 2번 이상 골랐어요", emoji: "🚗", rule: { tag: "car", min: 2 } },
 ];
 
 const img = (seed: string, w = 600, h = 600) => `https://picsum.photos/seed/${seed}/${w}/${h}`;
@@ -42,6 +49,14 @@ export const SEED_SETS: QuizSet[] = [
   { id: "s06", title: "식재료 구입 시 어떤 앱을 사용하세요?", imageUrl: img("veggie"), rewardPoints: 500, capacity: 993, baseParticipants: 1201, todayOnly: false, active: true, sort: 6 },
   { id: "s07", title: "어떤 장르의 게임을 좋아하시나요?", imageUrl: img("gamer"), rewardPoints: 450, capacity: 5000, baseParticipants: 3205, todayOnly: false, active: true, sort: 7 },
   { id: "s08", title: "어떤 음악 스트리밍앱을 사용하세요?", imageUrl: img("music"), rewardPoints: 240, capacity: 1000, baseParticipants: 3205, todayOnly: false, active: true, sort: 8 },
+  { id: "s09", title: "이번 연휴, 어디로 떠날까요? ✈️", imageUrl: img("travel"), rewardPoints: 120, capacity: 8000, baseParticipants: 2410, todayOnly: false, active: true, sort: 9 },
+  { id: "s10", title: "우리 집 반려동물 이야기 🐾", imageUrl: img("puppy"), rewardPoints: 80, capacity: 6000, baseParticipants: 1930, todayOnly: false, active: true, sort: 10 },
+  { id: "s11", title: "아침 스킨케어 루틴, 몇 단계?", imageUrl: img("skincare"), rewardPoints: 150, capacity: 4000, baseParticipants: 2877, todayOnly: false, active: true, sort: 11 },
+  { id: "s12", title: "올가을 옷장, 뭐부터 채울까요?", imageUrl: img("fashion"), rewardPoints: 90, capacity: 7000, baseParticipants: 4120, todayOnly: false, active: true, sort: 12 },
+  { id: "s13", title: "월급 관리, 나는 어떤 타입?", imageUrl: img("money"), rewardPoints: 200, capacity: 3000, baseParticipants: 1555, todayOnly: false, active: true, sort: 13 },
+  { id: "s14", title: "점심 메뉴 결정 장애 테스트 🍱", imageUrl: img("lunch"), rewardPoints: 60, capacity: 10000, baseParticipants: 6210, todayOnly: false, active: true, sort: 14 },
+  { id: "s15", title: "주말 드라이브 코스 추천받기 🚗", imageUrl: img("drive"), rewardPoints: 130, capacity: 5000, baseParticipants: 980, todayOnly: false, active: true, sort: 15 },
+  { id: "s16", title: "건강 챙기기, 어디까지 해봤나요?", imageUrl: img("health"), rewardPoints: 110, capacity: 5000, baseParticipants: 2040, todayOnly: false, active: true, sort: 16 },
 ];
 
 export const SEED_QUIZZES: Quiz[] = [
@@ -70,4 +85,35 @@ export const SEED_QUIZZES: Quiz[] = [
 
   q("s08", 1, "어떤 음악 스트리밍앱을 사용하세요?", [["멜론", ["music"]], ["유튜브 뮤직", ["music", "value"]], ["스포티파이", ["music"]], ["애플 뮤직", ["music", "apple"]]]),
   q("s08", 2, "디저트 하나만 고른다면?", [["달달한 케이크", ["cafe", "sweet"], "cake"], ["아메리카노로 충분", ["cafe", "coffee"], "coffee"]]),
+
+  q("s09", 1, "연휴 3일, 나의 선택은?", [["해외 여행", ["travel", "outdoor"]], ["국내 당일치기", ["travel", "outdoor"]], ["집에서 푹 쉬기", ["home", "rest"]], ["친구들과 맛집", ["dining_out", "outdoor"]]]),
+  q("s09", 2, "여행 가면 꼭 하는 것은?", [["현지 맛집 투어", ["travel", "dining_out"], "foodtour"], ["인생샷 찍기", ["travel", "beauty"], "photo"]]),
+  q("s09", 3, "숙소는 어떻게 고르나요?", [["가성비 최우선", ["value", "travel"]], ["위치·전망 우선", ["travel"]], ["호캉스 그 자체", ["travel", "rest"]], ["캠핑·차박", ["travel", "car", "outdoor"]]]),
+
+  q("s10", 1, "반려동물, 키우고 있나요?", [["강아지", ["pet"], "dog"], ["고양이", ["pet"], "cat"]]),
+  q("s10", 2, "반려동물 용품은 주로 어디서?", [["온라인 정기배송", ["pet", "online_shopping"]], ["동네 펫샵", ["pet", "convenience"]], ["대형마트", ["pet", "value"]], ["아직 안 키워요", ["rest"]]]),
+
+  q("s11", 1, "아침 스킨케어는 몇 단계?", [["세안만", ["rest"]], ["2~3단계", ["beauty"]], ["5단계 이상", ["beauty"]], ["선크림은 필수", ["beauty", "outdoor"]]]),
+  q("s11", 2, "화장품은 주로 어디서 사나요?", [["올리브영", ["beauty", "convenience"]], ["온라인 최저가", ["beauty", "value", "online_shopping"]], ["백화점·브랜드샵", ["beauty"]], ["다이소", ["beauty", "value"]]]),
+  q("s11", 3, "지금 가장 신경 쓰는 피부 고민은?", [["보습", ["beauty"], "moist"], ["모공·트러블", ["beauty"], "pore"]]),
+
+  q("s12", 1, "옷은 주로 어디서?", [["무신사·온라인", ["fashion", "online_shopping"]], ["SPA 매장", ["fashion", "value"]], ["백화점", ["fashion"]], ["빈티지·구제", ["fashion", "value"]]]),
+  q("s12", 2, "가을 아우터 하나만 고른다면?", [["트렌치코트", ["fashion"], "trench"], ["가죽 재킷", ["fashion"], "leather"]]),
+  q("s12", 3, "옷 살 때 가장 중요한 건?", [["디자인", ["fashion"]], ["가격", ["value"]], ["편안함", ["rest", "home"]], ["브랜드", ["fashion"]]]),
+
+  q("s13", 1, "월급날, 나는?", [["자동이체로 저축 먼저", ["saving", "value"]], ["카드값 정산", ["value"]], ["일단 쇼핑", ["shopping"]], ["주식·코인 매수", ["saving", "challenge"]]]),
+  q("s13", 2, "비상금은 어디에?", [["파킹통장·CMA", ["saving"]], ["그냥 통장", ["rest"]], ["ETF·펀드", ["saving", "challenge"]], ["없어요", ["rest"]]]),
+  q("s13", 3, "가계부 쓰나요?", [["앱으로 자동", ["saving", "tech"], "ledger"], ["안 써요", ["rest"], "noledger"]]),
+
+  q("s14", 1, "오늘 점심은?", [["한식", ["dining_out"], "korean"], ["양식·파스타", ["dining_out", "cafe"], "pasta"]]),
+  q("s14", 2, "점심 예산은?", [["8천원 이하", ["value"]], ["1만원 안팎", ["dining_out"]], ["1만 5천원 이상도 OK", ["dining_out"]], ["도시락·집밥", ["home", "value"]]]),
+  q("s14", 3, "배달 vs 외식", [["배달", ["delivery", "home"]], ["나가서 먹기", ["dining_out", "outdoor"]]]),
+
+  q("s15", 1, "차가 있나요?", [["내 차 있음", ["car"]], ["카셰어링 이용", ["car", "value"]], ["대중교통파", ["convenience"]], ["도보·자전거", ["fitness", "outdoor"]]]),
+  q("s15", 2, "주말 드라이브, 어디로?", [["바다", ["car", "travel", "outdoor"], "sea"], ["산·계곡", ["car", "travel", "outdoor"], "mountain"]]),
+  q("s15", 3, "주유는 주로?", [["가장 싼 주유소 찾아서", ["car", "value"]], ["가까운 곳 아무데나", ["car", "convenience"]], ["전기차 충전", ["car", "tech"]], ["해당 없음", ["rest"]]]),
+
+  q("s16", 1, "건강을 위해 하는 것은?", [["규칙적인 운동", ["fitness"]], ["영양제 챙기기", ["health"]], ["일찍 자기", ["early_bird", "rest"]], ["아무것도 안 함", ["rest"]]]),
+  q("s16", 2, "하루 물 섭취량은?", [["2L 이상", ["health", "fitness"], "water"], ["커피가 물", ["cafe", "coffee"], "coffeecup"]]),
+  q("s16", 3, "건강검진은?", [["매년 꼬박꼬박", ["health"]], ["회사에서 할 때만", ["health"]], ["안 받은 지 오래", ["rest"]], ["다음 달 예약함", ["health"]]]),
 ];
