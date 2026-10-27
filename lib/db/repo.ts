@@ -63,6 +63,12 @@ export interface Repo {
   /** 유저의 전체 스탬프(소비 포함) — 주간 출석 일수 집계용 */
   listStamps(userId: string): Promise<Stamp[]>;
 
+  // ── 로그인(소셜 연결) ──
+  findProfileByProvider(provider: string, providerId: string): Promise<Profile | null>;
+  linkProvider(userId: string, link: { provider: Profile["provider"]; providerId: string; nickname?: string; avatarUrl?: string }): Promise<Profile | null>;
+  /** 익명 프로필(from)의 기록을 기존 계정(to)으로 합친 뒤 from 을 삭제. 유니크 충돌 행은 to 것을 유지 */
+  mergeProfiles(fromId: string, toId: string): Promise<void>;
+
   // ── 친구초대 ──
   findProfileByInviteCode(code: string): Promise<Profile | null>;
   setReferredBy(userId: string, inviterId: string): Promise<void>;

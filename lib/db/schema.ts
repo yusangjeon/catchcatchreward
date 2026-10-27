@@ -16,8 +16,15 @@ create table if not exists profiles (
   nickname    text,
   invite_code text unique not null,
   referred_by uuid references profiles(id),
+  provider    text,
+  provider_id text,
+  avatar_url  text,
   created_at  timestamptz not null default now()
 );
+alter table profiles add column if not exists provider text;
+alter table profiles add column if not exists provider_id text;
+alter table profiles add column if not exists avatar_url text;
+create unique index if not exists profiles_provider_idx on profiles(provider, provider_id) where provider is not null;
 
 create table if not exists quiz_sets (
   id                text primary key,
@@ -193,13 +200,14 @@ create table if not exists rush_claims (
 create table if not exists game_plays (
   id         uuid primary key default gen_random_uuid(),
   user_id    uuid not null references profiles(id) on delete cascade,
-  game       text not null check (game in ('spot', 'rsp', 'scratch', 'memory')),
+  game       text not null,
   day_key    text not null,
   result     text not null,
   points     integer not null default 0,
   created_at timestamptz not null default now()
 );
 create index if not exists game_plays_user_idx on game_plays(user_id, day_key);
+alter table game_plays drop constraint if exists game_plays_game_check;
 
 alter table profiles                 enable row level security;
 alter table quiz_sets                enable row level security;

@@ -4,8 +4,14 @@ import { randomUUID } from "node:crypto";
 import { getRepo } from "@/lib/db";
 import type { Profile } from "@/lib/types";
 
-const COOKIE = "ccr_uid";
+export const COOKIE = "ccr_uid";
 const ONE_YEAR = 60 * 60 * 24 * 365;
+
+/** 세션 전환(로그인·로그아웃): 쿠키의 anonKey 를 다른 프로필의 것으로 바꾼다. Route Handler 안에서만 호출 */
+export async function setSessionAnonKey(anonKey: string) {
+  const jar = await cookies();
+  jar.set(COOKIE, anonKey, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: ONE_YEAR });
+}
 
 /**
  * 익명 유저 식별. 쿠키가 없으면 새로 발급한다.

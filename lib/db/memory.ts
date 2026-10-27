@@ -181,6 +181,34 @@ export const memoryRepo: Repo = {
     return store().stamps.filter((s) => s.userId === userId);
   },
 
+  async findProfileByProvider(provider, providerId) {
+    return [...store().profiles.values()].find((p) => p.provider === provider && p.providerId === providerId) ?? null;
+  },
+  async linkProvider(userId, link) {
+    const p = [...store().profiles.values()].find((x) => x.id === userId);
+    if (!p) return null;
+    p.provider = link.provider;
+    p.providerId = link.providerId;
+    if (link.nickname) p.nickname = link.nickname;
+    if (link.avatarUrl) p.avatarUrl = link.avatarUrl;
+    return p;
+  },
+  async mergeProfiles(fromId, toId) {
+    const s = store();
+    if (fromId === toId) return;
+    const mv = <T extends { userId: string }>(arr: T[], keyOf?: (x: T) => string) => {
+      const have = new Set(keyOf ? arr.filter((x) => x.userId === toId).map(keyOf) : []);
+      for (const x of arr) if (x.userId === fromId) { if (keyOf && have.has(keyOf(x))) x.userId = `__dropped__${fromId}`; else x.userId = toId; }
+    };
+    mv(s.ledger); mv(s.stamps); mv(s.spins); mv(s.redemptions); mv(s.gamePlays);
+    mv(s.completions, (c) => c.setId); mv(s.responses, (r) => r.quizId); mv(s.storeCompletions, (c) => c.missionId); mv(s.rushClaims, (c) => `${c.weekKey}:${c.missionKey}`);
+    for (const r of s.referrals) { if (r.inviterId === fromId) r.inviterId = toId; }
+    const fromInvitee = s.referrals.find((r) => r.inviteeId === fromId);
+    if (fromInvitee) { if (s.referrals.some((r) => r.inviteeId === toId)) s.referrals.splice(s.referrals.indexOf(fromInvitee), 1); else fromInvitee.inviteeId = toId; }
+    const ft = s.tagScores.get(fromId); if (ft) { const tt = s.tagScores.get(toId) ?? new Map(); for (const [k, v] of ft) tt.set(k, (tt.get(k) ?? 0) + v); s.tagScores.set(toId, tt); s.tagScores.delete(fromId); }
+    const fb = s.userBadges.get(fromId); if (fb) { const tb = s.userBadges.get(toId) ?? []; for (const b of fb) if (!tb.some((x) => x.badgeCode === b.badgeCode)) tb.push(b); s.userBadges.set(toId, tb); s.userBadges.delete(fromId); }
+    for (const [k, p] of s.profiles) if (p.id === fromId) s.profiles.delete(k);
+  },
   async findProfileByInviteCode(code) {
     return [...store().profiles.values()].find((p) => p.inviteCode === code) ?? null;
   },

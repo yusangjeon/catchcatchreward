@@ -74,10 +74,10 @@ export default function HomePage() {
           <span className="text-[16px] font-bold tabular-nums">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span>
         </Link>
         <div className="flex items-center gap-3">
-          <span className="flex h-[26px] items-center gap-1.5 rounded-lg border border-line bg-bg-2 px-2 text-[12px] font-semibold">
-            <img src="/myb/native/ic_basic_hex.png" alt="" className="h-[14px] w-[14px]" />
-            베이직
-          </span>
+          <Link href="/me" className="flex h-[26px] items-center gap-1.5 rounded-lg border border-line bg-bg-2 px-2 text-[12px] font-semibold">
+            {data?.me.avatarUrl ? <img src={data.me.avatarUrl} alt="" className="h-[16px] w-[16px] rounded-full object-cover" /> : <img src="/myb/native/ic_basic_hex.png" alt="" className="h-[14px] w-[14px]" />}
+            {data?.me.loggedIn ? (data.me.nickname ?? "MY").slice(0, 6) : "베이직"}
+          </Link>
           <Link href="/roulette" aria-label="선물함(룰렛)"><img src="/myb/native/ic_gift_badge.png" alt="" className="h-[28px] w-[28px]" /></Link>
           <Link href="/notifications" aria-label="알림" className="relative">
             <img src="/myb/native/ic_bell.png" alt="" className="h-[24px] w-[24px]" />

@@ -1,50 +1,56 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { GameHeader } from "@/components/games/GameHeader";
 import { PCoin } from "@/components/icons";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { fmt } from "@/hooks/useHome";
 import type { GamesPayload } from "@/lib/games/service";
 
-/* eslint-disable @next/next/no-img-element */
+const TILE: Record<string, { bg: string; art: React.ReactNode }> = {
+  spot: { bg: "linear-gradient(135deg,#bfe3ff,#8fd37a)", art: <svg viewBox="0 0 48 48" className="h-10 w-10"><circle cx="19" cy="19" r="12" fill="none" stroke="#191f28" strokeWidth="4" /><line x1="28" y1="28" x2="40" y2="40" stroke="#191f28" strokeWidth="5" strokeLinecap="round" /><circle cx="19" cy="19" r="5" fill="#ff5c8a" /></svg> },
+  slide: { bg: "linear-gradient(135deg,#ffe08a,#ff8a3d)", art: <svg viewBox="0 0 48 48" className="h-10 w-10"><rect x="4" y="4" width="18" height="18" rx="4" fill="#fff" /><rect x="26" y="4" width="18" height="18" rx="4" fill="#fff" opacity=".7" /><rect x="4" y="26" width="18" height="18" rx="4" fill="#fff" opacity=".7" /><rect x="26" y="26" width="18" height="18" rx="4" fill="#427cff" /><text x="35" y="40" fontSize="11" fontWeight="800" fill="#fff" textAnchor="middle">2048</text></svg> },
+  scratch: { bg: "linear-gradient(135deg,#ffb86b,#ff6b6b)", art: <svg viewBox="0 0 48 48" className="h-10 w-10"><rect x="6" y="12" width="36" height="24" rx="4" fill="#fff" /><circle cx="16" cy="24" r="4" fill="#ff8a3d" /><circle cx="24" cy="24" r="4" fill="#ff8a3d" /><circle cx="32" cy="24" r="4" fill="#ff8a3d" /></svg> },
+  rsp: { bg: "linear-gradient(135deg,#1e293b,#427cff)", art: <span className="text-[34px] leading-none">✌️</span> },
+  memory: { bg: "linear-gradient(135deg,#c084fc,#427cff)", art: <svg viewBox="0 0 48 48" className="h-10 w-10"><rect x="6" y="8" width="16" height="22" rx="3" fill="#fff" /><rect x="26" y="8" width="16" height="22" rx="3" fill="#fff" opacity=".8" /><rect x="6" y="34" width="36" height="6" rx="3" fill="#fff" opacity=".5" /></svg> },
+};
 
-/** 미니게임 허브 — 매일 리셋되는 3가지 게임(리텐션). 결과·보상은 서버가 결정 */
+/** 미니게임 허브 — 매일 리셋되는 5가지. 결과·보상은 서버가 결정 */
 export default function GamesPage() {
-  const router = useRouter();
   const [data, setData] = useState<GamesPayload | null>(null);
   useEffect(() => {
     fetch("/api/games", { cache: "no-store" }).then((r) => r.json()).then(setData).catch(() => {});
   }, []);
+  const todayPoints = data?.games.reduce((a, g) => a + g.todayPoints, 0) ?? 0;
+  const leftTotal = data?.games.reduce((a, g) => a + g.left, 0) ?? 0;
   return (
     <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
-      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center justify-between bg-[#f8f9fc] px-6">
-        <button type="button" onClick={() => router.back()} aria-label="뒤로" className="flex h-7 w-7 items-center justify-center"><img src="/myb/shop/ic_left.png" width={28} height={28} alt="" className="h-7 w-7" /></button>
-        <h1 className="text-[18px] font-semibold">미니게임</h1>
-        <Link href="/wallet" className="flex items-center gap-[6px]"><PCoin size={18} /><span className="text-[18px] font-semibold leading-[18px] text-[#33363f]">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span></Link>
-      </header>
-      <div className="flex flex-col gap-4 px-6 pt-[64px]">
-        <section className="rounded-[20px] bg-gradient-to-br from-[#191f28] to-[#2b3550] p-5 text-white">
-          <p className="text-[12px] font-semibold text-[#9fb6ff]">매일 0시 리셋</p>
-          <p className="mt-1 text-[18px] font-extrabold leading-[24px]">오늘의 게임 3가지<br />다 하면 러쉬 스탬프도 채워져요</p>
-          <p className="mt-2 text-[12px] text-white/70">이번 주 플레이 <b className="text-white">{data?.weekPlays ?? 0}</b>회 · 오늘 획득 <b className="text-white">{fmt(data?.games.reduce((a, g) => a + g.todayPoints, 0) ?? 0)}P</b></p>
+      <GameHeader title="미니게임" right={<Link href="/wallet" className="flex items-center gap-1 text-[16px]"><PCoin size={16} />{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</Link>} />
+      <div className="flex flex-col gap-4 px-5 pt-[64px]">
+        <section className="relative overflow-hidden rounded-[20px] bg-[#191f28] p-5 text-white">
+          <p className="text-[12px] font-semibold text-[#9fb6ff]">매일 0시 리셋 · 오늘 남은 플레이 {leftTotal}회</p>
+          <p className="mt-1 text-[20px] font-extrabold leading-[26px]">오늘 게임으로 <span className="text-[#fde047]">{fmt(todayPoints)}P</span> 모았어요</p>
+          <p className="mt-2 text-[12px] text-white/60">이번 주 {data?.weekPlays ?? 0}회 플레이 · 3회마다 러쉬 스탬프 미션 달성</p>
+          <span className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-[#427cff]/30 blur-2xl" />
         </section>
-        <ul className="flex flex-col gap-3">
+        <ul className="grid grid-cols-2 gap-3">
           {(data?.games ?? []).map((g) => (
             <li key={g.key}>
-              <Link href={g.href} className="flex items-center gap-4 rounded-[20px] bg-white p-4" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#f0f4ff] text-[30px]">{g.icon}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[16px] font-bold">{g.title}</p>
-                  <p className="mt-0.5 text-[12px] text-[#8b94a0]">{g.desc}</p>
-                  <p className="mt-1 text-[12px]">{g.left > 0 ? <span className="font-semibold text-[#427cff]">오늘 {g.left}회 남음</span> : <span className="text-[#b0b8c1]">오늘 완료 · 내일 다시</span>}{g.todayPoints > 0 && <span className="ml-2 text-[#ff8a3d]">+{fmt(g.todayPoints)}P</span>}</p>
+              <Link href={g.href} className="block overflow-hidden rounded-[20px] bg-white" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
+                <div className="flex h-[96px] items-center justify-center" style={{ background: TILE[g.key]?.bg }}>{TILE[g.key]?.art}</div>
+                <div className="p-3">
+                  <p className="text-[15px] font-bold">{g.title}</p>
+                  <p className="mt-0.5 line-clamp-2 min-h-[32px] text-[11px] leading-[16px] text-[#8b94a0]">{g.desc}</p>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${g.left > 0 ? "bg-[#e8f1ff] text-[#427cff]" : "bg-[#f2f3f5] text-[#8b94a0]"}`}>{g.left > 0 ? `${g.left}회 남음` : "내일 다시"}</span>
+                    {g.todayPoints > 0 && <span className="text-[12px] font-bold text-[#ff8a3d]">+{fmt(g.todayPoints)}P</span>}
+                  </div>
                 </div>
-                <span className={`shrink-0 rounded-lg px-3 py-2 text-[13px] font-bold ${g.left > 0 ? "bg-[#427cff] text-white" : "bg-[#f2f3f5] text-[#8b94a0]"}`}>{g.left > 0 ? "하기" : "완료"}</span>
               </Link>
             </li>
           ))}
-          {!data && [0, 1, 2].map((i) => <li key={i} className="h-[88px] animate-pulse rounded-[20px] bg-white" />)}
+          {!data && [0, 1, 2, 3].map((i) => <li key={i} className="h-[190px] animate-pulse rounded-[20px] bg-white" />)}
         </ul>
         {data && data.recent.length > 0 && (
           <section className="rounded-[16px] bg-white p-4" style={{ boxShadow: "0 2px 10px 0 rgba(0, 43, 141, 0.06)" }}>

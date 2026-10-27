@@ -16,8 +16,8 @@ export function pgClient(url: string): Sql {
   return client;
 }
 
-type ProfileRow = { id: string; anon_key: string; nickname: string | null; invite_code: string; referred_by: string | null; created_at: Date };
-const toProfile = (r: ProfileRow): Profile => ({ id: r.id, anonKey: r.anon_key, nickname: r.nickname ?? undefined, inviteCode: r.invite_code, referredBy: r.referred_by ?? undefined, createdAt: isoReq(r.created_at) });
+type ProfileRow = { id: string; anon_key: string; nickname: string | null; invite_code: string; referred_by: string | null; provider: string | null; provider_id: string | null; avatar_url: string | null; created_at: Date };
+const toProfile = (r: ProfileRow): Profile => ({ id: r.id, anonKey: r.anon_key, nickname: r.nickname ?? undefined, inviteCode: r.invite_code, referredBy: r.referred_by ?? undefined, provider: (r.provider as Profile["provider"]) ?? undefined, providerId: r.provider_id ?? undefined, avatarUrl: r.avatar_url ?? undefined, createdAt: isoReq(r.created_at) });
 type SetRow = { id: string; title: string; image_url: string; reward_points: number; capacity: number; base_participants: number; today_only: boolean; active: boolean; sort: number; target_badges: string[] };
 const toSet = (r: SetRow): QuizSet => ({ id: r.id, title: r.title, imageUrl: r.image_url, rewardPoints: r.reward_points, capacity: r.capacity, baseParticipants: r.base_participants, todayOnly: r.today_only, active: r.active, sort: r.sort, targetBadges: r.target_badges?.length ? r.target_badges : undefined });
 type StampRow = { id: string; user_id: string; source_type: string; source_id: string | null; created_at: Date; consumed_by: string | null };
@@ -160,6 +160,41 @@ export function createPostgresRepo(url: string): Repo {
       return (await sql<SpinRow[]>`select * from roulette_spins where user_id = ${userId} order by spun_at desc limit 100`).map(toSpin);
     },
 
+    async findProfileByProvider(provider, providerId) {
+      const r = await sql<ProfileRow[]>`select * from profiles where provider = ${provider} and provider_id = ${providerId}`;
+      return r[0] ? toProfile(r[0]) : null;
+    },
+    async linkProvider(userId, link) {
+      const r = await sql<ProfileRow[]>`update profiles set provider = ${link.provider ?? null}, provider_id = ${link.providerId}, nickname = coalesce(${link.nickname ?? null}, nickname), avatar_url = coalesce(${link.avatarUrl ?? null}, avatar_url) where id = ${userId} returning *`;
+      return r[0] ? toProfile(r[0]) : null;
+    },
+    async mergeProfiles(fromId, toId) {
+      if (fromId === toId) return;
+      await sql.begin(async (tx) => {
+        await tx`update point_ledger set user_id = ${toId} where user_id = ${fromId}`;
+        await tx`update stamps set user_id = ${toId} where user_id = ${fromId}`;
+        await tx`update roulette_spins set user_id = ${toId} where user_id = ${fromId}`;
+        await tx`update redemptions set user_id = ${toId} where user_id = ${fromId}`;
+        await tx`update game_plays set user_id = ${toId} where user_id = ${fromId}`;
+        await tx`delete from set_completions f where f.user_id = ${fromId} and exists (select 1 from set_completions t where t.user_id = ${toId} and t.set_id = f.set_id)`;
+        await tx`update set_completions set user_id = ${toId} where user_id = ${fromId}`;
+        await tx`delete from quiz_responses f where f.user_id = ${fromId} and exists (select 1 from quiz_responses t where t.user_id = ${toId} and t.quiz_id = f.quiz_id)`;
+        await tx`update quiz_responses set user_id = ${toId} where user_id = ${fromId}`;
+        await tx`delete from store_mission_completions f where f.user_id = ${fromId} and exists (select 1 from store_mission_completions t where t.user_id = ${toId} and t.mission_id = f.mission_id)`;
+        await tx`update store_mission_completions set user_id = ${toId} where user_id = ${fromId}`;
+        await tx`delete from rush_claims f where f.user_id = ${fromId} and exists (select 1 from rush_claims t where t.user_id = ${toId} and t.week_key = f.week_key and t.mission_key = f.mission_key)`;
+        await tx`update rush_claims set user_id = ${toId} where user_id = ${fromId}`;
+        await tx`update referrals set inviter_id = ${toId} where inviter_id = ${fromId}`;
+        await tx`delete from referrals where invitee_id = ${fromId} and exists (select 1 from referrals t where t.invitee_id = ${toId})`;
+        await tx`update referrals set invitee_id = ${toId} where invitee_id = ${fromId}`;
+        await tx`insert into user_tag_scores (user_id, tag, score, updated_at) select ${toId}, tag, score, now() from user_tag_scores where user_id = ${fromId} on conflict (user_id, tag) do update set score = user_tag_scores.score + excluded.score, updated_at = now()`;
+        await tx`delete from user_tag_scores where user_id = ${fromId}`;
+        await tx`insert into user_badges (user_id, badge_code, earned_at) select ${toId}, badge_code, earned_at from user_badges where user_id = ${fromId} on conflict do nothing`;
+        await tx`delete from user_badges where user_id = ${fromId}`;
+        await tx`update profiles set referred_by = ${toId} where referred_by = ${fromId}`;
+        await tx`delete from profiles where id = ${fromId}`;
+      });
+    },
     async findProfileByInviteCode(code) {
       const r = await sql<ProfileRow[]>`select * from profiles where invite_code = ${code}`;
       return r[0] ? toProfile(r[0]) : null;

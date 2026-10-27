@@ -111,6 +111,9 @@ export interface Profile {
   nickname?: string;
   inviteCode: string; // 친구초대 코드(8자)
   referredBy?: string; // 나를 초대한 유저 id
+  provider?: "kakao" | "dev"; // 소셜 로그인 연결(없으면 익명)
+  providerId?: string;
+  avatarUrl?: string;
   createdAt: string;
 }
 
@@ -153,7 +156,7 @@ export interface StoreMissionCompletion {
 export interface GamePlay {
   id: string;
   userId: string;
-  game: "spot" | "rsp" | "scratch" | "memory";
+  game: "spot" | "rsp" | "scratch" | "memory" | "slide";
   dayKey: string;
   result: string; // win/draw/lose, found:5, prize:50 …
   points: number;
@@ -208,6 +211,7 @@ export interface HomePayload {
   starter: { active: boolean; endsAt: string; multiplier: number }; // 뉴비 스타터팩(가입 후 3일 퀴즈 보상 2배)
   badgeProgress: { code: string; name: string; emoji: string; description: string; current: number; min: number; earned: boolean }[]; // 전체 배지 진행도
   welcome: { justNow: boolean; points: number }; // 가입 보너스(첫 방문 시 1회)
+  me: { loggedIn: boolean; nickname?: string; avatarUrl?: string; provider?: string }; // 로그인 상태
 }
 
 export interface PublicQuestion {

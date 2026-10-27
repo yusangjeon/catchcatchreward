@@ -3,6 +3,7 @@ import { createHash, randomInt } from "node:crypto";
 import { getRepo } from "@/lib/db";
 import { kstDayKey } from "@/lib/time";
 import type { GamePlay, Wallet } from "@/lib/types";
+import { SCENES } from "./spotScenes";
 
 /**
  * 미니게임 — 리텐션용 일일 콘텐츠. 결과·보상은 서버에서만 결정(원장 reason=game), 플레이는 game_plays 에 기록해 일일 한도·러쉬 집계.
@@ -11,12 +12,13 @@ import type { GamePlay, Wallet } from "@/lib/types";
  *  - scratch(복권 긁기): 하루 1장. 0P 50% · 5P 25% · 10P 15% · 50P 8% · 500P 2% (기대값 ≈16.8P)
  *  - memory(카드 뒤집기): 4×4 8쌍. 클라이언트 플레이, 완료 시 시도 수로 보상(≤16회 15P · ≤24회 10P · 그 외 5P). 하루 1회, 서버는 타당성(시도≥8·시간≥5s)만 검사
  */
-export const GAME_LIMITS: Record<GamePlay["game"], number> = { spot: 1, rsp: 3, scratch: 1, memory: 1 };
-export const SPOT_ROWS = 8;
-export const SPOT_COLS = 6;
+export const GAME_LIMITS: Record<GamePlay["game"], number> = { spot: 1, rsp: 3, scratch: 1, memory: 1, slide: 1 };
 export const SPOT_DIFFS = 5;
-const SPOT_POOL = ["🍎", "🍊", "🍋", "🍇", "🍓", "🥝", "🍑", "🍒", "🥐", "🍩", "🍪", "🧁", "🍦", "🍫", "🍭", "🥨", "🌸", "🌻", "🌵", "🍀", "🐶", "🐱", "🐰", "🐼", "🦊", "🐸", "🐥", "🦋", "⭐", "🌙", "☂️", "🎈", "🎁", "🧸", "🎲", "🚗"];
+export const SPOT_LIMIT_SEC = 75;
 const SCRATCH_PRIZES: [points: number, weight: number][] = [[0, 50], [5, 25], [10, 15], [50, 8], [500, 2]];
+const SCRATCH_SYMBOL: Record<number, string> = { 5: "🍒", 10: "🔔", 50: "⭐", 500: "💎" };
+const SCRATCH_POOL = ["🍀", "🍒", "🔔", "⭐", "💎", "🎁"];
+export const RSP_STREAK_BONUS = 20; // 3연승마다
 
 export class GameError extends Error {
   constructor(public code: "LIMIT" | "BAD_INPUT", message: string) {
@@ -36,20 +38,12 @@ function rng(seed: string) {
   };
 }
 
+/** 날짜 시드 → 장면 1개 + 차이 5개(전원 동일) */
 export function spotPuzzle(dayKey: string) {
   const r = rng(`spot:${dayKey}`);
-  const n = SPOT_ROWS * SPOT_COLS;
-  const pool = [...SPOT_POOL].sort(() => r() - 0.5).slice(0, 12);
-  const left = Array.from({ length: n }, () => pool[Math.floor(r() * pool.length)]);
-  const right = [...left];
-  const diffs = new Set<number>();
-  while (diffs.size < SPOT_DIFFS) diffs.add(Math.floor(r() * n));
-  for (const i of diffs) {
-    let e = right[i];
-    while (e === right[i]) e = pool[Math.floor(r() * pool.length)];
-    right[i] = e;
-  }
-  return { left, right, diffs: [...diffs].sort((a, b) => a - b), rows: SPOT_ROWS, cols: SPOT_COLS };
+  const scene = SCENES[Math.floor(r() * SCENES.length)];
+  const ids = [...scene.diffs.map((d) => d.id)].sort(() => r() - 0.5).slice(0, SPOT_DIFFS);
+  return { scene, diffIds: ids };
 }
 
 async function wallet(userId: string): Promise<Wallet> {
@@ -67,10 +61,11 @@ export interface GamesPayload {
 }
 
 const META: Record<GamePlay["game"], { title: string; desc: string; icon: string }> = {
-  spot: { title: "틀린그림 찾기", desc: "두 그림에서 다른 5곳을 60초 안에!", icon: "🔍" },
-  rsp: { title: "가위바위보", desc: "이기면 10P, 비기면 3P · 하루 3판", icon: "✌️" },
-  scratch: { title: "복권 긁기", desc: "하루 한 장, 최대 500P", icon: "🎟️" },
-  memory: { title: "카드 뒤집기", desc: "8쌍을 적은 시도로 맞추면 최대 15P", icon: "🃏" },
+  spot: { title: "틀린그림 찾기", desc: "두 그림에서 다른 5곳을 75초 안에", icon: "spot" },
+  slide: { title: "2048 퍼즐", desc: "타일을 합쳐 2048에 도전, 최대 50P", icon: "slide" },
+  scratch: { title: "복권 긁기", desc: "같은 그림 3개면 당첨, 최대 500P", icon: "scratch" },
+  rsp: { title: "가위바위보", desc: "승 10P · 3연승 보너스 +20P · 하루 3판", icon: "rsp" },
+  memory: { title: "브랜드 짝 맞추기", desc: "8쌍을 적은 시도로 맞추면 최대 15P", icon: "memory" },
 };
 
 export async function getGames(userId: string): Promise<GamesPayload> {
@@ -100,24 +95,34 @@ async function record(userId: string, game: GamePlay["game"], day: string, resul
   return play;
 }
 
-/** 틀린그림: 공개 퍼즐(정답 제외) */
+/** 틀린그림: 장면 + 적용된 차이(판정 중심 포함 — 즉시 피드백용, 보상이 작아 허용) */
 export async function getSpot(userId: string) {
   const day = kstDayKey();
-  const p = spotPuzzle(day);
+  const { scene, diffIds } = spotPuzzle(day);
   const plays = (await getRepo().listGamePlays(userId)).filter((x) => x.game === "spot" && x.dayKey === day);
-  return { dayKey: day, left: p.left, right: p.right, rows: p.rows, cols: p.cols, diffs: SPOT_DIFFS, played: plays.length > 0, lastResult: plays[0]?.result, limitSec: 60 };
+  return { dayKey: day, sceneId: scene.id, sceneName: scene.name, diffIds, total: SPOT_DIFFS, played: plays.length > 0, lastResult: plays[0]?.result, limitSec: SPOT_LIMIT_SEC };
 }
 
-export async function submitSpot(userId: string, picks: number[]) {
+export async function submitSpot(userId: string, foundIds: string[]) {
   const day = kstDayKey();
   await assertLimit(userId, "spot", day);
-  const p = spotPuzzle(day);
-  const set = new Set(p.diffs);
-  const found = [...new Set(picks)].filter((i) => set.has(i));
+  const { diffIds } = spotPuzzle(day);
+  const set = new Set(diffIds);
+  const found = [...new Set(foundIds)].filter((i) => set.has(i));
   const all = found.length === SPOT_DIFFS;
   const points = found.length * 5 + (all ? 10 : 0);
   await record(userId, "spot", day, `found:${found.length}/${SPOT_DIFFS}`, points, `틀린그림 찾기 ${found.length}/${SPOT_DIFFS}`);
-  return { ok: true as const, found: found.length, total: SPOT_DIFFS, diffs: p.diffs, points, wallet: await wallet(userId) };
+  return { ok: true as const, found: found.length, total: SPOT_DIFFS, diffIds, points, wallet: await wallet(userId) };
+}
+
+/** 2048: 클라이언트 플레이 후 점수 제출(일 1회). 최고 타일/점수 구간별 보상 */
+export async function playSlide(userId: string, score: number, maxTile: number) {
+  const day = kstDayKey();
+  await assertLimit(userId, "slide", day);
+  if (score < 0 || score > 200000 || maxTile < 2 || maxTile > 65536) throw new GameError("BAD_INPUT", "기록이 올바르지 않아요");
+  const points = maxTile >= 1024 || score >= 10000 ? 50 : maxTile >= 512 || score >= 5000 ? 30 : maxTile >= 256 || score >= 2000 ? 15 : 5;
+  await record(userId, "slide", day, `score:${score}/tile:${maxTile}`, points, `2048 ${score}점 (최고 ${maxTile})`);
+  return { ok: true as const, score, maxTile, points, wallet: await wallet(userId) };
 }
 
 export async function playRsp(userId: string, choice: "rock" | "paper" | "scissors") {
@@ -127,9 +132,15 @@ export async function playRsp(userId: string, choice: "rock" | "paper" | "scisso
   const cpu = opts[randomInt(0, 3)];
   const beats: Record<string, string> = { rock: "scissors", paper: "rock", scissors: "paper" };
   const result = cpu === choice ? "draw" : beats[choice] === cpu ? "win" : "lose";
-  const points = result === "win" ? 10 : result === "draw" ? 3 : 0;
-  await record(userId, "rsp", day, result, points, `가위바위보 ${result === "win" ? "승" : result === "draw" ? "무" : "패"}`);
-  return { ok: true as const, choice, cpu, result, points, left: GAME_LIMITS.rsp - n - 1, wallet: await wallet(userId) };
+  // 연승: 최근 플레이(최신순)에서 연속 win 수
+  const recent = (await getRepo().listGamePlays(userId)).filter((p) => p.game === "rsp");
+  let streak = 0;
+  for (const p of recent) { if (p.result === "win") streak++; else break; }
+  streak = result === "win" ? streak + 1 : 0;
+  const bonus = result === "win" && streak % 3 === 0 ? RSP_STREAK_BONUS : 0;
+  const points = (result === "win" ? 10 : result === "draw" ? 3 : 0) + bonus;
+  await record(userId, "rsp", day, result, points, `가위바위보 ${result === "win" ? "승" : result === "draw" ? "무" : "패"}${bonus ? ` · ${streak}연승 보너스` : ""}`);
+  return { ok: true as const, choice, cpu, result, points, bonus, streak, left: GAME_LIMITS.rsp - n - 1, wallet: await wallet(userId) };
 }
 
 export const MEMORY_PAIRS = 8;
@@ -155,6 +166,18 @@ export async function playScratch(userId: string) {
     }
     roll -= w;
   }
+  // 3×3 그리드: 당첨이면 당첨 심볼 3개, 아니면 어떤 심볼도 3개 미만
+  const grid: string[] = Array(9).fill("");
+  const sym = SCRATCH_SYMBOL[points];
+  const pos = new Set<number>();
+  if (sym) while (pos.size < 3) pos.add(randomInt(0, 9));
+  for (let i = 0; i < 9; i++) {
+    if (pos.has(i)) { grid[i] = sym; continue; }
+    const others = SCRATCH_POOL.filter((x) => x !== sym);
+    let pick = others[randomInt(0, others.length)];
+    while (grid.filter((g) => g === pick).length >= 2) pick = others[randomInt(0, others.length)];
+    grid[i] = pick;
+  }
   await record(userId, "scratch", day, `prize:${points}`, points, `복권 긁기 ${points}P`);
-  return { ok: true as const, points, wallet: await wallet(userId) };
+  return { ok: true as const, points, grid, symbol: sym ?? null, wallet: await wallet(userId) };
 }
