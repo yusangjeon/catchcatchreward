@@ -15,6 +15,7 @@ export interface RoulettePayload {
   stamps: number;
   needed: number;
   canSpin: boolean;
+  freeSpin: boolean; // 첫 룰렛 1회 무료(스핀 기록 없음)
   prizes: PublicPrize[];
   history: { id: string; prizeName: string; kind: PrizeKind; value: number; spunAt: string }[];
   wallet: Wallet;
@@ -25,6 +26,7 @@ export interface SpinResult {
   spinId: string;
   prize: PublicPrize;
   index: number; // 룰렛 조각 인덱스(prizes 배열 순서)
+  free: boolean; // 무료 스핀으로 돌렸는지(스탬프 미소비)
   wallet: Wallet;
 }
 

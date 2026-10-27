@@ -41,10 +41,12 @@ export async function getRoulette(userId: string): Promise<RoulettePayload> {
   const repo = getRepo();
   const [prizes, spins, w] = await Promise.all([repo.listPrizes(), repo.listSpins(userId), wallet(userId)]);
   const byId = new Map(prizes.map((p) => [p.id, p]));
+  const freeSpin = spins.length === 0;
   return {
     stamps: w.stamps,
     needed: STAMPS_PER_SPIN,
-    canSpin: w.stamps >= STAMPS_PER_SPIN,
+    canSpin: freeSpin || w.stamps >= STAMPS_PER_SPIN,
+    freeSpin,
     prizes: toPublic(prizes),
     history: spins.slice(0, 20).map((s) => {
       const p = byId.get(s.prizeId);
@@ -62,8 +64,10 @@ export async function spin(userId: string): Promise<SpinResult> {
   const repo = getRepo();
   const prizes = await repo.listPrizes();
   if (prizes.length === 0) throw new RouletteError("NO_PRIZES", "경품이 준비되지 않았어요");
-  const stamps = await repo.countUnconsumedStamps(userId);
-  if (stamps < STAMPS_PER_SPIN) throw new RouletteError("NOT_ENOUGH_STAMPS", `스탬프가 ${STAMPS_PER_SPIN - stamps}개 더 필요해요`);
+  // 첫 룰렛은 무료(스핀 기록이 없으면 스탬프 없이 1회). 그 뒤로는 스탬프 10개.
+  const free = (await repo.listSpins(userId)).length === 0;
+  const stamps = free ? 0 : await repo.countUnconsumedStamps(userId);
+  if (!free && stamps < STAMPS_PER_SPIN) throw new RouletteError("NOT_ENOUGH_STAMPS", `스탬프가 ${STAMPS_PER_SPIN - stamps}개 더 필요해요`);
 
   const total = prizes.reduce((s, p) => s + p.weight, 0);
   const roll = randomInt(0, total); // [0, total)
@@ -78,14 +82,16 @@ export async function spin(userId: string): Promise<SpinResult> {
   }
   const prize = prizes[index];
   const spinId = randomUUID();
-  const consumed = await repo.consumeStamps(userId, STAMPS_PER_SPIN, spinId);
-  if (consumed < STAMPS_PER_SPIN) throw new RouletteError("NOT_ENOUGH_STAMPS", "스탬프가 부족해요");
+  if (!free) {
+    const consumed = await repo.consumeStamps(userId, STAMPS_PER_SPIN, spinId);
+    if (consumed < STAMPS_PER_SPIN) throw new RouletteError("NOT_ENOUGH_STAMPS", "스탬프가 부족해요");
+  }
   await repo.saveSpin({ id: spinId, userId, prizeId: prize.id, roll: roll / total, spunAt: new Date().toISOString() });
   if (prize.kind === "points" && prize.value > 0) {
     await repo.addLedger({ userId, delta: prize.value, reason: "roulette", refType: "roulette_spin", refId: spinId, memo: prize.name });
   }
   // gifticon 은 1차 수동 처리: 당첨 기록(roulette_spins)만 남기고 운영에서 발송
-  return { ok: true, spinId, prize: toPublic(prizes)[index], index, wallet: await wallet(userId) };
+  return { ok: true, spinId, prize: toPublic(prizes)[index], index, free, wallet: await wallet(userId) };
 }
 
 /** 출석체크: KST 1일 1회. 10P 적립 + 스탬프 1개(sourceType=attendance, sourceId=날짜) */

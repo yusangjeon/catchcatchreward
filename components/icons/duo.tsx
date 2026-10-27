@@ -65,6 +65,9 @@ const P: Record<DuoName, { back?: string; front: string; fill?: string }> = {
   moon: { back: "M14 3a9 9 0 1 0 7 14.5A8 8 0 0 1 14 3z", front: "M14 3a9 9 0 1 0 7 14.5A8 8 0 0 1 14 3zM18 4l.5 1.5L20 6l-1.5.5L18 8l-.5-1.5L16 6l1.5-.5z" },
 };
 
+/** SVG 안에 직접 그릴 때(룰렛 조각 등) 경로 데이터 */
+export function duoPath(name: DuoName) { return P[name]; }
+
 export function DuoIcon({ name, size = 22, className, style }: { name: DuoName; size?: number; className?: string; style?: CSSProperties }) {
   const d = P[name];
   return (
