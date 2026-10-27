@@ -2,12 +2,17 @@
 
 import Link from "next/link";
 import { PCoin } from "@/components/icons";
+import { DuoIcon } from "@/components/icons/duo";
 import type { Merchant } from "@/lib/shop/types";
 
 /* eslint-disable @next/next/no-img-element */
 
+/** NEW: 연한 핑크 칩 + 점 / HOT: 잉크 칩 + 불꽃 아이콘 (말풍선 태그 대신 조용한 라벨) */
 export function NewTag() {
-  return <span className="absolute right-3 top-3 rounded-full bg-pink px-2 py-0.5 text-[10px] font-bold text-white">NEW</span>;
+  return <span className="absolute right-3 top-3 inline-flex h-[20px] items-center gap-1 rounded-full bg-pink-soft px-2 text-[10px] font-bold tracking-wide text-pink"><i className="h-1.5 w-1.5 rounded-full bg-pink" />NEW</span>;
+}
+export function HotTag() {
+  return <span className="absolute right-3 top-3 inline-flex h-[20px] items-center gap-0.5 rounded-full bg-ink px-2 text-[10px] font-bold tracking-wide text-white"><DuoIcon name="flame" size={11} className="text-[#ffb400]" />HOT</span>;
 }
 
 /** 적립률: 코인 + 숫자(브랜드색) + 단위 */
@@ -28,11 +33,11 @@ export function MerchantCard({ m, width, hot = false }: { m: Merchant; width?: n
   return (
     <Link
       href={`/shop/${m.id}`}
-      className={`myb-press relative flex shrink-0 flex-col gap-3 rounded-[18px] bg-white px-4 pb-4 pt-5 ${hot ? "ring-2 ring-myb" : ""}`}
+      className={`myb-press relative flex shrink-0 flex-col gap-3 rounded-[18px] bg-white px-4 pb-4 pt-5 ${hot ? "ring-1 ring-[#ffd2c2]" : ""}`}
       style={{ width, boxShadow: "0 4px 14px rgba(40,24,14,.06)" }}
     >
       {m.isNew && !hot && <NewTag />}
-      {hot && <span className="absolute right-3 top-3 rounded-full bg-myb px-2 py-0.5 text-[10px] font-bold text-white">HOT</span>}
+      {hot && <HotTag />}
       <div className="flex h-8 items-center justify-start">
         <img src={m.logo} alt={m.name} className="max-h-7 max-w-[120px] object-contain" />
       </div>
