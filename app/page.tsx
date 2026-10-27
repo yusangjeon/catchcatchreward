@@ -105,13 +105,14 @@ export default function HomePage() {
   return (
     <div className="bg-white">
       {/* 상단바 */}
+      <div className="relative" style={{ background: "linear-gradient(180deg,#fff3cc 0%,#fff3cc 12%,#fff8e3 50%,#fffdf6 74%,#ffffff 100%)" }}>
       <header className="flex h-[55px] items-center justify-between px-5">
         <Link href="/wallet" className="flex items-center gap-2">
           <PCoin size={24} />
           <span id="hdr-balance" className="text-[16px] font-bold tabular-nums">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span>
         </Link>
         <div className="flex items-center gap-3">
-          <Link href="/me" className="flex h-[26px] items-center gap-1.5 rounded-lg border border-line bg-bg-2 px-2 text-[12px] font-semibold">
+          <Link href="/me" className="flex h-[26px] items-center gap-1.5 rounded-full bg-white/80 px-2.5 text-[12px] font-semibold shadow-[0_1px_3px_rgba(0,0,0,.06)]">
             {data?.me.avatarUrl ? <img src={data.me.avatarUrl} alt="" className="h-[16px] w-[16px] rounded-full object-cover" /> : <DuoIcon name="badge" size={14} className="text-[#2f6fed]" />}
             {data?.newbie.active ? "신규 유저" : data?.me.loggedIn ? (data.me.nickname ?? "MY").slice(0, 6) : "베이직"}
           </Link>
@@ -124,8 +125,7 @@ export default function HomePage() {
       </header>
 
       {/* 히어로: 오늘도 만나서 반가워요 / N일차 퀴즈 3개로 시작해요! */}
-      <div className="relative" style={{ background: "linear-gradient(180deg,#fff3cc 0%,#fff8e3 46%,#fffdf6 72%,#ffffff 100%)" }}>
-      <section className="relative overflow-hidden px-5 pb-[22px] pt-[26px]">
+      <section className="relative overflow-hidden px-5 pb-[22px] pt-[14px]">
         <span className="absolute right-5 top-4 flex h-[26px] items-center gap-1 rounded-full bg-myb px-3 text-[12px] font-bold text-white">
           <img src="/brand/ic_clock.svg" alt="" className="h-[13px] w-[13px] brightness-0 invert" /> {data ? (data.newbie.active ? `${data.newbie.dayNo}일차` : "오늘") : "—"}
         </span>
