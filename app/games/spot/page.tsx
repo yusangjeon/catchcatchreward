@@ -1,136 +1,207 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
-import { SceneSvg } from "@/components/games/SceneSvg";
 import { Lottie } from "@/components/motion/Lottie";
 import { useToast } from "@/components/motion/Toast";
 import { fmt } from "@/hooks/useHome";
-import { HIT_R, SCENES } from "@/lib/games/spotScenes";
+import type { SpotPayload } from "@/lib/games/service";
 
-interface Puzzle { dayKey: string; sceneId: string; sceneName: string; diffIds: string[]; total: number; played: boolean; lastResult?: string; limitSec: number }
-interface Result { found: number; total: number; diffIds: string[]; points: number }
+/* eslint-disable @next/next/no-img-element */
+
+interface Circle { id: string; x: number; y: number; r: number }
+interface Token { id: string; token: string }
+interface Result { found: number; total: number; points: number; all: boolean; missed: Circle[]; left: number }
+type Mark = Circle & { kind: "found" | "missed" | "hint" };
+
+const MISS_PENALTY = 5;
 
 /**
- * 틀린그림 찾기 — 벡터 일러스트 두 장. 아래 그림에서 다른 곳을 탭. 맞추면 초록 원, 틀리면 X(−3초). 힌트 1회.
- * 판정은 클라이언트(즉시 피드백), 보상은 서버가 찾은 id 로 재검증.
+ * 틀린그림 찾기 — 일러스트 2장(위 원본 / 아래 다른 그림). 둘 중 아무 데나 탭.
+ * 판정은 서버(좌표 비노출): 맞으면 원 위치 + HMAC 토큰, 제출 시 토큰으로 적립. 틀리면 −5초. 힌트 1회/레벨.
  */
 export default function SpotPage() {
   const router = useRouter();
   const { show } = useToast();
-  const [p, setP] = useState<Puzzle | null>(null);
-  const [found, setFound] = useState<string[]>([]);
-  const [marks, setMarks] = useState<{ x: number; y: number; ok?: boolean }[]>([]);
-  const [misses, setMisses] = useState<{ x: number; y: number }[]>([]);
-  const [left, setLeft] = useState(75);
-  const [started, setStarted] = useState(false);
+  const [data, setData] = useState<SpotPayload | null>(null);
+  const [phase, setPhase] = useState<"idle" | "play" | "done">("idle");
+  const [tokens, setTokens] = useState<Token[]>([]);
+  const [marks, setMarks] = useState<Mark[]>([]);
+  const [misses, setMisses] = useState<{ x: number; y: number; k: number }[]>([]);
+  const [left, setLeft] = useState(60);
   const [hintUsed, setHintUsed] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [busy, setBusy] = useState(false);
+  const [imgReady, setImgReady] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const foundRef = useRef<string[]>([]);
+  const tokensRef = useRef<Token[]>([]);
+  const startedAt = useRef(0);
   const submitting = useRef(false);
+  const tapLock = useRef(false);
 
-  useEffect(() => {
-    fetch("/api/games/spot", { cache: "no-store" }).then((r) => r.json()).then((d: Puzzle) => { setP(d); setLeft(d.limitSec); }).catch(() => {});
-    return () => { if (timer.current) clearInterval(timer.current); };
+  const load = useCallback(async () => {
+    const d: SpotPayload = await fetch("/api/games/spot", { cache: "no-store" }).then((r) => r.json());
+    setData(d);
+    setLeft(d.limitSec);
+    setImgReady(0);
   }, []);
+  useEffect(() => {
+    void load().catch(() => {});
+    return () => { if (timer.current) clearInterval(timer.current); };
+  }, [load]);
 
-  const scene = p ? SCENES.find((s) => s.id === p.sceneId) : undefined;
-  const diffs = scene && p ? scene.diffs.filter((d) => p.diffIds.includes(d.id)) : [];
+  const stopTimer = () => { if (timer.current) { clearInterval(timer.current); timer.current = null; } };
 
-  async function submit(ids: string[]) {
-    if (submitting.current) return;
+  const submit = useCallback(async () => {
+    if (submitting.current || !data) return;
     submitting.current = true;
+    stopTimer();
     setBusy(true);
-    if (timer.current) clearInterval(timer.current);
     try {
-      const res = await fetch("/api/games/spot", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ picks: ids }) });
+      const seconds = (Date.now() - startedAt.current) / 1000;
+      const res = await fetch("/api/games/spot", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "submit", level: data.level.id, tokens: tokensRef.current, seconds }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "제출 실패");
-      setResult(j as Result);
-      // 못 찾은 것 표시
-      setMarks((m) => [...m, ...diffs.filter((d) => !ids.includes(d.id)).map((d) => ({ x: d.cx, y: d.cy, ok: false }))]);
-      show(j.points > 0 ? `${j.found}/${j.total} 찾았어요 · +${fmt(j.points)}P` : "아쉽게도 못 찾았어요", j.points > 0 ? undefined : "info");
+      const r = j as Result;
+      setResult(r);
+      setMarks((m) => [...m.filter((x) => x.kind !== "hint"), ...r.missed.map((c) => ({ ...c, kind: "missed" as const }))]);
+      setPhase("done");
+      show(r.points > 0 ? `${r.found}/${r.total} 찾았어요 · +${fmt(r.points)}P` : "아쉽게도 못 찾았어요", r.points > 0 ? undefined : "info");
     } catch (e) {
       show(e instanceof Error ? e.message : "제출 실패", "info");
+      submitting.current = false;
     } finally {
       setBusy(false);
     }
-  }
+  }, [data, show]);
 
   function start() {
-    setStarted(true);
+    if (!data || data.left <= 0) return;
+    setPhase("play");
+    startedAt.current = Date.now();
     timer.current = setInterval(() => setLeft((s) => {
-      if (s <= 1) { if (timer.current) clearInterval(timer.current); setTimeout(() => void submit(foundRef.current), 0); return 0; }
+      if (s <= 1) { stopTimer(); setTimeout(() => void submit(), 0); return 0; }
       return s - 1;
     }), 1000);
   }
 
-  function tap(x: number, y: number) {
-    if (!started || result || busy) return;
-    const hit = diffs.find((d) => !foundRef.current.includes(d.id) && Math.hypot(d.cx - x, d.cy - y) <= HIT_R);
-    if (hit) {
-      const next = [...foundRef.current, hit.id];
-      foundRef.current = next;
-      setFound(next);
-      setMarks((m) => [...m, { x: hit.cx, y: hit.cy }]);
-      if (next.length === diffs.length) void submit(next);
-    } else {
-      setMisses((m) => [...m.slice(-4), { x, y }]);
-      setLeft((s) => Math.max(1, s - 3));
+  async function tap(e: React.MouseEvent<HTMLDivElement>) {
+    if (phase !== "play" || !data || tapLock.current) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    tapLock.current = true;
+    try {
+      const res = await fetch("/api/games/spot", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "tap", level: data.level.id, x, y, tokens: tokensRef.current }) });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.message ?? "판정 실패");
+      if (j.hit) {
+        const next = [...tokensRef.current, { id: j.diff.id, token: j.token }];
+        tokensRef.current = next;
+        setTokens(next);
+        setMarks((m) => [...m.filter((k) => !(k.kind === "hint" && k.id === j.diff.id)), { ...j.diff, kind: "found" }]);
+        if (navigator.vibrate) navigator.vibrate(30);
+        if (j.found >= j.total) void submit();
+      } else {
+        const k = Date.now();
+        setMisses((m) => [...m.slice(-3), { x, y, k }]);
+        setTimeout(() => setMisses((m) => m.filter((z) => z.k !== k)), 700);
+        setLeft((s) => Math.max(1, s - MISS_PENALTY));
+      }
+    } catch (err) {
+      show(err instanceof Error ? err.message : "판정 실패", "info");
+      if (err instanceof Error && err.message.includes("레벨")) { stopTimer(); setPhase("idle"); setTokens([]); tokensRef.current = []; setMarks([]); void load(); }
+    } finally {
+      tapLock.current = false;
     }
   }
 
-  function hint() {
-    if (hintUsed || !started || result) return;
-    const rest = diffs.filter((d) => !foundRef.current.includes(d.id));
-    if (!rest.length) return;
+  async function hint() {
+    if (hintUsed || phase !== "play" || !data) return;
     setHintUsed(true);
-    const d = rest[0];
-    setMarks((m) => [...m, { x: d.cx, y: d.cy, ok: false }]);
-    setTimeout(() => setMarks((m) => m.filter((x) => !(x.x === d.cx && x.y === d.cy && x.ok === false))), 1500);
+    const res = await fetch("/api/games/spot", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "hint", level: data.level.id, tokens: tokensRef.current }) });
+    const j = await res.json();
+    if (!j.diff) return;
+    setMarks((m) => [...m, { ...j.diff, kind: "hint" }]);
+    setLeft((s) => Math.max(1, s - MISS_PENALTY));
   }
 
+  function nextLevel() {
+    setResult(null); setMarks([]); setMisses([]); setTokens([]); tokensRef.current = []; setHintUsed(false); submitting.current = false; setPhase("idle");
+    void load();
+  }
+
+  const total = data?.total ?? 5;
+  const found = tokens.length;
+  const pct = data ? (left / data.limitSec) * 100 : 100;
+  const renderImage = (src: string, label: string, blur: boolean, top: boolean) => (
+    <div className="relative overflow-hidden rounded-[14px] bg-[#e5e8ee]" style={{ aspectRatio: "1024 / 688" }} onClick={tap}>
+      <img src={src} alt={label} draggable={false} onLoad={() => setImgReady((n) => n + 1)} className={`block h-full w-full select-none transition-[filter] duration-300 ${blur ? "blur-[6px]" : ""}`} />
+      {marks.map((m) => (
+        <span key={m.kind + m.id} className={`spot-mark pointer-events-none absolute rounded-full border-[3px] ${m.kind === "found" ? "border-[#22c55e] shadow-[0_0_0_2px_rgba(255,255,255,.9)]" : m.kind === "missed" ? "border-dashed border-[#ff3b6b]" : "border-dashed border-[#ffb400] spot-hint"}`} style={{ left: `${(m.x - m.r) * 100}%`, top: `${(m.y - m.r * 1024 / 688) * 100}%`, width: `${m.r * 2 * 100}%`, aspectRatio: "1" }} />
+      ))}
+      {misses.map((m) => (
+        <span key={m.k} className="spot-miss pointer-events-none absolute text-[26px] font-black leading-none text-[#ff3b6b]" style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, transform: "translate(-50%,-50%)" }}>✕</span>
+      ))}
+      <span className={`absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[11px] font-bold text-white ${top ? "bg-black/45" : "bg-[#427cff]"}`}>{label}</span>
+    </div>
+  );
+
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
-      <GameHeader title="틀린그림 찾기" right={started ? <span className={left <= 10 ? "text-[#ff3939] text-[18px]" : "text-[#427cff] text-[18px]"}>{left}s</span> : null} />
-      <div className="flex flex-col gap-3 px-5 pt-[60px]">
-        <div className="flex items-center justify-between">
-          <p className="text-[13px] text-[#5c6573]"><b>{p?.sceneName ?? "…"}</b> · 다른 곳 <b>{p?.total ?? 5}개</b>를 아래 그림에서 탭</p>
-          <div className="flex items-center gap-1">{Array.from({ length: p?.total ?? 5 }).map((_, i) => <span key={i} className={`h-2.5 w-2.5 rounded-full ${i < found.length ? "bg-[#22c55e]" : "bg-[#dee2e9]"}`} />)}</div>
+    <div className="min-h-dvh bg-[#0f172a] pb-8 text-white">
+      <GameHeader dark title="틀린그림 찾기" right={phase === "play" ? <span className={`text-[20px] font-extrabold tabular-nums ${left <= 10 ? "text-[#ff5c7a]" : "text-[#9fb6ff]"}`}>{left}s</span> : data ? <span className="text-[13px] text-white/60">{data.left}회 남음</span> : null} />
+      <div className="flex flex-col gap-2.5 px-3 pt-[56px]">
+        <div className="flex items-center justify-between px-1">
+          <div className="min-w-0">
+            <p className="truncate text-[15px] font-bold">{data ? `${data.level.name}` : "불러오는 중…"} <span className="text-[12px] font-semibold text-white/50">LEVEL {data ? data.level.index + 1 : "-"}/3</span></p>
+            <p className="text-[11px] text-white/50">다른 곳 {total}개 · 차이당 {data?.pointPerDiff ?? 3}P · 전부 찾으면 +{data?.completeBonus ?? 10}P</p>
+          </div>
+          <div className="flex items-center gap-1.5">{Array.from({ length: total }).map((_, i) => <span key={i} className={`h-3 w-3 rounded-full transition-colors ${i < found ? "bg-[#22c55e] shadow-[0_0_8px_#22c55e]" : "bg-white/20"}`} />)}</div>
         </div>
-        {p?.played && !result && <p className="rounded-xl bg-[#fff6e5] px-4 py-3 text-[13px] text-[#9a5b00]">오늘은 이미 도전했어요 ({p.lastResult}). 내일 새 그림이 나와요.</p>}
-        <div className="relative rounded-2xl bg-white p-2" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
-          {scene ? <SceneSvg scene={scene} diffIds={[]} marks={[]} /> : <div className="aspect-[3/2] w-full animate-pulse rounded-2xl bg-[#eef0f4]" />}
-          <span className="absolute left-4 top-4 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-bold text-white">원본</span>
-        </div>
-        <div className="relative rounded-2xl bg-white p-2" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
-          {scene && p ? <SceneSvg scene={scene} diffIds={p.diffIds} marks={marks} misses={misses} onTap={started && !result && !p.played ? tap : undefined} className={started && !result ? "cursor-crosshair" : ""} /> : <div className="aspect-[3/2] w-full animate-pulse rounded-2xl bg-[#eef0f4]" />}
-          <span className="absolute left-4 top-4 rounded-full bg-[#427cff] px-2 py-0.5 text-[11px] font-bold text-white">여기서 찾기</span>
-          {!started && !result && !p?.played && <div className="absolute inset-2 flex items-center justify-center rounded-2xl bg-black/35 backdrop-blur-[2px]"><button type="button" onClick={start} className="myb-press h-12 rounded-xl bg-white px-6 text-[15px] font-bold text-[#191f28]">시작하기 · {p?.limitSec ?? 75}초</button></div>}
-          {result && (
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              {result.found === result.total && <Lottie src="/myb/lottie_confetti_pop.json" className="h-[260px] w-[260px]" />}
-            </div>
-          )}
-        </div>
-        {started && !result && (
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%`, background: left <= 10 ? "#ff5c7a" : "linear-gradient(90deg,#427cff,#22d3ee)" }} /></div>
+        {data ? (
+          <div className="relative flex flex-col gap-2">
+            {renderImage(data.level.a, "원본", false, true)}
+            {renderImage(data.level.b, "여기서 찾기", phase === "idle", false)}
+            {phase === "idle" && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-[14px]">
+                {data.left > 0 ? (
+                  <button type="button" onClick={start} disabled={imgReady < 2} className="myb-press flex h-14 items-center gap-2 rounded-full bg-white px-7 text-[16px] font-extrabold text-[#191f28] shadow-[0_8px_30px_rgba(0,0,0,.4)] disabled:opacity-60">
+                    {imgReady < 2 ? "그림 준비 중…" : `▶ 시작하기 · ${data.limitSec}초`}
+                  </button>
+                ) : (
+                  <div className="rounded-2xl bg-black/70 px-5 py-4 text-center text-[14px]">오늘 3레벨을 모두 풀었어요<br /><span className="text-[12px] text-white/60">내일 0시에 새 그림 3장이 열려요</span></div>
+                )}
+              </div>
+            )}
+            {result?.all && <div className="pointer-events-none absolute inset-0 flex items-center justify-center"><Lottie src="/myb/lottie_confetti_pop.json" className="h-[300px] w-[300px]" /></div>}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2"><div className="animate-pulse rounded-[14px] bg-white/10" style={{ aspectRatio: "1024 / 688" }} /><div className="animate-pulse rounded-[14px] bg-white/10" style={{ aspectRatio: "1024 / 688" }} /></div>
+        )}
+        {phase === "play" && (
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" disabled={hintUsed} onClick={hint} className="myb-press h-11 rounded-xl border border-[#dee2e9] bg-white text-[14px] font-bold disabled:opacity-40">💡 힌트 {hintUsed ? "사용함" : "1회"}</button>
-            <button type="button" disabled={busy} onClick={() => void submit(foundRef.current)} className="myb-press h-11 rounded-xl bg-[#191f28] text-[14px] font-bold text-white disabled:opacity-40">그만 찾기 ({found.length}/{p?.total ?? 5})</button>
+            <button type="button" disabled={hintUsed} onClick={() => void hint()} className="myb-press h-12 rounded-xl bg-white/10 text-[14px] font-bold disabled:opacity-40">💡 힌트 {hintUsed ? "사용함" : `(−${MISS_PENALTY}초)`}</button>
+            <button type="button" disabled={busy} onClick={() => void submit()} className="myb-press h-12 rounded-xl bg-white text-[14px] font-bold text-[#191f28] disabled:opacity-40">그만 찾기 ({found}/{total})</button>
           </div>
         )}
-        {result && (
-          <div className="rounded-[20px] bg-white p-5 text-center" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
-            <p className="text-[20px] font-extrabold">{result.found}/{result.total} 찾았어요 {result.found === result.total ? "🎉" : ""}</p>
-            <p className="mt-1 text-[14px] font-bold text-[#427cff]">+{fmt(result.points)}P</p>
-            <p className="mt-2 text-[12px] text-[#8b94a0]">초록 원 = 찾은 곳 · 분홍 점선 = 놓친 곳</p>
-            <button type="button" onClick={() => router.push("/games")} className="myb-press mt-4 h-11 w-full rounded-xl bg-[#427cff] text-[14px] font-bold text-white">다른 게임 하러 가기</button>
+        {phase === "done" && result && (
+          <div className="rounded-[20px] bg-white p-5 text-center text-[#191f28]">
+            <p className="text-[22px] font-extrabold">{result.all ? "완벽해요! 🎉" : `${result.found}/${result.total} 찾았어요`}</p>
+            <p className="mt-1 text-[16px] font-bold text-[#427cff]">+{fmt(result.points)}P 적립</p>
+            {!result.all && <p className="mt-1 text-[12px] text-[#8b94a0]">분홍 점선이 놓친 곳이에요</p>}
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => router.push("/games")} className="myb-press h-12 rounded-xl border border-[#dee2e9] text-[14px] font-bold">다른 게임</button>
+              {result.left > 0 ? (
+                <button type="button" onClick={nextLevel} className="myb-press h-12 rounded-xl bg-[#427cff] text-[14px] font-bold text-white">다음 레벨 ({result.left}회 남음)</button>
+              ) : (
+                <button type="button" onClick={() => router.push("/wallet")} className="myb-press h-12 rounded-xl bg-[#191f28] text-[14px] font-bold text-white">지갑 보기</button>
+              )}
+            </div>
           </div>
         )}
-        <p className="text-[11px] text-[#b0b8c1]">틀리게 탭하면 3초가 줄어요. 그림은 매일 0시에 바뀌고 모두 같은 그림을 풀어요.</p>
+        <p className="px-1 text-[11px] text-white/40">위·아래 그림 아무 데나 탭하면 돼요. 틀리면 {MISS_PENALTY}초가 줄어요. 매일 0시에 새 그림 3장.</p>
       </div>
     </div>
   );

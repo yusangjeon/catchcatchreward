@@ -38,7 +38,11 @@ export default function GamesPage() {
           {(data?.games ?? []).map((g) => (
             <li key={g.key}>
               <Link href={g.href} className="block overflow-hidden rounded-[20px] bg-white" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
-                <div className="flex h-[96px] items-center justify-center" style={{ background: TILE[g.key]?.bg }}>{TILE[g.key]?.art}</div>
+                {g.key === "spot" ? (
+                  <div className="relative h-[96px] bg-cover bg-center" style={{ backgroundImage: "url(/games/spot/park/a.webp)" }}><span className="absolute right-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold text-white">NEW 일러스트</span></div>
+                ) : (
+                  <div className="flex h-[96px] items-center justify-center" style={{ background: TILE[g.key]?.bg }}>{TILE[g.key]?.art}</div>
+                )}
                 <div className="p-3">
                   <p className="text-[15px] font-bold">{g.title}</p>
                   <p className="mt-0.5 line-clamp-2 min-h-[32px] text-[11px] leading-[16px] text-[#8b94a0]">{g.desc}</p>

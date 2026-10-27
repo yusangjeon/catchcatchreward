@@ -1,20 +1,22 @@
 import "server-only";
-import { createHash, randomInt } from "node:crypto";
+import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import { getRepo } from "@/lib/db";
 import { kstDayKey } from "@/lib/time";
 import type { GamePlay, Wallet } from "@/lib/types";
-import { SCENES } from "./spotScenes";
+import { SPOT_LEVELS, type SpotDiff } from "./spotLevels";
 
 /**
  * 미니게임 — 리텐션용 일일 콘텐츠. 결과·보상은 서버에서만 결정(원장 reason=game), 플레이는 game_plays 에 기록해 일일 한도·러쉬 집계.
- *  - spot(틀린그림 찾기): 날짜 시드로 모두 같은 퍼즐. 6×8 이모지 보드에서 5칸이 다름. 찾은 개수 × 5P, 전부 찾으면 +10P. 하루 1회
+ *  - spot(틀린그림 찾기): 일러스트 8장면(public/games/spot). 하루 3레벨, 날짜×회차로 장면 순환. 탭 판정은 서버(좌표 비노출) → 맞춘 차이마다 HMAC 토큰 발급, 제출 시 토큰 검증. 차이당 3P + 전부 찾으면 +10P, 60초
  *  - rsp(가위바위보): 하루 3판. 승 10P · 무 3P · 패 0P
  *  - scratch(복권 긁기): 하루 1장. 0P 50% · 5P 25% · 10P 15% · 50P 8% · 500P 2% (기대값 ≈16.8P)
  *  - memory(카드 뒤집기): 4×4 8쌍. 클라이언트 플레이, 완료 시 시도 수로 보상(≤16회 15P · ≤24회 10P · 그 외 5P). 하루 1회, 서버는 타당성(시도≥8·시간≥5s)만 검사
  */
-export const GAME_LIMITS: Record<GamePlay["game"], number> = { spot: 1, rsp: 3, scratch: 1, memory: 1, slide: 1 };
+export const GAME_LIMITS: Record<GamePlay["game"], number> = { spot: 3, rsp: 3, scratch: 1, memory: 1, slide: 1 };
 export const SPOT_DIFFS = 5;
-export const SPOT_LIMIT_SEC = 75;
+export const SPOT_LIMIT_SEC = 60;
+export const SPOT_POINT_PER_DIFF = 3;
+export const SPOT_COMPLETE_BONUS = 10;
 const SCRATCH_PRIZES: [points: number, weight: number][] = [[0, 50], [5, 25], [10, 15], [50, 8], [500, 2]];
 const SCRATCH_SYMBOL: Record<number, string> = { 5: "🍒", 10: "🔔", 50: "⭐", 500: "💎" };
 const SCRATCH_POOL = ["🍀", "🍒", "🔔", "⭐", "💎", "🎁"];
@@ -24,26 +26,6 @@ export class GameError extends Error {
   constructor(public code: "LIMIT" | "BAD_INPUT", message: string) {
     super(message);
   }
-}
-
-/** mulberry32 — 날짜 시드로 모두 같은 퍼즐 */
-function rng(seed: string) {
-  let a = createHash("sha256").update(seed).digest().readUInt32LE(0);
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-/** 날짜 시드 → 장면 1개 + 차이 5개(전원 동일) */
-export function spotPuzzle(dayKey: string) {
-  const r = rng(`spot:${dayKey}`);
-  const scene = SCENES[Math.floor(r() * SCENES.length)];
-  const ids = [...scene.diffs.map((d) => d.id)].sort(() => r() - 0.5).slice(0, SPOT_DIFFS);
-  return { scene, diffIds: ids };
 }
 
 async function wallet(userId: string): Promise<Wallet> {
@@ -61,7 +43,7 @@ export interface GamesPayload {
 }
 
 const META: Record<GamePlay["game"], { title: string; desc: string; icon: string }> = {
-  spot: { title: "틀린그림 찾기", desc: "두 그림에서 다른 5곳을 75초 안에", icon: "spot" },
+  spot: { title: "틀린그림 찾기", desc: "두 그림에서 다른 5곳, 하루 3레벨 · 최대 75P", icon: "spot" },
   slide: { title: "2048 퍼즐", desc: "타일을 합쳐 2048에 도전, 최대 50P", icon: "slide" },
   scratch: { title: "복권 긁기", desc: "같은 그림 3개면 당첨, 최대 500P", icon: "scratch" },
   rsp: { title: "가위바위보", desc: "승 10P · 3연승 보너스 +20P · 하루 3판", icon: "rsp" },
@@ -95,24 +77,84 @@ async function record(userId: string, game: GamePlay["game"], day: string, resul
   return play;
 }
 
-/** 틀린그림: 장면 + 적용된 차이(판정 중심 포함 — 즉시 피드백용, 보상이 작아 허용) */
-export async function getSpot(userId: string) {
-  const day = kstDayKey();
-  const { scene, diffIds } = spotPuzzle(day);
-  const plays = (await getRepo().listGamePlays(userId)).filter((x) => x.game === "spot" && x.dayKey === day);
-  return { dayKey: day, sceneId: scene.id, sceneName: scene.name, diffIds, total: SPOT_DIFFS, played: plays.length > 0, lastResult: plays[0]?.result, limitSec: SPOT_LIMIT_SEC };
+/** 날짜 × 회차 → 레벨. 하루 3레벨이 모두 다른 장면이 되도록 순환 */
+export function spotLevelFor(dayKey: string, playIndex: number) {
+  const dayNo = Math.floor(Date.parse(`${dayKey}T00:00:00Z`) / 86400_000);
+  return SPOT_LEVELS[(dayNo * GAME_LIMITS.spot + playIndex) % SPOT_LEVELS.length];
 }
 
-export async function submitSpot(userId: string, foundIds: string[]) {
+const spotSecret = () => process.env.ADMIN_KEY || process.env.SPOT_SECRET || "ccr-dev-spot-secret";
+function spotToken(userId: string, day: string, levelId: string, diffId: string) {
+  return createHmac("sha256", spotSecret()).update(`${userId}|${day}|${levelId}|${diffId}`).digest("base64url");
+}
+function verifyToken(userId: string, day: string, levelId: string, diffId: string, token: string) {
+  const expect = Buffer.from(spotToken(userId, day, levelId, diffId));
+  const got = Buffer.from(token);
+  return expect.length === got.length && timingSafeEqual(expect, got);
+}
+/** 제출된 토큰 중 유효한 차이 id 집합 */
+function validFound(userId: string, day: string, levelId: string, tokens: { id: string; token: string }[]) {
+  const level = SPOT_LEVELS.find((l) => l.id === levelId);
+  if (!level) return new Set<string>();
+  const ok = new Set<string>();
+  for (const t of tokens) if (level.diffs.some((d) => d.id === t.id) && verifyToken(userId, day, levelId, t.id, t.token)) ok.add(t.id);
+  return ok;
+}
+
+export interface SpotPayload {
+  dayKey: string; level: { id: string; name: string; a: string; b: string; index: number }; total: number; limitSec: number;
+  played: number; left: number; pointPerDiff: number; completeBonus: number; recent: { level: string; result: string; points: number }[];
+}
+/** 오늘 다음 레벨(좌표는 내려주지 않음) */
+export async function getSpot(userId: string): Promise<SpotPayload> {
   const day = kstDayKey();
-  await assertLimit(userId, "spot", day);
-  const { diffIds } = spotPuzzle(day);
-  const set = new Set(diffIds);
-  const found = [...new Set(foundIds)].filter((i) => set.has(i));
-  const all = found.length === SPOT_DIFFS;
-  const points = found.length * 5 + (all ? 10 : 0);
-  await record(userId, "spot", day, `found:${found.length}/${SPOT_DIFFS}`, points, `틀린그림 찾기 ${found.length}/${SPOT_DIFFS}`);
-  return { ok: true as const, found: found.length, total: SPOT_DIFFS, diffIds, points, wallet: await wallet(userId) };
+  const plays = (await getRepo().listGamePlays(userId)).filter((x) => x.game === "spot" && x.dayKey === day);
+  const idx = Math.min(plays.length, GAME_LIMITS.spot - 1);
+  const lv = spotLevelFor(day, idx);
+  return {
+    dayKey: day, level: { id: lv.id, name: lv.name, a: `/games/spot/${lv.id}/a.webp`, b: `/games/spot/${lv.id}/b.webp`, index: idx },
+    total: SPOT_DIFFS, limitSec: SPOT_LIMIT_SEC, played: plays.length, left: Math.max(0, GAME_LIMITS.spot - plays.length),
+    pointPerDiff: SPOT_POINT_PER_DIFF, completeBonus: SPOT_COMPLETE_BONUS,
+    recent: plays.map((p) => ({ level: p.result.split(":")[0], result: p.result, points: p.points })),
+  };
+}
+
+async function assertSpotLevel(userId: string, levelId: string) {
+  const day = kstDayKey();
+  const n = await assertLimit(userId, "spot", day);
+  const lv = spotLevelFor(day, n);
+  if (lv.id !== levelId) throw new GameError("BAD_INPUT", "레벨이 바뀌었어요. 다시 불러올게요");
+  return { day, lv, n };
+}
+
+/** 탭 판정: 정규화 좌표(0~1). 맞으면 원 + 토큰. 이미 찾은 차이는 무시 */
+export async function spotTap(userId: string, levelId: string, x: number, y: number, tokens: { id: string; token: string }[]) {
+  const { day, lv } = await assertSpotLevel(userId, levelId);
+  const found = validFound(userId, day, levelId, tokens);
+  const hit = lv.diffs.find((d) => !found.has(d.id) && Math.hypot((d.x - x) * 1024, (d.y - y) * 688) <= d.r * 1024 + 14);
+  if (!hit) return { hit: false as const, found: found.size, total: SPOT_DIFFS };
+  return { hit: true as const, diff: circle(hit), token: spotToken(userId, day, levelId, hit.id), found: found.size + 1, total: SPOT_DIFFS };
+}
+
+/** 힌트: 아직 못 찾은 차이 하나의 위치(토큰은 안 줌 — 직접 탭해야 적립) */
+export async function spotHint(userId: string, levelId: string, tokens: { id: string; token: string }[]) {
+  const { day, lv } = await assertSpotLevel(userId, levelId);
+  const found = validFound(userId, day, levelId, tokens);
+  const rest = lv.diffs.filter((d) => !found.has(d.id));
+  if (!rest.length) return { diff: null };
+  return { diff: circle(rest[randomInt(0, rest.length)]) };
+}
+
+const circle = (d: SpotDiff) => ({ id: d.id, x: d.x, y: d.y, r: d.r });
+
+export async function submitSpot(userId: string, levelId: string, tokens: { id: string; token: string }[], seconds: number) {
+  const { day, lv } = await assertSpotLevel(userId, levelId);
+  const found = validFound(userId, day, levelId, tokens);
+  const all = found.size === SPOT_DIFFS;
+  const points = found.size * SPOT_POINT_PER_DIFF + (all ? SPOT_COMPLETE_BONUS : 0);
+  await record(userId, "spot", day, `${lv.id}:${found.size}/${SPOT_DIFFS}:${Math.max(0, Math.round(seconds))}s`, points, `틀린그림 ${lv.name} ${found.size}/${SPOT_DIFFS}`);
+  const plays = (await getRepo().listGamePlays(userId)).filter((x) => x.game === "spot" && x.dayKey === day);
+  return { ok: true as const, found: found.size, total: SPOT_DIFFS, points, all, missed: lv.diffs.filter((d) => !found.has(d.id)).map(circle), left: Math.max(0, GAME_LIMITS.spot - plays.length), wallet: await wallet(userId) };
 }
 
 /** 2048: 클라이언트 플레이 후 점수 제출(일 1회). 최고 타일/점수 구간별 보상 */

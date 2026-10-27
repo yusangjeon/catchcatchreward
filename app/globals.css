@@ -147,3 +147,11 @@ body {
 /* survey.myb.im 캐러셀 도트 8px gap 12 */
 .survey-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ced5e0; }
 .survey-dot-on { background: #427cff; }
+
+/* 틀린그림 찾기 마커 */
+@keyframes spotPop { 0% { transform: scale(.3); opacity: 0 } 60% { transform: scale(1.15); opacity: 1 } 100% { transform: scale(1) } }
+@keyframes spotHint { 0%, 100% { opacity: .35; transform: scale(.95) } 50% { opacity: 1; transform: scale(1.08) } }
+@keyframes spotMiss { 0% { opacity: 1; transform: translate(-50%,-50%) scale(.6) } 100% { opacity: 0; transform: translate(-50%,-50%) scale(1.4) } }
+.spot-mark { animation: spotPop .35s cubic-bezier(.22,1,.36,1) both }
+.spot-hint { animation: spotHint .9s ease-in-out infinite }
+.spot-miss { animation: spotMiss .7s ease-out both }
