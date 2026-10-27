@@ -4,6 +4,7 @@ import { getRepo } from "@/lib/db";
 import { kstDayKey } from "@/lib/time";
 import { onFirstQuizCompletion } from "@/lib/invite/service";
 import { rushSummary } from "@/lib/rush/service";
+import { getNewbie, NEWBIE_GOAL } from "./newbie";
 import type { Badge, HomePayload, Persona, PublicQuestion, Quiz, QuizSet, SetCard, SetPayload, SubmitResult, UserBadge, Wallet } from "@/lib/types";
 
 /** 세트 완료 시 랜덤 보너스 후보(가중치 = 등장 횟수). 운영값은 추후 DB로. */
@@ -137,6 +138,7 @@ export async function getHome(userId: string): Promise<HomePayload> {
   if (justNow) await repo.addLedger({ userId, delta: SIGNUP_POINTS, reason: "signup", refType: "signup", memo: "가입 보너스" });
   const [sets, w, badges, scores, done, rush, profile, topups] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId), repo.listCompletions(userId), rushSummary(userId), repo.findProfile(userId), repo.countHoneyTopups(userId, kstDayKey())]);
   const attendedToday = await repo.hasStamp(userId, "attendance", kstDayKey());
+  const nb = await getNewbie(userId);
   const earned = new Set(badges.map((b) => b.code));
   const badgeProgress = (await repo.listBadges()).map((b) => ({
     code: b.code, name: b.name, emoji: b.emoji, description: b.description, current: Math.min(scores[b.rule.tag] ?? 0, b.rule.min), min: b.rule.min, earned: earned.has(b.code),
@@ -145,6 +147,8 @@ export async function getHome(userId: string): Promise<HomePayload> {
     wallet: w, honey: honeyLeft(done, topups), honeyMax: HONEY_PER_DAY + topups, honeyTopups: { used: topups, max: HONEY_TOPUP_MAX }, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday,
     starter: starterOf(profile?.createdAt ?? new Date(0).toISOString()), badgeProgress, welcome: { justNow, points: SIGNUP_POINTS },
     me: { loggedIn: !!profile?.provider, nickname: profile?.nickname, avatarUrl: profile?.avatarUrl, provider: profile?.provider },
+    newbie: { active: nb.active, dayNo: nb.dayNo, doneToday: nb.days.find((d) => d.today)?.done ?? 0, goal: NEWBIE_GOAL, claimableCount: nb.claimableCount, totalMax: nb.totalMax },
+    todayDone: done.filter((d) => d.dayKey === kstDayKey()).length,
   };
 }
 
@@ -241,4 +245,17 @@ export async function submitSet(userId: string, setId: string, answers: { quizId
     recommended: cards.filter((c) => !c.done).slice(0, 4),
     stats,
   };
+}
+
+/** 퀴즈 채널: 배지(=태그)별로 세트를 묶음. 세트의 선택지 태그 ∋ 배지 rule.tag 이면 그 배지 컬렉션에 속함 */
+export async function getChannel(userId: string): Promise<{ groups: { code: string; name: string; emoji: string; earned: boolean; setIds: string[] }[] }> {
+  const repo = getRepo();
+  const [sets, badges, mine] = await Promise.all([setCards(userId), repo.listBadges(), repo.listUserBadges(userId)]);
+  const quizzes = await Promise.all(sets.map((s) => repo.listQuizzesBySet(s.id)));
+  const tagsBySet = new Map(sets.map((s, i) => [s.id, new Set(quizzes[i].flatMap((q) => q.options.flatMap((o) => o.tags)))]));
+  const owned = new Set(mine.map((b) => b.badgeCode));
+  const groups = badges
+    .map((b) => ({ code: b.code, name: b.name, emoji: b.emoji, earned: owned.has(b.code), setIds: sets.filter((s) => tagsBySet.get(s.id)?.has(b.rule.tag)).map((s) => s.id) }))
+    .filter((g) => g.setIds.length > 0);
+  return { groups };
 }

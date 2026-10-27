@@ -63,7 +63,7 @@ export interface UserBadge {
   earnedAt: string;
 }
 
-export type LedgerReason = "signup" | "game" | "quiz_answer" | "quiz_bonus" | "mission" | "rush" | "store_mission" | "roulette" | "redeem" | "admin_adjust" | "referral";
+export type LedgerReason = "signup" | "newbie" | "game" | "quiz_answer" | "quiz_bonus" | "mission" | "rush" | "store_mission" | "roulette" | "redeem" | "admin_adjust" | "referral";
 
 export interface LedgerEntry {
   id: string;
@@ -213,6 +213,8 @@ export interface HomePayload {
   badgeProgress: { code: string; name: string; emoji: string; description: string; current: number; min: number; earned: boolean }[]; // 전체 배지 진행도
   welcome: { justNow: boolean; points: number }; // 가입 보너스(첫 방문 시 1회)
   me: { loggedIn: boolean; nickname?: string; avatarUrl?: string; provider?: string }; // 로그인 상태
+  newbie: { active: boolean; dayNo: number; doneToday: number; goal: number; claimableCount: number; totalMax: number }; // 3일 혜택 요약
+  todayDone: number; // 오늘 완료한 퀴즈 세트 수(KST)
 }
 
 export interface PublicQuestion {

@@ -15,12 +15,24 @@ import { NumberFlow } from "@/components/motion/NumberFlow";
 /** 마이비 reward-banner 원본(327×72) — upload.myb.im 캡처본 */
 const BANNERS = ["/myb/up/2025-12-19T03_30_12.125Z_banner.webp", "/myb/up/2025-12-29T08_07_33.114Z_133.webp", "/myb/up/2025-12-29T08_07_50.926Z_banner.webp", "/myb/up/2026-02-11T05-23-58.433Z_2509_myb_quizpass-banner_v1_327x72.webp", "/myb/up/2026-04-24T07-33-12.788Z_2604_myb_manboki-banner_v1_327x72-1.webp", "/myb/up/2026-04-24T07-33-32.380Z_2604_myb_manboki-banner_v1_327x72.webp", "/myb/up/2026-04-27T01-55-48.943Z_2604_myb_manboki-banner_v1_327x72.webp"];
 
-/** 퀵메뉴 아이콘 — 앱스토어 스크린샷 원본 픽셀(꿀 충전은 툴팁에 가려져 꿀단지 아이콘으로 대체) */
-const QUICK: { icon: string; label: string; href?: string; tip?: string }[] = [
-  { icon: "/myb/native/qm_attend.png", label: "출석체크" },
-  { icon: "/myb/native/qm_minigame.png", label: "미니게임", href: "/games" },
-  { icon: "/myb/native/ic_honey_jar.png", label: "꿀 충전", tip: "광고 보고 +1" },
-  { icon: "/myb/native/qm_invite.png", label: "친구초대", href: "/invite" },
+/** 퀵메뉴(마이비 영상 기준: 출석체크·만보기·3일 혜택·게임적립·내 쇼핑 … 가로 스크롤 + 점 인디케이터) */
+const QUICK: { key: string; icon?: string; label: string; href?: string; tip?: string }[] = [
+  { key: "attend", icon: "/myb/native/qm_attend.png", label: "출석체크" },
+  { key: "games", icon: "/myb/native/qm_minigame.png", label: "미니게임", href: "/games" },
+  { key: "newbie", label: "3일 혜택", href: "/newbie", tip: "최대 1,500P" },
+  { key: "honey", icon: "/myb/native/ic_honey_jar.png", label: "꿀 충전" },
+  { key: "invite", icon: "/myb/native/qm_invite.png", label: "친구초대", href: "/invite" },
+  { key: "shop", icon: "/myb/res/naverpay_circle.png", label: "내 쇼핑", href: "/shop" },
+  { key: "store", label: "매장미션", href: "/missions" },
+  { key: "roulette", icon: "/myb/native/ic_gift_blue.png", label: "룰렛", href: "/roulette" },
+];
+
+/** 포인트 모아서 살 수 있어요 — 지갑 상품 타일(원본 픽셀) */
+const PRODUCTS: { brand: string; name: string; points: number; img?: string; emoji?: string; bg: string }[] = [
+  { brand: "GS25", name: "빙그레)바나나우유240ML", points: 1900, emoji: "🍌", bg: "#f6f7fb" },
+  { brand: "스타벅스", name: "아이스 카페 아메리카노T", points: 6956, img: "/myb/native/tile_americano.png", bg: "#dff3ea" },
+  { brand: "네이버페이", name: "네이버페이 포인트 10,000원", points: 12000, img: "/myb/native/tile_npay.png", bg: "#f6f7fb" },
+  { brand: "신세계", name: "신세계 상품권 10,000원", points: 14900, img: "/myb/native/tile_ssg.png", bg: "#f6f7fb" },
 ];
 
 export default function HomePage() {
@@ -91,9 +103,9 @@ export default function HomePage() {
         <div className="flex items-center gap-3">
           <Link href="/me" className="flex h-[26px] items-center gap-1.5 rounded-lg border border-line bg-bg-2 px-2 text-[12px] font-semibold">
             {data?.me.avatarUrl ? <img src={data.me.avatarUrl} alt="" className="h-[16px] w-[16px] rounded-full object-cover" /> : <img src="/myb/native/ic_basic_hex.png" alt="" className="h-[14px] w-[14px]" />}
-            {data?.me.loggedIn ? (data.me.nickname ?? "MY").slice(0, 6) : "베이직"}
+            {data?.newbie.active ? "신규 유저" : data?.me.loggedIn ? (data.me.nickname ?? "MY").slice(0, 6) : "베이직"}
           </Link>
-          <Link href="/roulette" aria-label="선물함(룰렛)"><img src="/myb/native/ic_gift_badge.png" alt="" className="h-[28px] w-[28px]" /></Link>
+          <Link href="/gifts" aria-label="선물함"><img src="/myb/native/ic_gift_badge.png" alt="" className="h-[28px] w-[28px]" /></Link>
           <Link href="/notifications" aria-label="알림" className="relative">
             <img src="/myb/native/ic_bell.png" alt="" className="h-[24px] w-[24px]" />
             {data && (data.rush.claimable > 0 || !data.attendedToday) && <i className="absolute -right-0.5 top-0 h-2 w-2 rounded-full bg-red ring-2 ring-white" />}
@@ -101,89 +113,124 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* 비포인트 러쉬 배너 */}
-      <div className="flex h-[44px] items-center justify-between bg-gradient-to-r from-[#efe6ff] via-[#f3e4fb] to-[#ffe3f3] px-5">
-        <p className="flex items-center gap-1.5 text-[14px] font-extrabold text-purple">
-          {/* 원본 라벨 이미지 ic_bpointrush.webp(351×52) */}
-          <img src="/myb/bh/ic_bpointrush.webp" alt="비포인트 러쉬" height={22} className="h-[22px] w-auto" draggable={false} />
-          <span className="ml-1 text-[12px] font-semibold">{data ? `${Math.max(1, Math.ceil((new Date(data.rushEndsAt).getTime() - Date.now()) / 86400_000))}일 남음` : "—"}</span>
+      {/* 히어로: 오늘도 만나서 반가워요 / N일차 퀴즈 3개로 시작해요! */}
+      <section className="relative overflow-hidden px-5 pb-[22px] pt-[26px]" style={{ background: "linear-gradient(180deg,#fff6cf 0%,#fffaf0 55%,#ffffff 100%)" }}>
+        <span className="absolute right-5 top-4 flex h-[26px] items-center gap-1 rounded-full bg-myb px-3 text-[12px] font-bold text-white">
+          <img src="/myb/native/ic_clock_gray.png" alt="" className="h-[13px] w-[13px] brightness-0 invert" /> {data ? (data.newbie.active ? `${data.newbie.dayNo}일차` : "오늘") : "—"}
+        </span>
+        <img src="/myb/native/avatar_intj.png" alt="" className="pointer-events-none absolute -right-1 top-[46px] h-[104px] w-[104px] object-contain" />
+        <p className="text-[14px] font-medium text-ink-2">오늘도 만나서 반가워요</p>
+        <p className="mt-1 text-[22px] font-extrabold leading-[30px]">
+          <span className="text-myb">{data?.newbie.active ? `${data.newbie.dayNo}일차 퀴즈 ${data.newbie.goal}개` : "오늘의 퀴즈 3개"}</span>로 시작해요!
         </p>
-        <Link href="/rush" className="relative flex h-[26px] items-center gap-0.5 rounded-lg bg-gradient-to-r from-[#8e5cf0] to-[#b56cf3] px-2.5 text-[11px] font-bold text-white">
-          {data ? `스탬프 ${data.rush.stamps}/${data.rush.total}` : "미션 보기"} <ChevronRight size={12} />
-          {data && (data.rush.claimable > 0 || data.wallet.stamps >= 10) && <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />}
+        <Link href={data?.newbie.active ? "/newbie" : "/quiz"} className="mt-[22px] flex h-[52px] items-center gap-3 rounded-[14px] border border-[#c9d8ff] bg-white px-4">
+          <span className="text-[15px] font-bold tabular-nums text-myb">{data ? Math.min(3, data.todayDone) : 0}/3</span>
+          <span className="flex flex-1 gap-1.5">
+            {[0, 1, 2].map((i) => <i key={i} className={`h-[8px] flex-1 rounded-full ${data && data.todayDone > i ? "bg-myb" : "bg-[#dfe8ff]"}`} />)}
+          </span>
         </Link>
-      </div>
+      </section>
 
-      {/* 오늘의 루틴 */}
-      <section className="px-5 pt-[26px]">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[20px] font-bold">오늘의 루틴</h2>
-          <Link href="/rush" className="flex h-7 items-center gap-0.5 rounded-full border border-[#dfe3ea] px-2.5 text-[12px] text-ink-2">
-            더보기 <ChevronRight size={12} />
-          </Link>
-        </div>
-        <div className="mt-[12px] flex h-[70px] items-center gap-3 rounded-2xl border-2 border-[#ffcf6b] bg-[#fffbf1] px-4">
-          <img src="/myb/native/ic_honey_jar.png" alt="" className="h-[36px] w-[30px] object-contain" />
-          <div className="flex-1">
-            <p className="text-[15px] font-semibold">오늘의 꿀 <b className="font-extrabold">{data ? `${data.honey}/${data.honeyMax}` : "—"}</b></p>
-            <p className="mt-0.5 text-[13px] text-muted">{data && data.honey === 0 ? "내일 0시에 다시 충전돼요" : "퀴즈 푸는데 필요해요"}</p>
-          </div>
-          <Link href="/quiz" className="relative flex h-8 items-center rounded-lg bg-myb px-4 text-[13px] font-bold text-white">
-            이동
-            {data && data.honey > 0 && <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />}
-          </Link>
+      {/* 퀴즈 가로 카드 */}
+      <section className="pt-[18px]">
+        <div className="no-scrollbar flex gap-[14px] overflow-x-auto px-5">
+          {sets.length > 0 ? sets.slice(0, 8).map((s) => <SetCard key={s.id} s={s} size={150} />) : [0, 1, 2].map((i) => <div key={i} className="h-[230px] w-[150px] shrink-0 animate-pulse rounded-xl bg-bg-2" />)}
         </div>
       </section>
 
-      {/* 내게 딱 맞는 퀴즈 */}
-      <section className="mt-[12px] bg-[#f4f6fa] pb-5 pt-[24px]">
-        <Link href="/quiz" className="flex items-center justify-between px-5">
-          <h2 className="flex items-center gap-2 text-[20px] font-bold">
-            내게 딱 맞는 퀴즈
-            {data?.starter.active && <span className="rounded-full bg-[#ff8a3d] px-2 py-0.5 text-[11px] font-bold text-white">뉴비 2배 D-{Math.max(0, Math.ceil((new Date(data.starter.endsAt).getTime() - Date.now()) / 86400_000))}</span>}
-          </h2>
+      {/* 퀵메뉴(가로 스크롤 + 점) */}
+      <section className="pt-[26px]">
+        <QuickMenu
+          items={QUICK}
+          attended={!!data?.attendedToday}
+          onTap={(key, href) => {
+            if (key === "attend") return void attend();
+            if (key === "honey") return data && data.honeyTopups.used >= data.honeyTopups.max ? show(`오늘 충전은 ${data.honeyTopups.max}번까지예요. 내일 0시에 8개 충전`, "info") : setAd({ left: 15 });
+            if (href) router.push(href);
+          }}
+        />
+      </section>
+
+      {/* 포인트 모아서 살 수 있어요 */}
+      <section className="mt-[30px] px-5">
+        <Link href="/exchange" className="flex items-center justify-between">
+          <h2 className="text-[20px] font-bold">💰 포인트 모아서 살 수 있어요</h2>
           <ChevronRight size={20} className="text-ink-2" />
         </Link>
-        <div className="mt-[14px] flex gap-3 px-5">
-          <span className="flex h-[42px] items-center gap-1.5 rounded-xl border border-myb-line bg-myb-soft px-3.5 text-[15px] font-semibold">
-            <img src="/myb/native/ic_honey_small.png" alt="" className="h-[16px] w-[14px] object-contain" /> 보유 꿀 {data ? data.honey : "—"} <ChevronRight size={14} className="text-muted" />
-          </span>
-          {/* 프리패스 배너 — 원본 픽셀(캐릭터 장식 포함) */}
-          <span className="relative flex h-[42px] flex-1 items-end">
-            <img src="/myb/native/img_freepass_pill.png" alt="프리패스 · 광고 시청 없이" className="absolute bottom-0 left-0 h-[52px] w-full object-fill object-bottom" />
-          </span>
+        {data?.newbie.active && (
+          <>
+            <Link href="/newbie" className="mt-[18px] flex items-center gap-3 rounded-[14px] border border-[#b9ccff] bg-[#eef3ff] px-4 py-3">
+              <span className="text-[26px]">🎉</span>
+              <span>
+                <p className="text-[15px] font-bold text-myb">신규 유저 전용 혜택</p>
+                <p className="text-[13px] text-ink-2">3일 동안 매일 퀴즈 3개 풀면 최대 {fmt(data.newbie.totalMax)}P</p>
+              </span>
+            </Link>
+            <div className="relative mt-[14px] grid grid-cols-2 gap-[26px]">
+              {[{ brand: "네이버페이 포인트쿠폰", name: "네이버페이 1,000원", price: "1,500", img: "/myb/native/tile_npay.png", bg: "#6e6e6e" }, { brand: "트레져러", name: "한국거래소 금 1,000원", price: "무제한", img: "/myb/native/tile_gold.png", bg: "#8b6f3a" }].map((p) => (
+                <Link key={p.name} href="/newbie" className="block">
+                  <div className="overflow-hidden rounded-[18px]">
+                    <p className="flex h-[36px] items-center justify-center bg-myb text-[13px] font-bold text-white">🎉 신규 유저 전용 🎉</p>
+                    <div className="relative flex h-[136px] items-center justify-center" style={{ background: p.bg }}>
+                      <img src={p.img} alt="" className="h-[90px] w-[90px] object-contain opacity-60" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-white">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-[18px] text-ink">🔒</span>
+                        <span className="text-[14px] font-bold">{data.newbie.dayNo}일차 미션 완료하기</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="mt-2.5 text-[12px] text-muted">{p.brand}</p>
+                  <p className="mt-0.5 text-[15px] font-medium">{p.name}</p>
+                  <p className="mt-1 flex items-center gap-1 text-[16px] font-extrabold"><PCoin size={16} />{p.price}</p>
+                </Link>
+              ))}
+              <span className="pointer-events-none absolute left-1/2 top-[90px] flex h-[42px] w-[42px] -translate-x-1/2 items-center justify-center rounded-full text-[13px] font-black italic text-white shadow-md" style={{ background: "linear-gradient(135deg,#7c5cff,#c84cff)" }}>VS</span>
+            </div>
+          </>
+        )}
+        <div className="mt-[22px] grid grid-cols-2 gap-x-[26px] gap-y-6">
+          {PRODUCTS.map((p) => (
+            <Link key={p.name} href="/exchange" className="block">
+              <div className="flex h-[170px] items-center justify-center rounded-[18px]" style={{ background: p.bg }}>
+                {p.img ? <img src={p.img} alt="" className="h-[150px] w-[150px] object-contain" /> : <span className="text-[72px] leading-none">{p.emoji}</span>}
+              </div>
+              <p className="mt-2.5 text-[12px] text-muted">{p.brand}</p>
+              <p className="mt-0.5 truncate text-[15px] font-medium">{p.name}</p>
+              <p className="mt-1 flex items-center gap-1 text-[16px] font-extrabold"><PCoin size={16} />{fmt(p.points)}</p>
+            </Link>
+          ))}
         </div>
+      </section>
 
-        <div className="no-scrollbar mt-[18px] flex gap-4 overflow-x-auto px-5">
-          {sets.length > 0
-            ? sets.map((s) => <SetCard key={s.id} s={s} />)
-            : [0, 1, 2].map((i) => <div key={i} className="h-[220px] w-[145px] shrink-0 animate-pulse rounded-xl bg-bg-2" />)}
-        </div>
-
-        <div className="mx-5 mt-2 border-t border-[#e3e7ee]" />
-        <ul className="mt-[14px] grid grid-cols-4 px-3">
-          {QUICK.map((qk) => (
-            <li
-              key={qk.label}
-              className="relative flex cursor-pointer flex-col items-center gap-1"
-              role="button"
-              onClick={qk.label === "출석체크" ? () => void attend() : qk.href ? () => router.push(qk.href!) : () => (data && data.honeyTopups.used >= data.honeyTopups.max ? show(`오늘 충전은 ${data.honeyTopups.max}번까지예요. 내일 0시에 8개 충전`, "info") : setAd({ left: 15 }))}
-            >
-              {qk.label === "출석체크" && data?.attendedToday && <span className="absolute -top-1 right-3 flex h-4 w-4 items-center justify-center rounded-full bg-myb text-[10px] text-white">✓</span>}
-              {qk.tip && (
-                <span className="absolute -top-6 whitespace-nowrap rounded-full bg-[#ff8a3d] px-2.5 py-1 text-[11px] font-bold text-white after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-[#ff8a3d]">
-                  {qk.tip}
+      {/* 나를 위한 맞춤 서비스 */}
+      <section className="mt-[36px] px-5">
+        <h2 className="text-[20px] font-bold">나를 위한 맞춤 서비스</h2>
+        <p className="mt-1 text-[14px] text-ink-2">참여 패턴을 분석해 딱 맞는 서비스를 추천해요</p>
+        <ul className="mt-[18px] flex flex-col gap-3">
+          {[
+            { emoji: "🤝", title: "친구 초대", desc: "친구 초대하면 300P 적립", href: "/invite" },
+            { emoji: "🔥", title: "비포인트 러쉬", desc: data ? `이번 주 스탬프 ${data.rush.stamps}/${data.rush.total} · 미션 완료하면 룰렛 스탬프` : "주간 스탬프 미션", href: "/rush", dot: !!data && data.rush.claimable > 0 },
+            { emoji: "📍", title: "동네 매장 미션", desc: "매장 방문·저장·리뷰하고 스탬프", href: "/missions" },
+            { emoji: "🎡", title: "무료 룰렛", desc: data && data.wallet.stamps >= 10 ? "스탬프 10개 모였어요! 지금 돌리기" : `스탬프 ${data?.wallet.stamps ?? 0}/10 · 10개면 룰렛 1회`, href: "/roulette", dot: !!data && data.wallet.stamps >= 10 },
+          ].map((c) => (
+            <li key={c.title}>
+              <Link href={c.href} className="flex items-center gap-4 rounded-[18px] bg-white px-5 py-4" style={{ boxShadow: "0 4px 16px rgba(0,43,141,.08)" }}>
+                <span className="text-[34px] leading-none">{c.emoji}</span>
+                <span className="min-w-0 flex-1">
+                  <p className="text-[17px] font-bold">{c.title}</p>
+                  <p className="mt-0.5 truncate text-[13px] text-ink-2">{c.desc}</p>
                 </span>
-              )}
-              <img src={qk.icon} alt="" className="h-[30px] w-[34px] object-contain" />
-              <span className="text-[11px] font-medium text-ink-2">{qk.label}</span>
+                <span className="relative flex h-[38px] items-center rounded-[10px] bg-myb px-4 text-[14px] font-bold text-white">
+                  이동{c.dot && <i className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />}
+                </span>
+              </Link>
             </li>
           ))}
         </ul>
-
-        {/* 리워드 배너(자동 롤링) — 원본 327×72 */}
-        <Banners images={BANNERS} className="mx-5 mt-[22px]" />
       </section>
+
+      {/* 리워드 배너(자동 롤링) — 원본 327×72 */}
+      <Banners images={BANNERS} className="mx-5 mb-2 mt-[26px]" />
 
       {error && <p className="py-3 text-center text-xs text-red">연결 오류: {error}</p>}
 
@@ -225,6 +272,37 @@ export default function HomePage() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+/** 퀵메뉴: 5개씩 가로 스크롤, 점 인디케이터. 3일 혜택은 금색 "3일" 타이포 + 말풍선 */
+function QuickMenu({ items, attended, onTap }: { items: typeof QUICK; attended: boolean; onTap: (key: string, href?: string) => void }) {
+  const [page, setPage] = useState(0);
+  const pages = Math.ceil(items.length / 5);
+  return (
+    <div>
+      <ul className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto px-3" onScroll={(e) => setPage(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))}>
+        {items.map((qk) => (
+          <li key={qk.key} className="relative flex w-1/5 shrink-0 snap-start flex-col items-center gap-[10px] pt-[26px]">
+            <button type="button" onClick={() => onTap(qk.key, qk.href)} className="myb-press flex flex-col items-center gap-[10px]">
+              {qk.tip && <span className="absolute -top-0 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-myb px-2.5 py-1 text-[11px] font-bold text-white after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-myb">{qk.tip}</span>}
+              {qk.key === "attend" && attended && <span className="absolute right-2 top-[22px] flex h-4 w-4 items-center justify-center rounded-full bg-myb text-[10px] text-white">✓</span>}
+              {qk.key === "newbie" ? (
+                <span className="flex h-[40px] w-[40px] items-center justify-center text-[24px] font-black italic leading-none" style={{ background: "linear-gradient(180deg,#ffe27a,#f5a524)", WebkitBackgroundClip: "text", color: "transparent", filter: "drop-shadow(0 1px 0 #b06a00)" }}>3일</span>
+              ) : qk.key === "store" ? (
+                <span className="flex h-[40px] w-[40px] items-center justify-center text-[30px] leading-none">📍</span>
+              ) : (
+                <img src={qk.icon} alt="" className={`h-[40px] w-[40px] object-contain ${qk.key === "shop" ? "rounded-full" : ""}`} />
+              )}
+              <span className="text-[13px] font-medium text-ink">{qk.label}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-3 flex justify-center gap-1">
+        {Array.from({ length: pages }).map((_, i) => <i key={i} className={`h-[5px] rounded-full transition-all ${i === page ? "w-[22px] bg-[#8b94a0]" : "w-[12px] bg-[#e5e8ee]"}`} />)}
+      </div>
     </div>
   );
 }

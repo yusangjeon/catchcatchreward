@@ -42,22 +42,22 @@ function q(setId: string, n: number, question: string, options: SeedOption[]): Q
 }
 
 export const SEED_SETS: QuizSet[] = [
-  { id: "s01", title: "알쏭달쏭 경제용어 탐험, 함께 도전해봐요!", imageUrl: img("safe"), rewardPoints: 590, capacity: 5000, baseParticipants: 1201, todayOnly: true, active: true, sort: 1 },
-  { id: "s02", title: "당신의 소파 취향을 알려주세요 🛋️", imageUrl: img("sofa"), rewardPoints: 30, capacity: 10000, baseParticipants: 8888, todayOnly: false, active: true, sort: 2 },
-  { id: "s03", title: "드라마 \"형제들의 식탁\" 어디까지 봤나요?", imageUrl: img("drama"), rewardPoints: 55, capacity: 3000, baseParticipants: 1201, todayOnly: false, active: true, sort: 3 },
-  { id: "s04", title: "짜장면이 더 좋나요? 짬뽕이 더 좋나요?", imageUrl: img("noodle"), rewardPoints: 100, capacity: 5000, baseParticipants: 3205, todayOnly: false, active: true, sort: 4 },
-  { id: "s05", title: "어떤 스마트 워치를 사용하고 계시나요?", imageUrl: img("watch"), rewardPoints: 240, capacity: 1000, baseParticipants: 3205, todayOnly: false, active: true, sort: 5 },
-  { id: "s06", title: "식재료 구입 시 어떤 앱을 사용하세요?", imageUrl: img("veggie"), rewardPoints: 500, capacity: 993, baseParticipants: 1201, todayOnly: false, active: true, sort: 6 },
-  { id: "s07", title: "어떤 장르의 게임을 좋아하시나요?", imageUrl: img("gamer"), rewardPoints: 450, capacity: 5000, baseParticipants: 3205, todayOnly: false, active: true, sort: 7 },
-  { id: "s08", title: "어떤 음악 스트리밍앱을 사용하세요?", imageUrl: img("music"), rewardPoints: 240, capacity: 1000, baseParticipants: 3205, todayOnly: false, active: true, sort: 8 },
-  { id: "s09", title: "이번 연휴, 어디로 떠날까요? ✈️", imageUrl: img("travel"), rewardPoints: 120, capacity: 8000, baseParticipants: 2410, todayOnly: false, active: true, sort: 9 },
-  { id: "s10", title: "우리 집 반려동물 이야기 🐾", imageUrl: img("puppy"), rewardPoints: 80, capacity: 6000, baseParticipants: 1930, todayOnly: false, active: true, sort: 10 },
-  { id: "s11", title: "아침 스킨케어 루틴, 몇 단계?", imageUrl: img("skincare"), rewardPoints: 150, capacity: 4000, baseParticipants: 2877, todayOnly: false, active: true, sort: 11 },
-  { id: "s12", title: "올가을 옷장, 뭐부터 채울까요?", imageUrl: img("fashion"), rewardPoints: 90, capacity: 7000, baseParticipants: 4120, todayOnly: false, active: true, sort: 12 },
-  { id: "s13", title: "월급 관리, 나는 어떤 타입?", imageUrl: img("money"), rewardPoints: 200, capacity: 3000, baseParticipants: 1555, todayOnly: false, active: true, sort: 13 },
-  { id: "s14", title: "점심 메뉴 결정 장애 테스트 🍱", imageUrl: img("lunch"), rewardPoints: 60, capacity: 10000, baseParticipants: 6210, todayOnly: false, active: true, sort: 14 },
-  { id: "s15", title: "주말 드라이브 코스 추천받기 🚗", imageUrl: img("drive"), rewardPoints: 130, capacity: 5000, baseParticipants: 980, todayOnly: false, active: true, sort: 15 },
-  { id: "s16", title: "건강 챙기기, 어디까지 해봤나요?", imageUrl: img("health"), rewardPoints: 110, capacity: 5000, baseParticipants: 2040, todayOnly: false, active: true, sort: 16 },
+  { id: "s01", title: "알쏭달쏭 경제용어 탐험, 함께 도전해봐요!", imageUrl: "/quiz/covers/s01.webp", rewardPoints: 590, capacity: 5000, baseParticipants: 1201, todayOnly: true, active: true, sort: 1 },
+  { id: "s02", title: "당신의 소파 취향을 알려주세요 🛋️", imageUrl: "/quiz/covers/s02.webp", rewardPoints: 30, capacity: 10000, baseParticipants: 8888, todayOnly: false, active: true, sort: 2 },
+  { id: "s03", title: "드라마 \"형제들의 식탁\" 어디까지 봤나요?", imageUrl: "/quiz/covers/s03.webp", rewardPoints: 55, capacity: 3000, baseParticipants: 1201, todayOnly: false, active: true, sort: 3 },
+  { id: "s04", title: "짜장면이 더 좋나요? 짬뽕이 더 좋나요?", imageUrl: "/quiz/covers/s04.webp", rewardPoints: 100, capacity: 5000, baseParticipants: 3205, todayOnly: false, active: true, sort: 4 },
+  { id: "s05", title: "어떤 스마트 워치를 사용하고 계시나요?", imageUrl: "/quiz/covers/s05.webp", rewardPoints: 240, capacity: 1000, baseParticipants: 3205, todayOnly: false, active: true, sort: 5 },
+  { id: "s06", title: "식재료 구입 시 어떤 앱을 사용하세요?", imageUrl: "/quiz/covers/s06.webp", rewardPoints: 500, capacity: 993, baseParticipants: 1201, todayOnly: false, active: true, sort: 6 },
+  { id: "s07", title: "어떤 장르의 게임을 좋아하시나요?", imageUrl: "/quiz/covers/s07.webp", rewardPoints: 450, capacity: 5000, baseParticipants: 3205, todayOnly: false, active: true, sort: 7 },
+  { id: "s08", title: "어떤 음악 스트리밍앱을 사용하세요?", imageUrl: "/quiz/covers/s08.webp", rewardPoints: 240, capacity: 1000, baseParticipants: 3205, todayOnly: false, active: true, sort: 8 },
+  { id: "s09", title: "이번 연휴, 어디로 떠날까요? ✈️", imageUrl: "/quiz/covers/s09.webp", rewardPoints: 120, capacity: 8000, baseParticipants: 2410, todayOnly: false, active: true, sort: 9 },
+  { id: "s10", title: "우리 집 반려동물 이야기 🐾", imageUrl: "/quiz/covers/s10.webp", rewardPoints: 80, capacity: 6000, baseParticipants: 1930, todayOnly: false, active: true, sort: 10 },
+  { id: "s11", title: "아침 스킨케어 루틴, 몇 단계?", imageUrl: "/quiz/covers/s11.webp", rewardPoints: 150, capacity: 4000, baseParticipants: 2877, todayOnly: false, active: true, sort: 11 },
+  { id: "s12", title: "올가을 옷장, 뭐부터 채울까요?", imageUrl: "/quiz/covers/s12.webp", rewardPoints: 90, capacity: 7000, baseParticipants: 4120, todayOnly: false, active: true, sort: 12 },
+  { id: "s13", title: "월급 관리, 나는 어떤 타입?", imageUrl: "/quiz/covers/s13.webp", rewardPoints: 200, capacity: 3000, baseParticipants: 1555, todayOnly: false, active: true, sort: 13 },
+  { id: "s14", title: "점심 메뉴 결정 장애 테스트 🍱", imageUrl: "/quiz/covers/s14.webp", rewardPoints: 60, capacity: 10000, baseParticipants: 6210, todayOnly: false, active: true, sort: 14 },
+  { id: "s15", title: "주말 드라이브 코스 추천받기 🚗", imageUrl: "/quiz/covers/s15.webp", rewardPoints: 130, capacity: 5000, baseParticipants: 980, todayOnly: false, active: true, sort: 15 },
+  { id: "s16", title: "건강 챙기기, 어디까지 해봤나요?", imageUrl: "/quiz/covers/s16.webp", rewardPoints: 110, capacity: 5000, baseParticipants: 2040, todayOnly: false, active: true, sort: 16 },
 ];
 
 export const SEED_QUIZZES: Quiz[] = [
