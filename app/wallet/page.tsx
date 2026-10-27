@@ -148,6 +148,28 @@ export default function WalletPage() {
           ) : (
             <div className="mt-6 rounded-2xl bg-bg-2 p-8 text-center text-[14px] text-muted">아직 뱃지가 없어요.<br />퀴즈를 풀면 생겨요.</div>
           )}
+          {data && data.badgeProgress.some((b) => !b.earned) && (
+            <>
+              <h3 className="mt-8 text-[16px] font-bold">다음 뱃지까지</h3>
+              <ul className="mt-3 flex flex-col gap-3">
+                {data.badgeProgress.filter((b) => !b.earned).sort((a, b) => b.current / b.min - a.current / a.min).map((b) => (
+                  <li key={b.code} className="flex items-center gap-3 rounded-2xl border border-[#e3e8f0] px-4 py-3">
+                    <span className="text-[28px] grayscale" aria-hidden>{b.emoji}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between text-[14px]">
+                        <span className="font-semibold">{b.name}</span>
+                        <span className="tabular-nums text-muted">{b.current}/{b.min}</span>
+                      </div>
+                      <p className="mt-0.5 truncate text-[12px] text-muted">{b.description}</p>
+                      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-bg-2">
+                        <div className="myb-progress h-full rounded-full bg-myb" style={{ width: `${Math.round((b.current / b.min) * 100)}%` }} />
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </section>
       )}
     </div>

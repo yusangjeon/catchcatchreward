@@ -112,7 +112,11 @@ export async function getHome(userId: string): Promise<HomePayload> {
   const repo = getRepo();
   const [sets, w, badges, scores, done, rush, profile] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId), repo.listCompletions(userId), rushSummary(userId), repo.findProfile(userId)]);
   const attendedToday = await repo.hasStamp(userId, "attendance", kstDayKey());
-  return { wallet: w, honey: honeyLeft(done), honeyMax: HONEY_PER_DAY, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday, starter: starterOf(profile?.createdAt ?? new Date(0).toISOString()) };
+  const earned = new Set(badges.map((b) => b.code));
+  const badgeProgress = (await repo.listBadges()).map((b) => ({
+    code: b.code, name: b.name, emoji: b.emoji, description: b.description, current: Math.min(scores[b.rule.tag] ?? 0, b.rule.min), min: b.rule.min, earned: earned.has(b.code),
+  }));
+  return { wallet: w, honey: honeyLeft(done), honeyMax: HONEY_PER_DAY, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday, starter: starterOf(profile?.createdAt ?? new Date(0).toISOString()), badgeProgress };
 }
 
 export async function getSetPayload(userId: string, setId: string): Promise<SetPayload> {
