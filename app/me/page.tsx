@@ -1,5 +1,6 @@
 "use client";
 
+import { IconTile, type DuoName, type Tone } from "@/components/icons/duo";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
@@ -18,15 +19,15 @@ export default function MePage() {
 }
 
 const MENU = [
-  { href: "/history", label: "포인트 내역", icon: "/brand/coins.webp" },
-  { href: "/exchange", label: "포인트 교환", icon: "/brand/ticket.webp" },
-  { href: "/gifts", label: "선물함", icon: "/brand/gift.webp" },
-  { href: "/attendance", label: "출석 달력", icon: "/brand/qm_attend.webp" },
-  { href: "/invite", label: "친구초대", icon: "/brand/qm_invite.webp" },
-  { href: "/notifications", label: "알림", icon: "/brand/bell.webp" },
-  { href: "/notice", label: "공지사항", icon: "/brand/party.webp" },
-  { href: "/support", label: "고객센터", icon: "/brand/quiz.webp" },
-  { href: "/terms", label: "이용약관 · 개인정보", icon: "/brand/badge.webp" },
+  { href: "/history", label: "포인트 내역", name: "coin", tone: "amber" },
+  { href: "/exchange", label: "포인트 교환", name: "ticket", tone: "blue" },
+  { href: "/gifts", label: "선물함", name: "gift", tone: "pink" },
+  { href: "/attendance", label: "출석 달력", name: "calendar", tone: "green" },
+  { href: "/invite", label: "친구초대", name: "people", tone: "pink" },
+  { href: "/notifications", label: "알림", name: "bell", tone: "amber" },
+  { href: "/notice", label: "공지사항", name: "megaphone", tone: "blue" },
+  { href: "/support", label: "고객센터", name: "chat", tone: "teal" },
+  { href: "/terms", label: "이용약관 · 개인정보", name: "doc", tone: "gray" },
 ];
 
 /** MY — 계정 연결 상태, 잔액, 메뉴. 로그인은 카카오 */
@@ -67,7 +68,7 @@ function MeView() {
         <ul className="overflow-hidden rounded-[20px] bg-white" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           {MENU.map((m) => (
             <li key={m.href} className="border-b border-[var(--color-bg-2)] last:border-0">
-              <Link href={m.href} className="flex h-[52px] items-center gap-3 px-5 text-[15px]"><img src={m.icon} alt="" className="h-7 w-7 object-contain" /><span className="flex-1">{m.label}</span><span className="text-[#b0b8c1]">›</span></Link>
+              <Link href={m.href} className="flex h-[52px] items-center gap-3 px-5 text-[15px]"><IconTile name={m.name as DuoName} tone={m.tone as Tone} size={32} icon={18} /><span className="flex-1">{m.label}</span><span className="text-[#b0b8c1]">›</span></Link>
             </li>
           ))}
         </ul>

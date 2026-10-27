@@ -14,10 +14,17 @@ import { SPOT_LEVELS, type SpotDiff } from "./spotLevels";
  */
 export const GAME_LIMITS: Record<GamePlay["game"], number> = { spot: 3, rsp: 3, scratch: 1, memory: 1, slide: 1 };
 export const SPOT_DIFFS = 5;
-export const SPOT_LIMIT_SEC = 60;
-export const SPOT_POINT_PER_DIFF = 3;
-export const SPOT_COMPLETE_BONUS = 10;
-export const SPOT_SPEED_BONUS = 5; // 전부 찾고 절반 시간(30초) 안에 끝내면
+/** 레벨(오늘 n번째 판)별 난이도: 시간은 줄고 감점·보상은 커진다. 장면도 차이 크기(r) 기준으로 쉬운 것부터 배치 */
+export const SPOT_STAGES = [
+  { limitSec: 60, missPenalty: 5, pointPerDiff: 3, completeBonus: 10, speedBonus: 5 },
+  { limitSec: 50, missPenalty: 7, pointPerDiff: 4, completeBonus: 15, speedBonus: 8 },
+  { limitSec: 40, missPenalty: 10, pointPerDiff: 5, completeBonus: 20, speedBonus: 12 },
+] as const;
+export const spotStage = (playIndex: number) => SPOT_STAGES[Math.min(Math.max(0, playIndex), SPOT_STAGES.length - 1)];
+export const SPOT_LIMIT_SEC = SPOT_STAGES[0].limitSec;
+export const SPOT_POINT_PER_DIFF = SPOT_STAGES[0].pointPerDiff;
+export const SPOT_COMPLETE_BONUS = SPOT_STAGES[0].completeBonus;
+export const SPOT_SPEED_BONUS = SPOT_STAGES[0].speedBonus;
 const SCRATCH_PRIZES: [points: number, weight: number][] = [[0, 50], [5, 25], [10, 15], [50, 8], [500, 2]];
 const SCRATCH_SYMBOL: Record<number, string> = { 5: "🍒", 10: "🔔", 50: "⭐", 500: "💎" };
 const SCRATCH_POOL = ["🍀", "🍒", "🔔", "⭐", "💎", "🎁"];
@@ -79,9 +86,14 @@ async function record(userId: string, game: GamePlay["game"], day: string, resul
 }
 
 /** 날짜 × 회차 → 레벨. 하루 3레벨이 모두 다른 장면이 되도록 순환 */
+/** 장면 난이도 = 차이 영역 평균 반지름(작을수록 어려움). 오늘의 3장을 쉬운 순으로 정렬해 LV1→3 */
+const easeOf = (l: { diffs: { r: number }[] }) => l.diffs.reduce((a, d) => a + d.r, 0) / Math.max(1, l.diffs.length);
 export function spotLevelFor(dayKey: string, playIndex: number) {
   const dayNo = Math.floor(Date.parse(`${dayKey}T00:00:00Z`) / 86400_000);
-  return SPOT_LEVELS[(dayNo * GAME_LIMITS.spot + playIndex) % SPOT_LEVELS.length];
+  const n = SPOT_LEVELS.length;
+  const picks = Array.from({ length: GAME_LIMITS.spot }, (_, i) => SPOT_LEVELS[(dayNo * GAME_LIMITS.spot + i) % n]);
+  picks.sort((a, b) => easeOf(b) - easeOf(a));
+  return picks[Math.min(Math.max(0, playIndex), picks.length - 1)];
 }
 
 const spotSecret = () => process.env.ADMIN_KEY || process.env.SPOT_SECRET || "ccr-dev-spot-secret";
@@ -103,7 +115,7 @@ function validFound(userId: string, day: string, levelId: string, tokens: { id: 
 }
 
 export interface SpotPayload {
-  dayKey: string; level: { id: string; name: string; a: string; b: string; index: number }; total: number; limitSec: number;
+  dayKey: string; level: { id: string; name: string; a: string; b: string; index: number }; total: number; limitSec: number; missPenalty: number;
   played: number; left: number; pointPerDiff: number; completeBonus: number; speedBonus: number; recent: { level: string; result: string; points: number }[];
   today: { index: number; id: string; name: string; thumb: string; status: "done" | "current" | "locked"; found?: number; points?: number; seconds?: number }[];
   todayPoints: number;
@@ -131,8 +143,8 @@ export async function getSpot(userId: string): Promise<SpotPayload> {
   return {
     today, todayPoints: plays.reduce((a, p) => a + p.points, 0), best,
     dayKey: day, level: { id: lv.id, name: lv.name, a: `/games/spot/${lv.id}/a.webp`, b: `/games/spot/${lv.id}/b.webp`, index: idx },
-    total: SPOT_DIFFS, limitSec: SPOT_LIMIT_SEC, played: plays.length, left: Math.max(0, GAME_LIMITS.spot - plays.length),
-    pointPerDiff: SPOT_POINT_PER_DIFF, completeBonus: SPOT_COMPLETE_BONUS, speedBonus: SPOT_SPEED_BONUS,
+    total: SPOT_DIFFS, limitSec: spotStage(idx).limitSec, missPenalty: spotStage(idx).missPenalty, played: plays.length, left: Math.max(0, GAME_LIMITS.spot - plays.length),
+    pointPerDiff: spotStage(idx).pointPerDiff, completeBonus: spotStage(idx).completeBonus, speedBonus: spotStage(idx).speedBonus,
     recent: plays.map((p) => ({ level: p.result.split(":")[0], result: p.result, points: p.points })),
   };
 }
@@ -169,8 +181,10 @@ export async function submitSpot(userId: string, levelId: string, tokens: { id: 
   const { day, lv } = await assertSpotLevel(userId, levelId);
   const found = validFound(userId, day, levelId, tokens);
   const all = found.size === SPOT_DIFFS;
-  const speedBonus = all && seconds <= SPOT_LIMIT_SEC / 2 ? SPOT_SPEED_BONUS : 0;
-  const points = found.size * SPOT_POINT_PER_DIFF + (all ? SPOT_COMPLETE_BONUS : 0) + speedBonus;
+  const before = (await getRepo().listGamePlays(userId)).filter((x) => x.game === "spot" && x.dayKey === day).length;
+  const st = spotStage(before);
+  const speedBonus = all && seconds <= st.limitSec / 2 ? st.speedBonus : 0;
+  const points = found.size * st.pointPerDiff + (all ? st.completeBonus : 0) + speedBonus;
   await record(userId, "spot", day, `${lv.id}:${found.size}/${SPOT_DIFFS}:${Math.max(0, Math.round(seconds))}s`, points, `틀린그림 ${lv.name} ${found.size}/${SPOT_DIFFS}${speedBonus ? " · 스피드" : ""}`);
   const plays = (await getRepo().listGamePlays(userId)).filter((x) => x.game === "spot" && x.dayKey === day);
   return { ok: true as const, found: found.size, total: SPOT_DIFFS, points, all, speedBonus, seconds: Math.round(seconds), missed: lv.diffs.filter((d) => !found.has(d.id)).map(circle), left: Math.max(0, GAME_LIMITS.spot - plays.length), wallet: await wallet(userId) };

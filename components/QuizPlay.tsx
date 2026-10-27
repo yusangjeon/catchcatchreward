@@ -1,5 +1,6 @@
 "use client";
 
+import { DuoIcon } from "@/components/icons/duo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -94,7 +95,7 @@ export function QuizPlay({ setId }: { setId: string }) {
       {/* 하단 파란 영역 */}
       <div className="flex flex-1 flex-col bg-myb px-[40px] pt-[38px] pb-28">
         <div className="flex items-center gap-3">
-          <img src="/brand/mascot_1.webp" alt="" className="h-[52px] w-[52px] rounded-full ring-[3px] ring-white" />
+          <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-white text-[15px] font-black tracking-wide text-myb ring-[3px] ring-white/60">{data.persona.code.replace(/\?/g, "").slice(0, 2) || "NEW"}</span>
           <div>
             <p className="text-[13px] font-medium text-white">
               {data.persona.title} · <b className="font-extrabold">{data.persona.code}</b>
@@ -211,7 +212,7 @@ function RewardScreen({ result }: { result: SubmitResult }) {
         </div>
         {result.starterBonus > 0 && (
           <p className="mt-4 flex h-[42px] items-center justify-center gap-1.5 rounded-xl bg-[#fff6e5] text-[13px] text-[#9a5b00]">
-            <img src="/brand/gift.webp" alt="" className="h-5 w-5 object-contain" /> 뉴비 스타터팩 2배로 <PCoin size={18} /> <b className="text-[16px] font-extrabold text-[#ff8a3d]">+{fmt(result.starterBonus)}</b> 더 받았어요
+            <DuoIcon name="gift" size={18} className="text-[#d98a00]" /> 뉴비 스타터팩 2배로 <PCoin size={18} /> <b className="text-[16px] font-extrabold text-[#ff8a3d]">+{fmt(result.starterBonus)}</b> 더 받았어요
           </p>
         )}
         {result.bonus > 0 && (

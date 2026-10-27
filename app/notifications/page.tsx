@@ -1,5 +1,6 @@
 "use client";
 
+import { IconTile, type DuoName, type Tone } from "@/components/icons/duo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -8,8 +9,8 @@ import { PushToggle } from "@/components/PushToggle";
 
 /* eslint-disable @next/next/no-img-element */
 
-const ICON: Record<Notice["kind"], string> = {
-  rush: "/brand/stamp.webp", redeem: "/brand/qm_roulette.webp", referral: "/brand/qm_invite.webp", honey: "/brand/qm_honey.webp", attendance: "/brand/qm_attend.webp", roulette: "/brand/qm_games.webp",
+const ICON: Record<Notice["kind"], [DuoName, Tone]> = {
+  rush: ["flame", "orange"], redeem: ["ticket", "blue"], referral: ["people", "pink"], honey: ["drop", "amber"], attendance: ["calendar", "green"], roulette: ["wheel", "amber"],
 };
 
 /** 알림 — 홈 종 아이콘. 상태에서 파생된 할 일·소식 */
@@ -34,7 +35,7 @@ export default function NotificationsPage() {
           <li key={n.id}>
             <Link href={n.href} className="flex items-center gap-3 rounded-[16px] bg-white px-4 py-[14px]" style={{ boxShadow: "0 2px 10px 0 rgba(40, 24, 14, 0.06)" }}>
               <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-myb-soft)]">
-                <img src={ICON[n.kind]} width={28} height={28} alt="" className="h-7 w-7 object-contain" />
+                <IconTile name={ICON[n.kind][0]} tone={ICON[n.kind][1]} size={40} />
                 {n.action && <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#ff3939] ring-2 ring-white" />}
               </span>
               <div className="min-w-0 flex-1">

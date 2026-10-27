@@ -12,7 +12,7 @@ import type { GamesPayload } from "@/lib/games/service";
 /* eslint-disable @next/next/no-img-element */
 
 /** 카드 그림 — 브랜드 아이콘 16종 중 8쌍 */
-const LOGOS = ["qm_attend", "qm_games", "qm_honey", "qm_invite", "qm_shop", "qm_store", "qm_roulette", "bell", "piggy", "gold", "badge", "ticket", "gift", "trophy", "coins", "mascot_4"].map((k) => `/brand/${k}.webp`);
+const LOGOS = Array.from({ length: 16 }, (_, i) => `/quiz/covers/s${String(i + 1).padStart(2, "0")}.webp`);
 function shuffle<T>(a: T[]): T[] {
   const b = [...a];
   for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; }

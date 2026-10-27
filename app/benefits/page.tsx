@@ -1,30 +1,31 @@
 "use client";
 
+import { DuoIcon, IconTile, type DuoName, type Tone } from "@/components/icons/duo";
 import Link from "next/link";
 import { PCoin, ChevronRight } from "@/components/icons";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { Countdown } from "@/components/motion/Countdown";
 import { useHome, fmt } from "@/hooks/useHome";
 
-/* eslint-disable @next/next/no-img-element */
+ 
 
 const CARD_SHADOW = "0 5px 16px rgba(40,24,14,.08)";
 
-const EARN: { icon: string; title: string; sub: string; href: string; chip?: string }[] = [
-  { icon: "/brand/qm_attend.webp", title: "출석체크", sub: "매일 10P + 스탬프 1 · 7일 연속 +50P", href: "/attendance" },
-  { icon: "/brand/quiz.webp", title: "취향 퀴즈", sub: "세트 완료마다 포인트 + 랜덤 보너스 + 스탬프", href: "/quiz", chip: "HOT" },
-  { icon: "/brand/mascot_3.webp", title: "틀린그림찾기", sub: "하루 3판 · 차이당 3P · 완주 +10P · 30초 안에 +5P", href: "/games/spot", chip: "NEW" },
-  { icon: "/brand/qm_games.webp", title: "미니게임", sub: "2048 · 복권 · 가위바위보 · 카드 뒤집기", href: "/games" },
-  { icon: "/brand/qm_roulette.webp", title: "무료 룰렛", sub: "스탬프 10개 = 1회 · 최대 편의점 5,000원", href: "/roulette" },
-  { icon: "/brand/qm_invite.webp", title: "친구 초대", sub: "친구 300P · 친구가 첫 퀴즈 완료하면 나는 500P", href: "/invite", chip: "500P" },
-  { icon: "/brand/qm_store.webp", title: "매장 미션", sub: "매장 방문·저장·리뷰 인증하고 포인트 + 스탬프", href: "/missions" },
-  { icon: "/brand/qm_shop.webp", title: "쇼핑 방문 적립", sub: "제휴 쇼핑몰 방문만 해도 하루 5P", href: "/shop" },
+const EARN: { name: DuoName; tone: Tone; title: string; sub: string; href: string; chip?: string }[] = [
+  { name: "calendar", tone: "green", title: "출석체크", sub: "매일 10P + 스탬프 1 · 7일 연속 +50P", href: "/attendance" },
+  { name: "quiz", tone: "blue", title: "취향 퀴즈", sub: "세트 완료마다 포인트 + 랜덤 보너스 + 스탬프", href: "/quiz", chip: "HOT" },
+  { name: "search", tone: "violet", title: "틀린그림찾기", sub: "하루 3판 · LV1→3 점점 어려워져요 · 완주 보너스", href: "/games/spot", chip: "NEW" },
+  { name: "gamepad", tone: "violet", title: "미니게임", sub: "2048 · 복권 · 가위바위보 · 카드 뒤집기", href: "/games" },
+  { name: "wheel", tone: "amber", title: "무료 룰렛", sub: "스탬프 10개 = 1회 · 최대 편의점 5,000원", href: "/roulette" },
+  { name: "people", tone: "pink", title: "친구 초대", sub: "친구 300P · 친구가 첫 퀴즈 완료하면 나는 500P", href: "/invite", chip: "500P" },
+  { name: "pin", tone: "teal", title: "매장 미션", sub: "매장 방문·저장·리뷰 인증하고 포인트 + 스탬프", href: "/missions" },
+  { name: "bag", tone: "blue", title: "쇼핑 방문 적립", sub: "제휴 쇼핑몰 방문만 해도 하루 5P", href: "/shop" },
 ];
 
-const SOON = [
-  { icon: "/brand/qm_games.webp", title: "게임적립", sub: "게임 설치·플레이 보상", href: "/game" },
-  { icon: "/brand/quiz.webp", title: "설문 보상", sub: "설문 참여하고 포인트", href: "/survey" },
-  { icon: "/brand/qm_store.webp", title: "초간단적립", sub: "앱 설치·가입 참여", href: "/cpq" },
+const SOON: { name: DuoName; title: string; sub: string; href: string }[] = [
+  { name: "gamepad", title: "게임적립", sub: "게임 설치·플레이 보상", href: "/game" },
+  { name: "chat", title: "설문 보상", sub: "설문 참여하고 포인트", href: "/survey" },
+  { name: "bolt", title: "초간단적립", sub: "앱 설치·가입 참여", href: "/cpq" },
 ];
 
 /** 혜택 탭 — 우리 기능 허브(오늘 할 일 · 진행 중 이벤트 · 적립 메뉴 · 준비 중 제휴) */
@@ -48,15 +49,15 @@ export default function BenefitsPage() {
 
       <div className="flex flex-col gap-8 px-5 pb-10 pt-[64px]">
         {/* 오늘 할 일 */}
-        <section className="relative overflow-hidden rounded-[22px] p-5 text-white" style={{ background: "linear-gradient(135deg,#ff5a2d 0%,#ff8a5c 60%,#ffb13d 100%)", boxShadow: "0 10px 28px rgba(255,90,45,.28)" }}>
-          <img src="/brand/mascot_1.webp" alt="" className="pointer-events-none absolute -right-3 -top-2 h-[118px] w-[118px] object-contain" draggable={false} />
+        <section className="relative overflow-hidden rounded-[22px] p-5 text-white" style={{ background: "linear-gradient(135deg,#2f6fed 0%,#5b8cff 70%,#7fa6ff 100%)", boxShadow: "0 10px 28px rgba(47,111,237,.28)" }}>
+          <DuoIcon name="sparkle" size={96} className="pointer-events-none absolute -right-2 -top-3 text-white/25" />
           <p className="text-[13px] font-medium text-white/85">{data?.newbie.active ? `${data.newbie.dayNo}일차 · 3일 혜택 진행 중` : "오늘 할 일"}</p>
           <p className="mt-1 text-[22px] font-extrabold leading-[28px]">오늘 다 하면<br />최대 {fmt(data?.newbie.active ? 300 + 10 + 30 + 60 : 10 + 30 + 60)}P 이상</p>
           <ul className="mt-4 flex flex-col gap-2">
             {todo.map((t) => (
               <li key={t.label}>
                 <Link href={t.href} className="flex h-[44px] items-center justify-between rounded-[12px] bg-white/18 px-3 backdrop-blur-sm">
-                  <span className="flex items-center gap-2 text-[14px] font-bold"><span className={`flex h-5 w-5 items-center justify-center rounded-full text-[12px] ${t.done ? "bg-white text-myb" : "bg-white/30"}`}>{t.done ? "✓" : ""}</span>{t.label}</span>
+                  <span className="flex items-center gap-2 text-[14px] font-bold"><span className={`flex h-5 w-5 items-center justify-center rounded-full text-[12px] ${t.done ? "bg-white text-[#2f6fed]" : "bg-white/30"}`}>{t.done ? "✓" : ""}</span>{t.label}</span>
                   <span className="text-[12px] font-semibold text-white/90">{t.done ? "완료" : t.pts} ›</span>
                 </Link>
               </li>
@@ -66,7 +67,7 @@ export default function BenefitsPage() {
 
         {/* 진행 중 이벤트 */}
         <section>
-          <h2 className="flex items-center gap-1.5 text-[18px] font-bold"><img src="/brand/flame.webp" alt="" className="h-6 w-6 object-contain" />지금 진행 중</h2>
+          <h2 className="text-[18px] font-bold">지금 진행 중</h2>
           <div className="no-scrollbar -mx-5 mt-3 flex gap-3 overflow-x-auto px-5">
             {data?.newbie.active && (
               <Link href="/newbie" className="flex w-[220px] shrink-0 flex-col justify-between rounded-[18px] bg-white p-4" style={{ boxShadow: CARD_SHADOW }}>
@@ -81,7 +82,7 @@ export default function BenefitsPage() {
               <p className="mt-1 text-[12px] text-ink-2">{data && data.rush.claimable > 0 ? `받을 보상 ${data.rush.claimable}개` : "7개 모으면 300P"}</p>
             </Link>
             <Link href="/monthly" className="flex w-[220px] shrink-0 flex-col justify-between rounded-[18px] bg-white p-4" style={{ boxShadow: CARD_SHADOW }}>
-              <span className="w-fit rounded-full bg-[#eef7ff] px-2 py-0.5 text-[11px] font-bold text-[#1d6fd6]">월간</span>
+              <span className="w-fit rounded-full bg-[#eeeaff] px-2 py-0.5 text-[11px] font-bold text-[#6b55e6]">월간</span>
               <p className="mt-2 text-[16px] font-extrabold">월간 도전 과제 3,300P</p>
               <p className="mt-1 text-[12px] text-ink-2">퀴즈·출석·게임·룰렛·초대</p>
             </Link>
@@ -95,7 +96,7 @@ export default function BenefitsPage() {
             {EARN.map((m) => (
               <li key={m.href}>
                 <Link href={m.href} className="flex items-center gap-3">
-                  <img src={m.icon} width={44} height={44} alt="" className="h-11 w-11 shrink-0 object-contain" />
+                  <IconTile name={m.name} tone={m.tone} size={44} />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-1.5"><p className="text-[16px] font-semibold leading-[18px]">{m.title}</p>{m.chip && <span className="rounded-full px-2 py-0.5 text-[11px] font-bold text-white" style={{ background: "linear-gradient(104deg,#ff2600,#ffad50)" }}>{m.chip}</span>}</span>
                     <p className="mt-1.5 text-[13px] leading-[16px] text-ink-2">{m.sub}</p>
@@ -114,7 +115,7 @@ export default function BenefitsPage() {
             {SOON.map((m) => (
               <li key={m.href}>
                 <Link href={m.href} className="flex flex-col items-center rounded-[16px] bg-white px-2 py-4 text-center" style={{ boxShadow: CARD_SHADOW }}>
-                  <img src={m.icon} width={40} height={40} alt="" className="h-10 w-10 object-contain opacity-60 grayscale" />
+                  <IconTile name={m.name} tone="gray" size={40} />
                   <p className="mt-2 text-[13px] font-bold">{m.title}</p>
                   <p className="mt-0.5 text-[11px] text-muted">{m.sub}</p>
                 </Link>

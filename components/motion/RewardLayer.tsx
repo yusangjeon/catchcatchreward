@@ -81,7 +81,7 @@ export function RewardLayer() {
           <h2 className="rw-title text-[26px] font-black text-white" style={{ animationDelay: ".05s", textShadow: "0 4px 18px rgba(255,138,92,.5)" }}>{item.title ?? "보상 지급!"}</h2>
           <div className="relative mt-5 flex h-[230px] w-[230px] items-center justify-center">
             <div className="rw-rays absolute inset-[-30px] rounded-full" style={{ background: "conic-gradient(from 0deg, rgba(255,197,61,0) 0deg, rgba(255,197,61,.5) 20deg, rgba(255,197,61,0) 40deg, rgba(255,197,61,0) 90deg, rgba(255,197,61,.5) 110deg, rgba(255,197,61,0) 130deg, rgba(255,197,61,0) 180deg, rgba(255,197,61,.5) 200deg, rgba(255,197,61,0) 220deg, rgba(255,197,61,0) 270deg, rgba(255,197,61,.5) 290deg, rgba(255,197,61,0) 310deg)", mask: "radial-gradient(circle, #000 25%, transparent 70%)", WebkitMask: "radial-gradient(circle, #000 25%, transparent 70%)" }} />
-            <img src={item.image ?? "/brand/mascot_2.webp"} alt="" className="rw-coin relative h-[220px] w-[220px] object-contain" style={{ animationDelay: ".1s" }} draggable={false} />
+            <img src={item.image ?? "/brand/coins.webp"} alt="" className="rw-coin relative h-[220px] w-[220px] object-contain" style={{ animationDelay: ".1s" }} draggable={false} />
             <span className="rw-sticker absolute -right-2 top-4 rotate-12 rounded-xl bg-gold px-2.5 py-1 text-[14px] font-black text-ink shadow-md" style={{ animationDelay: ".45s" }}>+{item.points.toLocaleString("ko-KR")}{unit}</span>
             <span className="rw-sticker absolute -left-3 bottom-10 -rotate-12 rounded-xl bg-white px-2 py-0.5 text-[12px] font-bold text-myb shadow-md" style={{ animationDelay: ".6s" }}>{item.subtitle ?? "굿잡!"}</span>
           </div>

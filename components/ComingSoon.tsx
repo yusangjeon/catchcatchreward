@@ -1,12 +1,13 @@
 "use client";
 
+import { IconTile, type DuoName } from "@/components/icons/duo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 /* eslint-disable @next/next/no-img-element */
 
 /** 제휴 연동 전 자리 화면 — 광고 유입 유저가 가짜 오퍼를 만나지 않도록 대체 행동을 안내 */
-export function ComingSoon({ title, desc, image = "/brand/mascot_3.webp", alt }: { title: string; desc: string; image?: string; alt: { label: string; href: string; sub: string }[] }) {
+export function ComingSoon({ title, desc, icon = "sparkle", alt }: { title: string; desc: string; icon?: DuoName; alt: { label: string; href: string; sub: string }[] }) {
   const router = useRouter();
   return (
     <div className="flex min-h-dvh flex-col bg-bg text-ink">
@@ -16,7 +17,7 @@ export function ComingSoon({ title, desc, image = "/brand/mascot_3.webp", alt }:
         <span className="w-7" />
       </header>
       <div className="flex flex-1 flex-col items-center px-6 pt-[92px]">
-        <img src={image} alt="" className="h-[160px] w-[160px] object-contain" draggable={false} />
+        <IconTile name={icon} tone="gray" size={120} icon={64} round />
         <span className="mt-4 rounded-full bg-myb-soft px-3 py-1 text-[12px] font-bold text-myb-dark">제휴사 연동 준비 중</span>
         <p className="mt-3 text-center text-[20px] font-extrabold">{title}은 곧 열려요</p>
         <p className="mt-2 text-center text-[13px] leading-[20px] text-ink-2">{desc}</p>

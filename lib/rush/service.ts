@@ -32,14 +32,14 @@ interface MissionDef {
 
 /** 마이비 원본 보상값(출석 10/20 · 퀴즈 10/20)을 유지하고, 만보기·로또·설문·게임 자리는 우리 기능(룰렛·배지·매장·초대)으로 */
 export const RUSH_MISSIONS: MissionDef[] = [
-  { key: "attend1", metric: "attendance", title: "출석체크", stepTitle: "출석체크 완료하기", hintLabel: "출석 일수", value: 1, reward: 10, action: "attendance", href: "/", icon: "/brand/qm_attend.webp" },
-  { key: "attend3", metric: "attendance", title: "출석체크", stepTitle: "출석체크 3일 하기", hintLabel: "출석 일수", value: 3, reward: 20, action: "attendance", href: "/", icon: "/brand/qm_attend.webp" },
-  { key: "quiz5", metric: "quiz", title: "퀴즈", stepTitle: "퀴즈 5개 완료하기", hintLabel: "퀴즈 완료", value: 5, reward: 10, action: "link", href: "/quiz", icon: "/brand/quiz.webp" },
-  { key: "quiz10", metric: "quiz", title: "퀴즈", stepTitle: "퀴즈 10개 완료하기", hintLabel: "퀴즈 완료", value: 10, reward: 20, action: "link", href: "/quiz", icon: "/brand/quiz.webp" },
-  { key: "roulette1", metric: "roulette", title: "룰렛", stepTitle: "무료 룰렛 돌리기", hintLabel: "룰렛 참여", value: 1, reward: 20, action: "link", href: "/roulette", icon: "/brand/qm_games.webp" },
-  { key: "game3", metric: "game", title: "미니게임", stepTitle: "미니게임 3회 하기", hintLabel: "게임 플레이", value: 3, reward: 20, action: "link", href: "/games", icon: "/brand/qm_games.webp" },
-  { key: "store1", metric: "store", title: "매장미션", stepTitle: "매장 미션 완료하기", hintLabel: "매장 미션", value: 1, reward: 30, action: "link", href: "/missions", icon: "/brand/qm_store.webp" },
-  { key: "invite1", metric: "invite", title: "친구초대", stepTitle: "친구 1명 초대하기", hintLabel: "초대 완료", value: 1, reward: 50, action: "link", href: "/invite", icon: "/brand/qm_invite.webp" },
+  { key: "attend1", metric: "attendance", title: "출석체크", stepTitle: "출석체크 완료하기", hintLabel: "출석 일수", value: 1, reward: 10, action: "attendance", href: "/", icon: "calendar" },
+  { key: "attend3", metric: "attendance", title: "출석체크", stepTitle: "출석체크 3일 하기", hintLabel: "출석 일수", value: 3, reward: 20, action: "attendance", href: "/", icon: "calendar" },
+  { key: "quiz5", metric: "quiz", title: "퀴즈", stepTitle: "퀴즈 5개 완료하기", hintLabel: "퀴즈 완료", value: 5, reward: 10, action: "link", href: "/quiz", icon: "quiz" },
+  { key: "quiz10", metric: "quiz", title: "퀴즈", stepTitle: "퀴즈 10개 완료하기", hintLabel: "퀴즈 완료", value: 10, reward: 20, action: "link", href: "/quiz", icon: "quiz" },
+  { key: "roulette1", metric: "roulette", title: "룰렛", stepTitle: "무료 룰렛 돌리기", hintLabel: "룰렛 참여", value: 1, reward: 20, action: "link", href: "/roulette", icon: "gamepad" },
+  { key: "game3", metric: "game", title: "미니게임", stepTitle: "미니게임 3회 하기", hintLabel: "게임 플레이", value: 3, reward: 20, action: "link", href: "/games", icon: "gamepad" },
+  { key: "store1", metric: "store", title: "매장미션", stepTitle: "매장 미션 완료하기", hintLabel: "매장 미션", value: 1, reward: 30, action: "link", href: "/missions", icon: "pin" },
+  { key: "invite1", metric: "invite", title: "친구초대", stepTitle: "친구 1명 초대하기", hintLabel: "초대 완료", value: 1, reward: 50, action: "link", href: "/invite", icon: "people" },
 ];
 
 export class RushError extends Error {

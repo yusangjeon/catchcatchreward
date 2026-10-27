@@ -102,7 +102,7 @@ export function ClockIcon({ className, size = 14 }: P) {
   );
 }
 
-/* eslint-disable @next/next/no-img-element */
+ 
 /** 캐치 코인 — 코랄 오렌지 링 + 골드 면 + 흰 "C". 전 화면 포인트 아이콘(이미지 파일 없음) */
 export function PCoin({ size = 24, className }: P) {
   return (
@@ -161,6 +161,7 @@ export function PSvg({ size = 16, className, fill = "#FFFFFF" }: P & { fill?: st
 }
 /** 프로필 아바타 — 캐치 마스코트 4포즈(시드로 결정적 선택) */
 export function Avatar({ seed, size = 50, className }: P & { seed: string }) {
-  const n = ([...seed].reduce((a, c) => a + c.charCodeAt(0), 0) % 4) + 1;
-  return <img src={`/brand/mascot_${n}.webp`} width={size} height={size} alt="" draggable={false} className={`inline-block shrink-0 rounded-full bg-[#fff0ea] object-cover select-none ${className ?? ""}`} />;
+  const hues = [215, 150, 260, 330, 190, 35];
+  let h = 0; for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) % 6;
+  return <span className={`inline-flex items-center justify-center rounded-full font-black text-white ${className ?? ""}`} style={{ width: size, height: size, fontSize: size * 0.4, background: `hsl(${hues[h]} 70% 55%)` }}>{seed.slice(0, 1)}</span>;
 }

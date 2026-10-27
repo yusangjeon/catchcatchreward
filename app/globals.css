@@ -17,6 +17,17 @@
   --color-bg: #faf9f7; /* 따뜻한 회백색 페이지 배경 */
   --color-bg-2: #f3f1ee;
   --color-bg-3: #f1efec;
+  --color-blue: #2f6fed; /* 보조색: 퀴즈·쇼핑·정보 */
+  --color-blue-soft: #e8f1ff;
+  --color-green: #1aa362; /* 출석·완료 */
+  --color-green-soft: #e4f7ee;
+  --color-violet: #6b55e6; /* 게임·월간 */
+  --color-violet-soft: #eeeaff;
+  --color-teal: #0f9bb0; /* 매장·위치 */
+  --color-teal-soft: #e2f6f8;
+  --color-amber: #d98a00; /* 꿀·보상 */
+  --color-amber-soft: #fff3d6;
+  --color-navy: #2b3a67; /* 히어로 그라디언트 */
   --color-purple: #7b3fe4;
   --color-honey: #ffb02e;
   --color-pink: #ff3d9a;

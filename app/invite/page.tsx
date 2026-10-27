@@ -1,5 +1,6 @@
 "use client";
 
+import { DuoIcon } from "@/components/icons/duo";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
@@ -87,8 +88,8 @@ function InviteView() {
       </header>
 
       <div className="flex flex-col gap-5 px-6 pt-[64px]">
-        <section className="flex items-center gap-4 rounded-[20px] bg-gradient-to-r from-[var(--color-myb)] to-[var(--color-myb-line)] p-5 text-white">
-          <img src="/brand/qm_invite.webp" width={56} height={56} alt="" className="h-14 w-14 object-contain" />
+        <section className="flex items-center gap-4 rounded-[20px] bg-gradient-to-r from-[#e23d7b] to-[#ff8fb8] p-5 text-white">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20"><DuoIcon name="people" size={32} /></span>
           <div>
             <p className="text-[18px] font-extrabold leading-[24px]">친구 초대하고<br />둘 다 포인트 받기</p>
             <p className="mt-1 text-[12px] text-white/85">친구는 바로 {fmt(data?.rewards.invitee ?? 300)}P, 나는 친구가 첫 퀴즈를 풀면 {fmt(data?.rewards.inviter ?? 500)}P</p>

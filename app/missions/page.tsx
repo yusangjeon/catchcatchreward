@@ -1,5 +1,6 @@
 "use client";
 
+import { DuoIcon, IconTile } from "@/components/icons/duo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -59,9 +60,9 @@ export default function MissionsPage() {
       </header>
 
       <div className="flex flex-col gap-4 px-6 pt-[64px]">
-        <section className="relative overflow-hidden rounded-[20px] bg-[var(--color-myb-soft)] p-5 pr-[110px]">
-          <img src="/brand/qm_store.webp" alt="" className="pointer-events-none absolute -bottom-2 right-3 h-[92px] w-[92px] object-contain" />
-          <p className="text-[12px] font-semibold text-myb-dark">캐치랭크 제휴 매장</p>
+        <section className="relative overflow-hidden rounded-[20px] bg-[#e2f6f8] p-5 pr-[100px]">
+          <DuoIcon name="store" size={96} className="pointer-events-none absolute -bottom-3 right-2 text-[#0f9bb0]/25" />
+          <p className="text-[12px] font-semibold text-[#0f9bb0]">캐치랭크 제휴 매장</p>
           <p className="mt-1 text-[18px] font-extrabold leading-[24px]">동네 매장 방문·저장·리뷰하고<br />포인트와 스탬프 받기</p>
           <p className="mt-2 text-[12px] text-ink-2">완료한 미션 <b className="text-ink">{data?.doneCount ?? 0}</b>개 · 매장에서 받은 인증코드를 입력하면 바로 적립돼요</p>
         </section>
@@ -74,7 +75,7 @@ export default function MissionsPage() {
                 <span className="text-[12px] text-[#8b94a0]">{m.capacity > 0 ? `${Math.max(0, m.capacity - m.completedCount)}명 남음` : `${m.completedCount}명 참여`}</span>
               </div>
               <div className="mt-3 flex items-start gap-3">
-                <span className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[14px] bg-[var(--color-myb-soft)]"><img src="/brand/store_pin.webp" alt="" className="h-[32px] w-[32px] object-contain" /></span>
+                <IconTile name="pin" tone="teal" size={44} />
                 <div className="min-w-0">
                   <p className="text-[12px] font-medium text-[#5c6573]">{m.storeName}</p>
                   <p className="mt-0.5 text-[16px] font-bold">{m.title}</p>

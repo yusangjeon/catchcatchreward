@@ -1,5 +1,6 @@
 "use client";
 
+import { IconTile, type DuoName, type Tone } from "@/components/icons/duo";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
@@ -7,7 +8,7 @@ import "swiper/css";
 
 /* eslint-disable @next/next/no-img-element */
 
-export type BannerSlide = { title: string; sub: string; img: string; href: string; bg: string; dark?: boolean };
+export type BannerSlide = { title: string; sub: string; img?: string; icon?: DuoName; tone?: Tone; href: string; bg: string; dark?: boolean };
 
 /** 자동 롤링 배너(327×72 비율) — 텍스트+브랜드 일러스트를 CSS 로 그린다 */
 export function Banners({ slides, className }: { slides: BannerSlide[]; className?: string }) {
@@ -21,7 +22,7 @@ export function Banners({ slides, className }: { slides: BannerSlide[]; classNam
                 <p className="text-[14px] font-extrabold leading-[18px]">{b.title}</p>
                 <p className={`mt-0.5 text-[11px] leading-[14px] ${b.dark ? "text-white/80" : "text-ink-2"}`}>{b.sub}</p>
               </span>
-              <img src={b.img} alt="" className="h-[56px] w-[56px] object-contain" draggable={false} />
+              {b.icon ? <IconTile name={b.icon} tone={b.tone ?? "blue"} size={48} round /> : <img src={b.img} alt="" className="h-[56px] w-[56px] object-contain" draggable={false} />}
             </Link>
           </SwiperSlide>
         ))}

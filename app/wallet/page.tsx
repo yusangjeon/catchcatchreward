@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
+import { DuoIcon, IconTile, type DuoName, type Tone } from "@/components/icons/duo";
 import Link from "next/link";
 import { useState } from "react";
 import { useHome, fmt } from "@/hooks/useHome";
@@ -14,13 +15,13 @@ const Info = () => <img src="/brand/ic_info.svg" alt="안내" className="h-[16px
 const TABS = ["자산", "상품 구매", "뱃지"] as const;
 
 /** 상품 카테고리 원형 */
-const BRANDS: { name: string; img?: string; label?: string; bg?: string; pad?: boolean }[] = [
-  { name: "전체", img: "/brand/gift.webp", pad: true },
+const BRANDS: { name: string; img?: string; icon?: DuoName; tone?: Tone; label?: string; bg?: string; pad?: boolean }[] = [
+  { name: "전체", icon: "gift", tone: "orange" },
   { name: "카페", img: "/products/americano_tall.webp" },
   { name: "편의점", img: "/products/cu_5000.webp" },
-  { name: "상품권", img: "/brand/ticket.webp", pad: true },
-  { name: "포인트", img: "/brand/coins.webp", pad: true },
-  { name: "금", img: "/brand/gold.webp", pad: true },
+  { name: "상품권", icon: "ticket", tone: "blue" },
+  { name: "포인트", icon: "coin", tone: "amber" },
+  { name: "금", icon: "star", tone: "amber" },
 ];
 const PRODUCTS = EX.map((p) => ({ name: p.name, p: p.points as number | null, img: p.img }));
 
@@ -43,7 +44,7 @@ export default function WalletPage() {
             onClick={() => setTab(t)}
             className={`flex items-center justify-center gap-1.5 rounded-xl text-[13px] ${tab === t ? "bg-white font-bold shadow-sm" : "font-medium text-ink-2"}`}
           >
-            {t === "상품 구매" && <img src="/brand/gift.webp" alt="" className={`h-[16px] w-[16px] object-contain ${tab === t ? "" : "grayscale"}`} />}
+            {t === "상품 구매" && <DuoIcon name="gift" size={16} className={tab === t ? "text-myb" : "text-muted"} />}
             {t}
           </button>
         ))}
@@ -65,8 +66,8 @@ export default function WalletPage() {
           <AssetRow icon={<PCoin size={22} />} name="포인트" value={fmt(balance)} />
           <AssetRow icon={<CXCoin size={22} />} name="룰렛 스탬프" value={`${stampCount}개`} />
 
-          <Link href="/shop" className="mt-[30px] flex h-[46px] items-center justify-between rounded-xl bg-[#fff0f6] px-4 text-[13px]">
-            <span className="flex items-center gap-1.5"><img src="/brand/qm_shop.webp" alt="" className="h-[18px] w-[18px] object-contain" /> 쇼핑 방문 적립</span>
+          <Link href="/shop" className="mt-[30px] flex h-[46px] items-center justify-between rounded-xl bg-[#e8f1ff] px-4 text-[13px]">
+            <span className="flex items-center gap-1.5"><DuoIcon name="bag" size={18} className="text-[#2f6fed]" /> 쇼핑 방문 적립</span>
             <span className="flex items-center gap-1 text-[14px] font-extrabold"><PCoinPink size={16} />하루 5P <ChevronRight size={15} className="text-muted" /></span>
           </Link>
 
@@ -75,7 +76,7 @@ export default function WalletPage() {
               <p className="flex items-center gap-2 text-[14px] font-bold text-[#c98a00]">
                 <span className="rounded-full border border-[#e3a300] px-2 py-0.5 text-[11px]">교환</span> 포인트로 상품 교환
               </p>
-              <p className="mt-1.5 flex items-center gap-1 whitespace-nowrap text-[18px] font-extrabold"><img src="/brand/ticket.webp" alt="" className="h-[22px] w-[22px] object-contain" /> {fmt(balance)}P <span className="ml-1 text-[12px] font-medium text-ink-2">최소 1,000P부터</span></p>
+              <p className="mt-1.5 flex items-center gap-1 whitespace-nowrap text-[18px] font-extrabold"><DuoIcon name="ticket" size={22} className="text-[#2f6fed]" /> {fmt(balance)}P <span className="ml-1 text-[12px] font-medium text-ink-2">최소 1,000P부터</span></p>
             </div>
             <ChevronRight className="text-muted" />
           </Link>
@@ -87,7 +88,7 @@ export default function WalletPage() {
               <p className="mt-1.5 text-[13px] text-muted">스탬프 {data?.wallet.stamps ?? 0}개 · 10개 모으면 룰렛 1회 <ChevronRight size={12} className="inline text-muted" /></p>
               <div className="mt-2 h-1.5 w-40 overflow-hidden rounded-full bg-line"><div className="myb-progress h-full rounded-full bg-myb" style={{ width: `${Math.min(100, ((data?.wallet.stamps ?? 0) % 10) * 10)}%` }} /></div>
             </div>
-            <img src="/brand/piggy.webp" alt="" className="h-[56px] w-[86px] object-contain" />
+            <IconTile name="stamp" tone="orange" size={56} round />
           </Link>
         </section>
       )}
@@ -98,7 +99,7 @@ export default function WalletPage() {
           <div className="no-scrollbar mt-[18px] flex gap-[14px] overflow-x-auto">
             {BRANDS.map((b, i) => (
               <span key={b.name} className={`flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-white text-center text-[9px] font-extrabold shadow-sm ${b.bg ?? ""} ${i === 0 ? "ring-2 ring-myb ring-offset-2" : ""}`}>
-                {b.img ? <img src={b.img} alt={b.name} className={b.pad ? "h-[38px] w-[38px] object-contain" : "h-full w-full object-cover"} /> : <span className="text-[24px]">{b.label}</span>}
+                {b.icon ? <IconTile name={b.icon} tone={b.tone ?? "gray"} size={58} round /> : b.img ? <img src={b.img} alt={b.name} className="h-full w-full object-cover" /> : <span className="text-[24px]">{b.label}</span>}
               </span>
             ))}
           </div>

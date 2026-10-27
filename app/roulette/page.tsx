@@ -1,5 +1,6 @@
 "use client";
 
+import { DuoIcon, IconTile } from "@/components/icons/duo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -91,7 +92,7 @@ export default function RoulettePage() {
         <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           <div className="flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-[16px] font-semibold">
-              <img src="/brand/stamp.webp" width={24} height={24} alt="" className="h-6 w-6" />
+              <DuoIcon name="stamp" size={24} className="text-myb" />
               내 스탬프
             </h2>
             <span className="text-[14px] font-medium text-[#5c6573]">
@@ -103,7 +104,7 @@ export default function RoulettePage() {
               const filled = i < Math.min(data?.stamps ?? 0, data?.needed ?? 10);
               return (
                 <span key={i} className={`flex aspect-square items-center justify-center rounded-full border ${filled ? "border-[#ffb3d9] bg-[var(--color-myb-soft)]" : "border-dashed border-[#dee2e9] bg-[var(--color-bg)]"}`}>
-                  {filled ? <img src="/brand/stamp.webp" width={28} height={28} alt="" className="myb-pop-in h-7 w-7" /> : <span className="text-[12px] font-medium text-[#b0b8c1]">{i + 1}</span>}
+                  {filled ? <DuoIcon name="stamp" size={28} className="myb-pop-in text-myb" /> : <span className="text-[12px] font-medium text-[#b0b8c1]">{i + 1}</span>}
                 </span>
               );
             })}
@@ -210,7 +211,7 @@ export default function RoulettePage() {
                   
                 </div>
               )}
-              <img src={result.prize.kind === "none" ? "/brand/mascot_5.webp" : "/brand/coins.webp"} alt="" width={120} height={120} className="myb-pop-in myb-float relative mx-auto h-[120px] w-[120px] object-contain" />
+              {result.prize.kind === "none" ? <div className="mx-auto w-fit"><IconTile name="wheel" tone="gray" size={120} icon={64} round /></div> : <img src="/brand/coins.webp" alt="" width={120} height={120} className="myb-pop-in myb-float relative mx-auto h-[120px] w-[120px] object-contain" />}
               <p className="relative mt-4 text-[20px] font-bold">{result.prize.kind === "none" ? "아쉬워요, 다음 기회에!" : "축하해요! 당첨됐어요"}</p>
               <p className="relative mt-2 flex items-center justify-center gap-1.5 text-[26px] font-extrabold text-[var(--color-myb)]">
                 {result.prize.kind === "points" && <PCoin size={26} />}

@@ -1,5 +1,6 @@
 "use client";
 
+import { DuoIcon } from "@/components/icons/duo";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
@@ -19,7 +20,6 @@ interface Result { found: number; total: number; points: number; all: boolean; m
 interface Float { k: number; x: number; y: number; text: string; ok: boolean }
 type Mark = Circle & { kind: "found" | "missed" | "hint" };
 
-const MISS_PENALTY = 5;
 
 /**
  * 틀린그림 찾기 — 일러스트 2장(위 원본 / 아래 다른 그림). 둘 중 아무 데나 탭.
@@ -156,9 +156,9 @@ export default function SpotPage() {
         const k = Date.now();
         setMisses((m) => [...m.slice(-3), { x, y, k }]);
         setTimeout(() => setMisses((m) => m.filter((z) => z.k !== k)), 700);
-        setLeft((s) => Math.max(1, s - MISS_PENALTY));
+        setLeft((s) => Math.max(1, s - (data?.missPenalty ?? 5)));
         haptic("error"); sfx("miss");
-        addFloat(x, y, `틀렸어요 −${MISS_PENALTY}초`, false);
+        addFloat(x, y, `틀렸어요 −${data?.missPenalty ?? 5}초`, false);
         burst("miss", cx, cy);
         setShake(true); setFlash(true);
         setTimeout(() => setShake(false), 450); setTimeout(() => setFlash(false), 500);
@@ -178,7 +178,7 @@ export default function SpotPage() {
     const j = await res.json();
     if (!j.diff) return;
     setMarks((m) => [...m, { ...j.diff, kind: "hint" }]);
-    setLeft((s) => Math.max(1, s - MISS_PENALTY));
+    setLeft((s) => Math.max(1, s - (data?.missPenalty ?? 5)));
     haptic("tap"); sfx("pop");
   }
 
@@ -227,7 +227,7 @@ export default function SpotPage() {
       <div className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-3 pt-[52px]">
         {/* 상태 줄: 레벨 칩 · 찾은 개수 5개 · 타이머 바 */}
         <div className="flex shrink-0 items-center justify-between px-0.5">
-          <span className="rounded-full bg-[var(--color-myb-soft)] px-2.5 py-1 text-[12px] font-bold text-[var(--color-myb)]">LV {data ? data.level.index + 1 : "-"}<span className="font-medium text-[var(--color-myb-line)]">/3</span></span>
+          <span className="rounded-full bg-[var(--color-myb-soft)] px-2.5 py-1 text-[12px] font-bold text-[var(--color-myb)]">LV {data ? data.level.index + 1 : "-"}<span className="font-medium text-[var(--color-myb-line)]">/3</span>{data && <span className="ml-1 font-medium text-[var(--color-myb-line)]">· {data.limitSec}초</span>}</span>
           <div className="flex items-center gap-2">{Array.from({ length: total }).map((_, i) => <span key={i} ref={(el) => { dots.current[i] = el; }} className={`flex h-[20px] w-[20px] items-center justify-center rounded-full border-2 text-[11px] font-black text-white transition-all duration-300 ${i < found ? "border-[#22c55e] bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,.6)]" : "border-[#dee2e9] bg-white"}`}>{i < found ? "✓" : ""}</span>)}</div>
           <span className="w-[52px] text-right text-[12px] font-semibold text-[#8b94a0]">{data ? data.level.name : ""}</span>
         </div>
@@ -277,7 +277,7 @@ export default function SpotPage() {
             <div className="flex items-center gap-2">
               {data.today.map((t) => (
                 <span key={t.index} className={`flex h-8 items-center gap-1.5 rounded-full pl-2 pr-3 text-[12px] font-bold ${t.status === "done" ? "bg-[#e9f7ef] text-[#1aa260]" : t.status === "current" ? "bg-[var(--color-myb)] text-white" : "bg-[#f1efec] text-[#b9b4ad]"}`}>
-                  {t.status === "done" ? (t.found === data.total ? <img src="/brand/trophy.webp" alt="" className="h-5 w-5 object-contain" /> : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden><path d="m5 12 5 5L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>) : t.status === "current" ? <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5.5v13l10-6.5z" /></svg> : <img src="/brand/lock.webp" alt="" className="h-4 w-4 object-contain opacity-70 grayscale" />} {t.index + 1}
+                  {t.status === "done" ? (t.found === data.total ? <DuoIcon name="trophy" size={16} /> : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden><path d="m5 12 5 5L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>) : t.status === "current" ? <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5.5v13l10-6.5z" /></svg> : <DuoIcon name="lock" size={14} />} {t.index + 1}
                 </span>
               ))}
             </div>

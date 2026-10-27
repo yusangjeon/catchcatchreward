@@ -1,7 +1,8 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
+ 
 
+import { DuoIcon } from "@/components/icons/duo";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
@@ -68,7 +69,7 @@ export default function NewbiePage() {
                 ) : d.past ? (
                   <span className="flex h-11 items-center justify-center rounded-xl bg-[var(--color-bg-3)] text-[14px] font-bold text-[#8b94a0]">기간 종료</span>
                 ) : (
-                  <span className="flex h-11 items-center justify-center rounded-xl bg-[var(--color-bg-3)] text-[14px] font-bold text-[#8b94a0]"><img src="/brand/lock.webp" alt="" className="mr-1 h-5 w-5 object-contain opacity-70 grayscale" />{d.day}일차에 열려요</span>
+                  <span className="flex h-11 items-center justify-center rounded-xl bg-[var(--color-bg-3)] text-[14px] font-bold text-[#8b94a0]"><DuoIcon name="lock" size={16} className="mr-1" />{d.day}일차에 열려요</span>
                 )}
               </div>
             </li>
