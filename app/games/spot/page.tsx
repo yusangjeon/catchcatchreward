@@ -6,6 +6,7 @@ import { GameHeader } from "@/components/games/GameHeader";
 import { Lottie } from "@/components/motion/Lottie";
 import { useToast } from "@/components/motion/Toast";
 import { fmt } from "@/hooks/useHome";
+import { PCoin } from "@/components/icons";
 import { haptic, sfx } from "@/lib/fx";
 import type { SpotPayload } from "@/lib/games/service";
 
@@ -27,7 +28,7 @@ export default function SpotPage() {
   const router = useRouter();
   const { show } = useToast();
   const [data, setData] = useState<SpotPayload | null>(null);
-  const [phase, setPhase] = useState<"idle" | "count" | "play" | "done">("idle");
+  const [phase, setPhase] = useState<"idle" | "count" | "play" | "done" | "review">("idle");
   const [count, setCount] = useState(3);
   const [floats, setFloats] = useState<Float[]>([]);
   const [shake, setShake] = useState(false);
@@ -181,6 +182,7 @@ export default function SpotPage() {
   const total = data?.total ?? 5;
   const found = tokens.length;
   const pct = data ? (left / data.limitSec) * 100 : 100;
+  const stars = result ? (result.all ? (result.speedBonus ? 3 : 2) : result.found >= 3 ? 1 : 0) : 0;
   const renderImage = (src: string, label: string, blur: boolean, top: boolean) => (
     <div className={`relative mx-auto overflow-hidden rounded-[14px] bg-[#e5e8ee] ${shake ? "spot-shake" : ""}`} style={dim ? { width: dim.w, height: dim.h, boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" } : { aspectRatio: "1024 / 688", boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }} onClick={tap}>
       <img src={src} alt={label} draggable={false} onLoad={() => setImgReady((n) => n + 1)} className={`block h-full w-full select-none transition-[filter] duration-300 ${blur ? "blur-[6px]" : ""}`} />
@@ -199,17 +201,17 @@ export default function SpotPage() {
   );
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-[#f8f9fc] pb-2 text-[#191f28]">
-      <GameHeader title="틀린그림 찾기" right={phase === "play" ? <span className={`text-[20px] font-extrabold tabular-nums ${left <= 10 ? "text-[#ff3939]" : "text-[#427cff]"}`}>{left}s</span> : data ? <span className="text-[13px] text-[#8b94a0]">{data.left}회 남음</span> : null} />
-      <div className="flex min-h-0 flex-1 flex-col gap-2 px-3 pt-[54px]">
-        <div className="flex shrink-0 items-center justify-between px-1">
-          <div className="min-w-0">
-            <p className="truncate text-[15px] font-bold">{data ? `${data.level.name}` : "불러오는 중…"} <span className="text-[12px] font-semibold text-[#8b94a0]">LEVEL {data ? data.level.index + 1 : "-"}/3</span></p>
-            <p className="text-[11px] text-[#8b94a0]">다른 곳 {total}개 · 차이당 {data?.pointPerDiff ?? 3}P · 전부 찾으면 +{data?.completeBonus ?? 10}P</p>
-          </div>
-          <div className="flex items-center gap-1.5">{Array.from({ length: total }).map((_, i) => <span key={i} className={`h-3 w-3 rounded-full transition-colors ${i < found ? "bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,.5)]" : "bg-[#dee2e9]"}`} />)}</div>
+    <div className="flex h-dvh flex-col overflow-hidden bg-[#f8f9fc] text-[#191f28]">
+      <GameHeader title="틀린그림 찾기" right={phase === "play" ? <span className={`text-[22px] font-extrabold tabular-nums ${left <= 10 ? "text-[#ff3939]" : "text-[#427cff]"}`}>{left}</span> : null} />
+      <div className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-3 pt-[52px]">
+        {/* 상태 줄: 레벨 칩 · 찾은 개수 5개 · 타이머 바 */}
+        <div className="flex shrink-0 items-center justify-between px-0.5">
+          <span className="rounded-full bg-[#e8f1ff] px-2.5 py-1 text-[12px] font-bold text-[#427cff]">LV {data ? data.level.index + 1 : "-"}<span className="font-medium text-[#9fb6ff]">/3</span></span>
+          <div className="flex items-center gap-2">{Array.from({ length: total }).map((_, i) => <span key={i} className={`h-[18px] w-[18px] rounded-full border-2 transition-all ${i < found ? "border-[#22c55e] bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,.5)]" : "border-[#dee2e9] bg-white"}`} />)}</div>
+          <span className="w-[52px] text-right text-[12px] font-semibold text-[#8b94a0]">{data ? data.level.name : ""}</span>
         </div>
         <div className="h-1 w-full shrink-0 overflow-hidden rounded-full bg-[#e5e8ee]"><div className="h-full rounded-full transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%`, background: left <= 10 ? "#ff3939" : "linear-gradient(90deg,#427cff,#22d3ee)" }} /></div>
+
         {data ? (
           <div ref={area} className="relative flex min-h-0 flex-1 flex-col justify-center gap-2">
             {renderImage(data.level.a, "원본", false, true)}
@@ -220,13 +222,13 @@ export default function SpotPage() {
               </div>
             )}
             {phase === "idle" && (
-              <div className="absolute inset-0 flex items-center justify-center rounded-[14px]">
+              <div className="absolute inset-0 flex items-center justify-center">
                 {data.left > 0 ? (
-                  <button type="button" onClick={start} disabled={imgReady < 2} className="myb-press flex h-14 items-center gap-2 rounded-full bg-[#427cff] px-7 text-[16px] font-extrabold text-white shadow-[0_8px_30px_rgba(66,124,255,.45)] disabled:opacity-60">
-                    {imgReady < 2 ? "그림 준비 중…" : `▶ 시작하기 · ${data.limitSec}초`}
+                  <button type="button" onClick={start} disabled={imgReady < 2} className="myb-press flex h-14 items-center gap-2 rounded-full bg-[#427cff] px-8 text-[17px] font-extrabold text-white shadow-[0_8px_30px_rgba(66,124,255,.45)] disabled:opacity-60">
+                    {imgReady < 2 ? "준비 중…" : "▶ 시작"}
                   </button>
                 ) : (
-                  <div className="rounded-2xl bg-white/95 px-5 py-4 text-center text-[14px] font-semibold shadow-lg">오늘 3레벨을 모두 풀었어요<br /><span className="text-[12px] font-normal text-[#8b94a0]">내일 0시에 새 그림 3장이 열려요</span></div>
+                  <div className="rounded-2xl bg-white/95 px-5 py-4 text-center text-[14px] font-semibold shadow-lg">오늘 3레벨을 모두 풀었어요<br /><span className="text-[12px] font-normal text-[#8b94a0]">내일 0시에 새 그림 3장</span></div>
                 )}
               </div>
             )}
@@ -235,54 +237,59 @@ export default function SpotPage() {
         ) : (
           <div ref={area} className="flex min-h-0 flex-1 flex-col gap-2"><div className="animate-pulse rounded-[14px] bg-[#e5e8ee]" style={{ aspectRatio: "1024 / 688" }} /><div className="animate-pulse rounded-[14px] bg-[#e5e8ee]" style={{ aspectRatio: "1024 / 688" }} /></div>
         )}
-        {phase === "play" && (
-          <div className="grid shrink-0 grid-cols-2 gap-2">
-            <button type="button" disabled={hintUsed} onClick={() => void hint()} className="myb-press h-12 rounded-xl border border-[#dee2e9] bg-white text-[14px] font-bold disabled:opacity-40">💡 힌트 {hintUsed ? "사용함" : `(−${MISS_PENALTY}초)`}</button>
-            <button type="button" disabled={busy} onClick={() => void submit()} className="myb-press h-12 rounded-xl bg-[#191f28] text-[14px] font-bold text-white disabled:opacity-40">그만 찾기 ({found}/{total})</button>
-          </div>
-        )}
-        {phase === "done" && result && (
-          <div className="shrink-0 rounded-[20px] bg-white px-5 py-3 text-center text-[#191f28]" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
-            <p className="text-[26px] tracking-[4px]">{"★".repeat(result.all ? (result.speedBonus ? 3 : 2) : result.found >= 3 ? 1 : 0)}<span className="text-[#dee2e9]">{"★".repeat(3 - (result.all ? (result.speedBonus ? 3 : 2) : result.found >= 3 ? 1 : 0))}</span></p>
-            <p className="mt-1 text-[22px] font-extrabold">{result.all ? "완벽해요! 🎉" : `${result.found}/${result.total} 찾았어요`}</p>
-            <p className="mt-1 text-[16px] font-bold text-[#427cff]">+{fmt(result.points)}P 적립{result.speedBonus ? <span className="ml-1 rounded-full bg-[#fff0b3] px-2 py-0.5 text-[11px] text-[#9a5b00]">⚡ 스피드 +{result.speedBonus}P</span> : null}</p>
-            <p className="mt-1 text-[12px] text-[#8b94a0]">{result.seconds}초 소요{result.all && !result.speedBonus ? ` · 30초 안에 끝내면 ⚡ +${data?.speedBonus ?? 5}P` : ""}</p>
-            {!result.all && <p className="mt-1 text-[12px] text-[#8b94a0]">분홍 점선이 놓친 곳이에요</p>}
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => router.push("/games")} className="myb-press h-12 rounded-xl border border-[#dee2e9] text-[14px] font-bold">다른 게임</button>
+
+        {/* 하단: 둥근 버튼 2개(힌트 · 그만) — 플레이 중에만 */}
+        <div className="flex h-[64px] shrink-0 items-center justify-center gap-8">
+          {phase === "play" && (
+            <>
+              <button type="button" disabled={hintUsed} onClick={() => void hint()} className="myb-press flex flex-col items-center gap-0.5 disabled:opacity-40">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-[22px] shadow-[0_4px_14px_rgba(0,43,141,.12)]">💡</span>
+                <span className="text-[11px] font-semibold text-[#5c6573]">힌트 {hintUsed ? "0" : "1"}</span>
+              </button>
+              <button type="button" disabled={busy} onClick={() => void submit()} className="myb-press flex flex-col items-center gap-0.5 disabled:opacity-40">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#191f28] text-[18px] text-white shadow-[0_4px_14px_rgba(0,43,141,.2)]">■</span>
+                <span className="text-[11px] font-semibold text-[#5c6573]">그만</span>
+              </button>
+            </>
+          )}
+          {phase === "idle" && data && (
+            <div className="flex items-center gap-2">
+              {data.today.map((t) => (
+                <span key={t.index} className={`flex h-8 items-center gap-1 rounded-full px-3 text-[12px] font-bold ${t.status === "done" ? "bg-[#e9f7ef] text-[#1aa260]" : t.status === "current" ? "bg-[#427cff] text-white" : "bg-[#eef0f4] text-[#b0b8c1]"}`}>
+                  {t.status === "done" ? (t.found === data.total ? "🏆" : "✓") : t.status === "current" ? "▶" : "🔒"} {t.index + 1}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 결과 팝업 */}
+      {phase === "done" && result && (
+        <>
+          <div className="myb-fade-in fixed inset-0 z-[999] bg-black/55" />
+          <div className="myb-modal-in fixed left-1/2 top-1/2 z-[1000] w-[calc(100%-56px)] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-[24px] bg-white px-6 pb-6 pt-7 text-center">
+            <p className="text-[34px] tracking-[6px] text-[#ffb400]">{"★".repeat(stars)}<span className="text-[#e5e8ee]">{"★".repeat(3 - stars)}</span></p>
+            <p className="mt-2 text-[24px] font-extrabold">{result.all ? "완벽해요!" : `${result.found}/${result.total} 찾았어요`}</p>
+            <p className="mt-2 flex items-center justify-center gap-1 text-[20px] font-extrabold text-[#427cff]"><PCoin size={20} />+{fmt(result.points)}</p>
+            <p className="mt-1 text-[12px] text-[#8b94a0]">{result.seconds}초{result.speedBonus ? ` · ⚡ 스피드 +${result.speedBonus}P` : ""}{!result.all ? " · 놓친 곳은 분홍 점선" : ""}</p>
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => router.push("/games")} className="myb-press h-12 rounded-xl border border-[#dee2e9] text-[14px] font-bold">나가기</button>
               {result.left > 0 ? (
-                <button type="button" onClick={nextLevel} className="myb-press h-12 rounded-xl bg-[#427cff] text-[14px] font-bold text-white">다음 레벨 ({result.left}회 남음)</button>
+                <button type="button" onClick={nextLevel} className="myb-press h-12 rounded-xl bg-[#427cff] text-[14px] font-bold text-white">다음 레벨</button>
               ) : (
                 <button type="button" onClick={() => router.push("/wallet")} className="myb-press h-12 rounded-xl bg-[#191f28] text-[14px] font-bold text-white">지갑 보기</button>
               )}
             </div>
+            {!result.all && <button type="button" onClick={() => setPhase("review")} className="mt-3 text-[12px] text-[#8b94a0] underline">놓친 곳 보기</button>}
           </div>
-        )}
-        {data && phase !== "play" && phase !== "count" && (
-          <section className="shrink-0 rounded-[16px] bg-white px-3 py-2.5" style={{ boxShadow: "0 2px 10px 0 rgba(0, 43, 141, 0.06)" }}>
-            <div className="flex items-center justify-between">
-              <p className="text-[13px] font-bold">오늘의 3레벨</p>
-              <p className="text-[12px] text-[#8b94a0]">오늘 <b className="text-[#427cff]">+{fmt(data.todayPoints)}P</b>{data.best ? ` · 최단 ${data.best.seconds}초(${data.best.level})` : ""}</p>
-            </div>
-            <ul className="mt-2 grid grid-cols-3 gap-2">
-              {data.today.map((t) => (
-                <li key={t.index} className={`flex items-center gap-2 overflow-hidden rounded-xl border p-1 ${t.status === "current" ? "border-[#427cff]" : "border-[#eef0f4]"}`}>
-                  <div className="relative h-[40px] w-[56px] shrink-0 overflow-hidden rounded-lg bg-[#e5e8ee]">
-                    <img src={t.thumb} alt="" className={`h-full w-full object-cover ${t.status === "locked" ? "blur-[3px] opacity-70" : ""}`} loading="lazy" />
-                    {t.status === "done" && <span className="absolute inset-0 flex items-center justify-center bg-black/35 text-[16px]">{t.found === data.total ? "🏆" : "✓"}</span>}
-                    {t.status === "locked" && <span className="absolute inset-0 flex items-center justify-center text-[14px]">🔒</span>}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-[11px] font-semibold">{t.index + 1}. {t.name}</p>
-                    <p className="truncate text-[10px] text-[#8b94a0]">{t.status === "done" ? `${t.found}/${data.total} · +${t.points}P` : t.status === "current" ? "진행 중" : "다음"}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-        <p className="shrink-0 truncate px-1 text-[10px] text-[#b0b8c1]">아무 데나 탭 · 틀리면 진동과 −{MISS_PENALTY}초 · 30초 안에 전부 찾으면 ⚡ 보너스 · 매일 0시 새 그림 3장</p>
-      </div>
+        </>
+      )}
+      {phase === "review" && result && (
+        <div className="fixed bottom-5 left-1/2 z-[1000] flex -translate-x-1/2 gap-2">
+          <button type="button" onClick={() => setPhase("done")} className="myb-press h-11 rounded-full bg-[#191f28] px-5 text-[14px] font-bold text-white shadow-lg">결과로 돌아가기</button>
+        </div>
+      )}
     </div>
   );
 }
