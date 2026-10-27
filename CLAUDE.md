@@ -122,3 +122,17 @@
   - 제휴: `lib/shop/affiliate.ts` — `COUPANG_PARTNERS_URL`·`AFFILIATE_URL_<ID>` env → 없으면 쇼핑몰 홈. `/api/shop/out?merchant=` 가 하루 1회 방문 적립 5P(원장 mission/shop_click) 후 302. 상세 CTA 가 `target=_blank` 앵커. 구매 포스트백은 제휴사 리포트 수동 대사(1차).
   - 관리자 `/admin/export?type=segments` CSV(관리자 쿠키 path=/admin 이라 /api 아래가 아니라 /admin 아래에 둠).
   - 다음 단계: ① 대표님 Supabase 프로젝트 → DATABASE_URL → /admin/db ② Vercel 환경변수(ADMIN_KEY 설정 완료) ③ 실기기 캡처(2x/3x) 받으면 남은 아이콘(퀵메뉴 꿀 충전·상품 타일 3장·탭 활성 상태) 교체 ④ 미션(캐치랭크 매장·제휴 쇼핑 → 스탬프) 등록 UI ⑤ 비포인트 러쉬·bplay·월간미션 웹뷰(추가 mock 필요).
+- 2026-10-27(15차): **카카오 로그인·미니게임 재제작·부가 화면·꿀 충전** (커밋 1df097e·2f25440).
+  - 카카오 OAuth(`lib/auth/kakao.ts`, `KAKAO_REST_API_KEY`·`KAKAO_CLIENT_SECRET`(선택)·`APP_BASE_URL`, 콜백 `/api/auth/kakao/callback`) → `profiles.provider/provider_id`, 익명 기록을 `repo.mergeProfiles` 로 병합(원장·스탬프·완료·배지 이관). `/login`·`/me`·로그아웃. 세션 쿠키 `ccr_uid`.
+  - 미니게임 5종: 틀린그림(아래 16차에서 재제작)·2048(`/games/slide`)·복권(3×3 심볼)·가위바위보(3연승 +20P)·카드 뒤집기. 대표님 피드백 "너무 대충" → 벡터 장면으로 1차 재제작했으나 부족.
+  - 화면: `/attendance`(출석 달력, 7일마다 +50P) · `/gifts`(선물함) · `/notice` · `/support` · `/terms`. 꿀 충전 = 모의 광고 15초 시청 → `POST /api/honey`(일 3회, `honey_topups`).
+  - 마이비 영상 캡처(대표님 Drive, 스크래치 `mybvideo/ref/t###.jpg` 47프레임)로 최신 홈·퀴즈 채널·러쉬·초간단 레이아웃 확보.
+- 2026-10-27(16차): **틀린그림 시중 앱 수준 재제작 + 영상 기준 홈·퀴즈 채널·러쉬 재설계 + 3일 혜택.**
+  - 틀린그림(`/games/spot`): 연결된 이미지 생성 MCP(gpt_image_2_5, 장당 0.25크레딧)로 퍼즐북 풍 일러스트 8장면 생성 → 스크래치 `spotgen/gen.py`(PIL+numpy) 로 물체 단위 편집(색상 선택 hue shift·배경 복제 제거·좌우 반전·확대) 5개씩 → `public/games/spot/<id>/{a,b}.webp`(2.4MB). 좌표는 `lib/games/spotLevels.ts`(서버 전용, 정규화 0~1). **탭 판정은 서버**(`POST /api/games/spot action=tap`) → 맞춘 차이마다 HMAC 토큰(`ADMIN_KEY` 또는 `SPOT_SECRET` 키), 제출 시 토큰 검증(위조 0점). 하루 3레벨(날짜×회차로 장면 순환) · 60초 · 틀리면 −5초 · 힌트 1회(−5초) · 차이당 3P + 완주 +10P. 화면: 다크, 위 원본/아래 찾기(시작 전 블러), 양쪽 동기 마커(초록 원/분홍 점선/노랑 펄스), 다음 레벨 이어하기. 검수: 차이 40개 A/B 크롭 시트로 전수 확인(하늘·잔디가 같이 물드는 문제 → `excl` 색상 범위, 반전 중심 bbox 측정으로 보정). 옛 `spotScenes.ts`·`SceneSvg.tsx` 삭제.
+  - 퀴즈 커버: picsum → 주제별 실사진 16장(`public/quiz/covers/sNN.webp`, 같은 MCP). `migrate.ts` 시드는 image_url 이 picsum 인 행만 교체.
+  - 홈(`app/page.tsx`, 영상 t006~t008): 헤더 P잔액·"신규 유저" 칩·선물함·종 → 히어로 "오늘도 만나서 반가워요 / N일차 퀴즈 3개로 시작해요!"(진행 바 todayDone/3, 아바타) → 퀴즈 가로 카드 150 → 퀵메뉴 8종 가로 스크롤+점(출석·미니게임·3일 혜택(말풍선 최대 1,500P)·꿀 충전·친구초대·내 쇼핑·매장미션·룰렛) → "💰 포인트 모아서 살 수 있어요"(신규 유저 전용 네이버페이 vs 금 잠금 카드 + 상품 타일 4) → "나를 위한 맞춤 서비스"(친구초대·러쉬·매장미션·룰렛 카드) → 배너. 러쉬 상단 띠·오늘의 루틴 제거.
+  - 3일 혜택(`/newbie`, `lib/quiz/newbie.ts`): 가입 후 3일, 매일 퀴즈 세트 3개 완료 → 300/500/700P(원장 `newbie`, refId day{n} 로 1회). `HomePayload.newbie`·`todayDone`.
+  - 퀴즈 채널(`/quiz`, t010~t013): "✨ 시작하기 좋은 퀴즈" 2열 4장 → "캐치 뱃지 컬렉션"(배지 칩 탭 + 썸네일 리스트 카드 + 더보기, `/api/quiz/channel`: 선택지 태그 ∋ 배지 rule.tag 로 묶음) → 전체 퀴즈.
+  - 러쉬(`/rush`, t070·t072): 다크 #191f28, 히어로 그라디언트, "✨ 스페셜 미션" 필, 프리패스 게임/퀴즈 배너, 단계 보상 카드(게임적립 10/10/20·퀴즈 10/10/10), 매장 도전 과제, "🔥 스탬프 미션" 필, 스탬프 7개=300P 보드(톱니 원, 라벨), 번호 미션 리스트(P·핑크 진행 문구·이동하기/받기).
+  - QA(Playwright, 로컬 Postgres): spot 레벨 1 완주(5/5 +25P·confetti) → 레벨 2 부분(2/5, 놓친 곳 표시) → 위조 토큰 0점 → 3회 소진; 홈/퀴즈/3일 혜택(퀴즈 3세트 → 1일차 300P, 중복 ALREADY_CLAIMED, 2일차 NOT_COMPLETED); 러쉬 출석→받기. 콘솔 에러 0.
+  - 남은 것: 웹푸시(VAPID+SW+Vercel cron) · 월간미션·비플레이 웹뷰 · 갤러리 아티팩트 갱신 · Supabase 연결(대표님 DATABASE_URL) · 카카오 앱 키.
