@@ -14,6 +14,7 @@ const NAV = [
   { href: "/admin/redemptions", label: "교환 신청" },
   { href: "/admin/grant", label: "수동 지급" },
   { href: "/admin/users", label: "유저" },
+  { href: "/admin/db", label: "DB" },
 ];
 
 /** 관리자(최소) — 데스크톱 폭. 폰 셸(Shell)은 /admin 에서 비활성 */

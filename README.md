@@ -15,7 +15,7 @@ Next.js 15.5 · React 19 · Tailwind 4 · TypeScript · pnpm · Supabase(Postgre
 ## 라이브
 
 - https://catchcatchreward-git-main-yusang.vercel.app (Vercel, `main` 자동 배포). 폰 브라우저에서 **홈 화면에 추가**하면 PWA 로 전체화면 실행.
-- 데이터는 인메모리(서버 인스턴스별) — 영속이 필요하면 아래 Supabase 연결.
+- 데이터는 `DATABASE_URL` 이 있으면 Postgres(영속), 없으면 인메모리.
 
 ## 실행
 
@@ -24,10 +24,13 @@ pnpm install
 pnpm dev        # http://localhost:3000
 ```
 
-환경변수 없이 실행하면 **인메모리 저장소**로 동작한다(서버 재시작 시 초기화). Supabase를 붙이려면:
+환경변수 없이 실행하면 **인메모리 저장소**로 동작한다(서버 인스턴스 교체 시 초기화). 영속 저장(Supabase 등 Postgres)을 붙이려면:
 
-1. Supabase 프로젝트 생성 → SQL Editor에서 `supabase/migrations/0001_init.sql` → `0002_rush_invite_store.sql`(단독 실행) → `supabase/seed.sql` 실행
-2. `.env.example`을 `.env.local`로 복사하고 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` 입력. 관리자(`/admin`)는 `ADMIN_KEY` 설정 시 열림(로컬 QA: `CCR_DEV_TOOLS=1`)
+1. Supabase 프로젝트 생성 → Project Settings → Database → Connection string **URI**(Transaction pooler, 6543) 복사
+2. 그 값을 `DATABASE_URL` 로 설정(Vercel 환경변수 또는 `.env.local`) → 관리자 **/admin/db** 에서 "스키마 적용 + 시드" 1회(또는 `pnpm db:migrate`)
+3. 관리자(`/admin`)는 `ADMIN_KEY` 설정 시 열림(로컬 QA: `CCR_DEV_TOOLS=1`)
+
+스키마 원본은 `lib/db/schema.ts`(`pnpm db:sql` 로 `supabase/migrations/0001_init.sql` 생성). 저장소 구현은 `lib/db/postgres.ts`(postgres.js, 직접 연결) · `lib/db/memory.ts`.
 
 ```powershell
 pnpm typecheck  # tsc

@@ -1,52 +1,46 @@
--- 캐치캐치리워드 초기 스키마 (MVP 1차)
--- 원칙
---  * 포인트는 point_ledger에 적립/차감 이벤트로만 쌓고, 잔액은 집계(view)로 본다.
---  * 룰렛 확률·보상 계산은 서버(service role)에서만 수행한다. 클라이언트는 결과만 받는다.
---  * 퀴즈 응답 → 태그 점수(user_tag_scores) → 배지(user_badges). 배지 = 유저 세그먼트 원천.
---  * 모든 테이블 RLS on. anon/authenticated 정책은 2차에서 추가. 1차는 서버 전용 접근.
+-- 자동 생성: lib/db/schema.ts (pnpm db:sql). 직접 수정하지 말 것.
 
 create extension if not exists "pgcrypto";
 
--- ───────────────────────────── 유저 ─────────────────────────────
 create table if not exists profiles (
   id          uuid primary key default gen_random_uuid(),
-  anon_key    text unique not null,           -- 쿠키 기반 익명 식별자. 로그인 도입 시 auth.users.id 로 매핑
+  anon_key    text unique not null,
   nickname    text,
+  invite_code text unique not null,
+  referred_by uuid references profiles(id),
   created_at  timestamptz not null default now()
 );
 
--- ───────────────────────────── 퀴즈 ─────────────────────────────
--- 마이비식 구조: 퀴즈 세트(카드 1장) 안에 문항 여러 개. 세트 완료 시 보상.
 create table if not exists quiz_sets (
-  id                uuid primary key default gen_random_uuid(),
+  id                text primary key,
   title             text not null,
   image_url         text not null default '',
-  reward_points     integer not null default 100,   -- 세트 완료 보상 B포인트
-  capacity          integer not null default 1000,  -- "N명 가능"
-  base_participants integer not null default 0,     -- 표시용 기본 참여 수(실 완료 수와 합산)
-  today_only        boolean not null default false, -- "오늘만" 배지
+  reward_points     integer not null default 100,
+  capacity          integer not null default 1000,
+  base_participants integer not null default 0,
+  today_only        boolean not null default false,
   active            boolean not null default true,
   sort              integer not null default 0,
+  target_badges     text[] not null default '{}',
   created_at        timestamptz not null default now()
 );
 
 create table if not exists quizzes (
-  id          uuid primary key default gen_random_uuid(),
-  set_id      uuid not null references quiz_sets(id) on delete cascade,
+  id          text primary key,
+  set_id      text not null references quiz_sets(id) on delete cascade,
   question    text not null,
-  kind        smallint not null check (kind in (2, 4)),   -- 2지선다 / 4지선다
+  kind        smallint not null check (kind in (2, 4)),
   active      boolean not null default true,
-  sort        integer not null default 0,
-  created_at  timestamptz not null default now()
+  sort        integer not null default 0
 );
 create index if not exists quizzes_set_idx on quizzes(set_id);
 
 create table if not exists quiz_options (
-  id          uuid primary key default gen_random_uuid(),
-  quiz_id     uuid not null references quizzes(id) on delete cascade,
+  id          text primary key,
+  quiz_id     text not null references quizzes(id) on delete cascade,
   label       text not null,
-  image_url   text,                          -- 이미지형 선택지(2지선다 카드)
-  tags        text[] not null default '{}',  -- 선택 시 누적되는 취향 태그 (예: {spicy, late_night})
+  image_url   text,
+  tags        text[] not null default '{}',
   sort        integer not null default 0
 );
 create index if not exists quiz_options_quiz_idx on quiz_options(quiz_id);
@@ -54,26 +48,23 @@ create index if not exists quiz_options_quiz_idx on quiz_options(quiz_id);
 create table if not exists quiz_responses (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references profiles(id) on delete cascade,
-  quiz_id     uuid not null references quizzes(id) on delete cascade,
-  option_id   uuid not null references quiz_options(id) on delete cascade,
-  day_key     date not null,                 -- KST 기준 응답일
+  quiz_id     text not null references quizzes(id) on delete cascade,
+  option_id   text not null references quiz_options(id) on delete cascade,
+  day_key     text not null,
   answered_at timestamptz not null default now(),
-  unique (user_id, quiz_id)                  -- 같은 문항은 1회만
+  unique (user_id, quiz_id)
 );
-create index if not exists quiz_responses_user_day_idx on quiz_responses(user_id, day_key);
-create index if not exists quiz_responses_option_idx on quiz_responses(option_id);
+create index if not exists quiz_responses_quiz_idx on quiz_responses(quiz_id);
 
 create table if not exists set_completions (
   id           uuid primary key default gen_random_uuid(),
   user_id      uuid not null references profiles(id) on delete cascade,
-  set_id       uuid not null references quiz_sets(id) on delete cascade,
-  day_key      date not null,
+  set_id       text not null references quiz_sets(id) on delete cascade,
+  day_key      text not null,
   completed_at timestamptz not null default now(),
-  unique (user_id, set_id)                   -- 세트당 1회
+  unique (user_id, set_id)
 );
-create index if not exists set_completions_set_idx on set_completions(set_id);
 
--- ───────────────────────────── 취향 태그 · 배지 ─────────────────────────────
 create table if not exists user_tag_scores (
   user_id     uuid not null references profiles(id) on delete cascade,
   tag         text not null,
@@ -83,11 +74,11 @@ create table if not exists user_tag_scores (
 );
 
 create table if not exists badges (
-  code        text primary key,               -- 예: spicy_lover
-  name        text not null,                  -- 예: 매운맛러버
+  code        text primary key,
+  name        text not null,
   description text,
   emoji       text,
-  rule        jsonb not null                  -- {"tag":"spicy","min":3}
+  rule        jsonb not null
 );
 
 create table if not exists user_badges (
@@ -96,140 +87,116 @@ create table if not exists user_badges (
   earned_at   timestamptz not null default now(),
   primary key (user_id, badge_code)
 );
-create index if not exists user_badges_badge_idx on user_badges(badge_code); -- 관리자: 배지별 유저 수
-
--- ───────────────────────────── 미션 · 스탬프 ─────────────────────────────
-do $$ begin
-  create type mission_type as enum ('quiz_set', 'shopping', 'store_visit', 'store_save', 'store_review');
-exception when duplicate_object then null; end $$;
-
-create table if not exists missions (
-  id             uuid primary key default gen_random_uuid(),
-  type           mission_type not null,
-  title          text not null,
-  description    text,
-  reward_points  integer not null default 0,
-  reward_stamps  integer not null default 1,
-  config         jsonb not null default '{}', -- quiz_set: {"count":5} / store_*: {"place_id":"..."} / shopping: {"partner":"...","min_amount":30000}
-  active         boolean not null default true,
-  created_at     timestamptz not null default now()
-);
-
-create table if not exists mission_completions (
-  id           uuid primary key default gen_random_uuid(),
-  user_id      uuid not null references profiles(id) on delete cascade,
-  mission_id   uuid not null references missions(id) on delete cascade,
-  day_key      date not null,
-  completed_at timestamptz not null default now(),
-  meta         jsonb not null default '{}',
-  unique (user_id, mission_id, day_key)       -- 일 1회 미션 기본. 1회성 미션은 앱에서 추가 체크
-);
 
 create table if not exists stamps (
   id           uuid primary key default gen_random_uuid(),
   user_id      uuid not null references profiles(id) on delete cascade,
-  source_type  text not null,                 -- mission | admin | event
-  source_id    uuid,
+  source_type  text not null,
+  source_id    text,
   created_at   timestamptz not null default now(),
-  consumed_by  uuid                           -- roulette_spins.id (소비되면 세팅). null = 미사용
+  consumed_by  text
 );
-create index if not exists stamps_user_unconsumed_idx on stamps(user_id) where consumed_by is null;
-
--- ───────────────────────────── 룰렛 ─────────────────────────────
-do $$ begin
-  create type prize_kind as enum ('points', 'gifticon', 'none');
-exception when duplicate_object then null; end $$;
+create index if not exists stamps_user_idx on stamps(user_id);
 
 create table if not exists roulette_prizes (
-  id      uuid primary key default gen_random_uuid(),
+  id      text primary key,
   name    text not null,
-  kind    prize_kind not null,
-  value   integer not null default 0,         -- points: 포인트 수 / gifticon: 액면가(원) / none: 0
-  weight  integer not null check (weight >= 0), -- 확률 가중치. 합으로 나눠 확률 계산 (서버)
+  kind    text not null check (kind in ('points', 'gifticon', 'none')),
+  value   integer not null default 0,
+  weight  integer not null check (weight >= 0),
   active  boolean not null default true,
   sort    integer not null default 0
 );
 
 create table if not exists roulette_spins (
-  id        uuid primary key default gen_random_uuid(),
+  id        uuid primary key,
   user_id   uuid not null references profiles(id) on delete cascade,
-  prize_id  uuid not null references roulette_prizes(id),
-  roll      double precision not null,        -- 서버 난수 (감사용)
+  prize_id  text not null references roulette_prizes(id),
+  roll      double precision not null,
   spun_at   timestamptz not null default now()
 );
-
--- ───────────────────────────── 포인트 원장 · 교환 ─────────────────────────────
-do $$ begin
-  create type ledger_reason as enum ('quiz_answer', 'quiz_bonus', 'mission', 'roulette', 'redeem', 'admin_adjust', 'referral');
-exception when duplicate_object then null; end $$;
 
 create table if not exists point_ledger (
   id          bigserial primary key,
   user_id     uuid not null references profiles(id) on delete cascade,
-  delta       integer not null,               -- 적립 +, 차감 -
-  reason      ledger_reason not null,
-  ref_type    text,                            -- quiz_response | mission_completion | roulette_spin | redemption
-  ref_id      uuid,
+  delta       integer not null,
+  reason      text not null,
+  ref_type    text,
+  ref_id      text,
   memo        text,
   created_at  timestamptz not null default now()
 );
 create index if not exists point_ledger_user_idx on point_ledger(user_id, created_at desc);
 
-create or replace view point_balances as
-  select user_id, coalesce(sum(delta), 0)::integer as balance
-  from point_ledger
-  group by user_id;
-
-do $$ begin
-  create type redemption_status as enum ('requested', 'processing', 'done', 'rejected');
-exception when duplicate_object then null; end $$;
-
 create table if not exists redemptions (
   id            uuid primary key default gen_random_uuid(),
   user_id       uuid not null references profiles(id) on delete cascade,
-  kind          text not null,                -- gifticon_cu5000 등 상품 코드
+  kind          text not null,
   amount_points integer not null check (amount_points > 0),
-  status        redemption_status not null default 'requested',
+  status        text not null default 'requested' check (status in ('requested', 'processing', 'done', 'rejected')),
   requested_at  timestamptz not null default now(),
   processed_at  timestamptz,
-  memo          text                           -- 1차: 운영자 수동 처리 메모
+  memo          text
 );
 
--- ───────────────────────────── RPC ─────────────────────────────
--- 태그 점수 원자적 +1. 갱신 후 유저 전체 태그 점수를 반환한다.
-create or replace function increment_tag_scores(p_user uuid, p_tags text[])
-returns table (tag text, score integer)
-language plpgsql security definer as $$
-begin
-  insert into user_tag_scores (user_id, tag, score, updated_at)
-  select p_user, t, 1, now() from unnest(p_tags) as t
-  on conflict (user_id, tag) do update
-    set score = user_tag_scores.score + 1, updated_at = now();
-  return query select s.tag, s.score from user_tag_scores s where s.user_id = p_user;
-end $$;
+create table if not exists referrals (
+  id          uuid primary key default gen_random_uuid(),
+  inviter_id  uuid not null references profiles(id) on delete cascade,
+  invitee_id  uuid not null unique references profiles(id) on delete cascade,
+  code        text not null,
+  status      text not null default 'pending' check (status in ('pending', 'rewarded')),
+  created_at  timestamptz not null default now(),
+  rewarded_at timestamptz
+);
+create index if not exists referrals_inviter_idx on referrals(inviter_id);
 
--- 세트별 완료 수 (참여자 수 표시용)
-create or replace function count_set_completions()
-returns table (set_id uuid, cnt bigint)
-language sql security definer as $$
-  select set_id, count(*) from set_completions group by set_id;
-$$;
+create table if not exists store_missions (
+  id            text primary key,
+  store_name    text not null,
+  kind          text not null check (kind in ('visit', 'save', 'review')),
+  title         text not null,
+  description   text,
+  reward_points integer not null default 0,
+  code          text not null,
+  capacity      integer not null default 0,
+  active        boolean not null default true,
+  sort          integer not null default 99,
+  created_at    timestamptz not null default now()
+);
 
--- ───────────────────────────── RLS ─────────────────────────────
-alter table profiles            enable row level security;
-alter table quiz_sets           enable row level security;
-alter table quizzes             enable row level security;
-alter table set_completions     enable row level security;
-alter table quiz_options        enable row level security;
-alter table quiz_responses      enable row level security;
-alter table user_tag_scores     enable row level security;
-alter table badges              enable row level security;
-alter table user_badges         enable row level security;
-alter table missions            enable row level security;
-alter table mission_completions enable row level security;
-alter table stamps              enable row level security;
-alter table roulette_prizes     enable row level security;
-alter table roulette_spins      enable row level security;
-alter table point_ledger        enable row level security;
-alter table redemptions         enable row level security;
--- 1차는 service role(서버)만 접근. anon 정책 없음 = 클라이언트 직접 접근 차단.
+create table if not exists store_mission_completions (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references profiles(id) on delete cascade,
+  mission_id   text not null references store_missions(id) on delete cascade,
+  completed_at timestamptz not null default now(),
+  unique (user_id, mission_id)
+);
+
+create table if not exists rush_claims (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references profiles(id) on delete cascade,
+  week_key    text not null,
+  mission_key text not null,
+  points      integer not null default 0,
+  claimed_at  timestamptz not null default now(),
+  unique (user_id, week_key, mission_key)
+);
+
+alter table profiles                 enable row level security;
+alter table quiz_sets                enable row level security;
+alter table quizzes                  enable row level security;
+alter table quiz_options             enable row level security;
+alter table quiz_responses           enable row level security;
+alter table set_completions          enable row level security;
+alter table user_tag_scores          enable row level security;
+alter table badges                   enable row level security;
+alter table user_badges              enable row level security;
+alter table stamps                   enable row level security;
+alter table roulette_prizes          enable row level security;
+alter table roulette_spins           enable row level security;
+alter table point_ledger             enable row level security;
+alter table redemptions              enable row level security;
+alter table referrals                enable row level security;
+alter table store_missions           enable row level security;
+alter table store_mission_completions enable row level security;
+alter table rush_claims              enable row level security;

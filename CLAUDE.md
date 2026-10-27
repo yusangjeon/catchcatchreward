@@ -41,7 +41,7 @@
 ## 기술 방향 (2026-10-24 확정)
 - Next.js 15.5 + React 19 + Tailwind 4 + TypeScript, pnpm (기존 `yusangjeon/catchreward`와 동일 스택 → UI 자산 재사용 가능)
 - **반응형 모바일 웹** (catchreward는 420×912 절대좌표 픽셀복제라 반응형 아님 — 구조만 참고, 좌표 복사 금지)
-- DB: Supabase(Postgres) — 스키마 `supabase/migrations/0001_init.sql`. env 없으면 인메모리 저장소(`lib/db/memory.ts`)로 동작. 저장소는 `Repo` 인터페이스(`lib/db/repo.ts`) 뒤에 숨기고 비즈니스 규칙은 `lib/quiz/service.ts`에만 둔다.
+- DB: Postgres(Supabase 포함, `DATABASE_URL` 직접 연결) — 스키마 원본 `lib/db/schema.ts`(`pnpm db:sql` → `supabase/migrations/0001_init.sql`), 어댑터 `lib/db/postgres.ts`(postgres.js). env 없으면 인메모리 저장소(`lib/db/memory.ts`). 저장소는 `Repo` 인터페이스(`lib/db/repo.ts`) 뒤에 숨기고 비즈니스 규칙은 각 `lib/*/service.ts`에만 둔다. 관리자 `/admin/db` 에서 스키마 적용+시드(idempotent).
 - 배포: Vercel
 - 포인트는 **원장(ledger) 테이블**로 적립/차감 이벤트를 쌓고 잔액은 집계. 룰렛·보상 확률은 서버에서만 계산.
 
@@ -116,4 +116,5 @@
   - Repo 확장: listStamps · countResponsesByOption · 초대(findProfileByInviteCode/setReferredBy/addReferral/…) · 매장 미션 CRUD/완료 · rush_claims · listProfiles. Supabase `0002_rush_invite_store.sql`(**미연결 검증**, enum 확장은 단독 적용).
   - QA: typecheck·lint·build, API 스모크(`qa/smoke3.sh`: 초대 SELF/ALREADY/INVALID·첫 완료 보상, 러쉬 claim/ALREADY_CLAIMED/NOT_COMPLETED, 매장 BAD_CODE/ALREADY_DONE/SOLD_OUT 경로, 꿀 8→9번째 NO_HONEY), Playwright(`qa/feat10*.js`) 콘솔 에러 0. 갤러리 아티팩트 46장 갱신.
   - 주의: Vercel 서버리스 인메모리는 인스턴스마다 따로라 포인트가 리셋될 수 있음 → Supabase 키 연결이 다음 1순위.
-  - 다음 단계: ① Supabase 연결(키 필요) + 어댑터 첫 스모크(0001+0002) ② Vercel 환경변수(ADMIN_KEY 확인·SUPABASE) ③ 실기기 캡처(2x/3x) 받으면 남은 아이콘(퀵메뉴 꿀 충전·상품 타일 3장·탭 활성 상태) 교체 ④ 미션(캐치랭크 매장·제휴 쇼핑 → 스탬프) 등록 UI ⑤ 비포인트 러쉬·bplay·월간미션 웹뷰(추가 mock 필요).
+- 2026-10-27(12차): **Postgres 어댑터 교체·검증 + 관리자 DB 화면.** supabase-js 어댑터(미검증, uuid id 불일치)를 버리고 `postgres`(porsager) 직접 연결 어댑터로 교체. 스키마를 `lib/db/schema.ts` 단일 출처로 재작성(앱 생성 id 는 text, enum 대신 check, 전 테이블 RLS on·정책 없음 → PostgREST 차단). `lib/db/migrate.ts` = 스키마(idempotent) + TS 시드(배지·세트·문항·경품·매장). CLI `pnpm db:sql|db:migrate|db:status`(tsx). 로컬 Postgres 16(apt, `/var/lib/postgresql/ccr`, 포트 5433)에서 전 테스트 스위트(smoke3·feat10a~d·gallery 46장) 통과, 서버 에러 0. 발견·수정: 같은 태그 중복 시 `ON CONFLICT DO UPDATE` 2회 → unnest 를 group by 로 묶어 증가분 합산. Supabase 연결은 대표님이 DATABASE_URL(Transaction pooler 6543) 을 Vercel 에 넣고 `/admin/db` 버튼 1회.
+  - 다음 단계: ① 대표님 Supabase 프로젝트 → DATABASE_URL → /admin/db ② Vercel 환경변수(ADMIN_KEY 설정 완료) ③ 실기기 캡처(2x/3x) 받으면 남은 아이콘(퀵메뉴 꿀 충전·상품 타일 3장·탭 활성 상태) 교체 ④ 미션(캐치랭크 매장·제휴 쇼핑 → 스탬프) 등록 UI ⑤ 비포인트 러쉬·bplay·월간미션 웹뷰(추가 mock 필요).

@@ -154,3 +154,20 @@ export async function toggleStoreMissionAction(fd: FormData) {
   await getRepo().updateStoreMission(str(fd, "id"), { active: fd.get("active") === "1" });
   revalidatePath("/admin/stores");
 }
+
+/** DB 스키마 적용 + 시드 (DATABASE_URL 필요). idempotent 라 여러 번 눌러도 안전 */
+export async function migrateDbAction() {
+  await requireAdmin();
+  const url = process.env.DATABASE_URL;
+  if (!url) redirect("/admin/db?error=nourl");
+  const { pgClient } = await import("@/lib/db/postgres");
+  const { migrateAndSeed } = await import("@/lib/db/migrate");
+  try {
+    const r = await migrateAndSeed(pgClient(url));
+    revalidatePath("/admin/db");
+    redirect(`/admin/db?ok=${encodeURIComponent(JSON.stringify(r.seeded))}`);
+  } catch (e) {
+    if (e && typeof e === "object" && "digest" in e) throw e; // redirect
+    redirect(`/admin/db?error=${encodeURIComponent(e instanceof Error ? e.message : String(e))}`);
+  }
+}
