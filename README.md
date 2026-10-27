@@ -12,6 +12,11 @@
 
 Next.js 15.5 · React 19 · Tailwind 4 · TypeScript · pnpm · Supabase(Postgres) · Vercel
 
+## 라이브
+
+- https://catchcatchreward-git-main-yusang.vercel.app (Vercel, `main` 자동 배포). 폰 브라우저에서 **홈 화면에 추가**하면 PWA 로 전체화면 실행.
+- 데이터는 인메모리(서버 인스턴스별) — 영속이 필요하면 아래 Supabase 연결.
+
 ## 실행
 
 ```powershell
@@ -21,7 +26,7 @@ pnpm dev        # http://localhost:3000
 
 환경변수 없이 실행하면 **인메모리 저장소**로 동작한다(서버 재시작 시 초기화). Supabase를 붙이려면:
 
-1. Supabase 프로젝트 생성 → SQL Editor에서 `supabase/migrations/0001_init.sql` 실행 → `supabase/seed.sql` 실행
+1. Supabase 프로젝트 생성 → SQL Editor에서 `supabase/migrations/0001_init.sql` → `0002_rush_invite_store.sql`(단독 실행) → `supabase/seed.sql` 실행
 2. `.env.example`을 `.env.local`로 복사하고 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` 입력. 관리자(`/admin`)는 `ADMIN_KEY` 설정 시 열림(로컬 QA: `CCR_DEV_TOOLS=1`)
 
 ```powershell
@@ -29,6 +34,22 @@ pnpm typecheck  # tsc
 pnpm lint       # eslint
 pnpm build      # 프로덕션 빌드
 ```
+
+## 기능 (2026-10-27)
+
+| 영역 | 화면 | 규칙 |
+|---|---|---|
+| 취향 퀴즈 | `/quiz`, `/quiz/[setId]` | 하루 꿀 8개(세트 8회), 세트 완료 → 포인트 + 랜덤 보너스 + 태그→배지 + 스탬프 1. 가입 3일 스타터팩 2배. 보상 화면에 선택 분포 |
+| 세그먼트 타깃 | 관리자 세트 등록 | `target_badges` 보유 유저에게만 노출("내 취향 맞춤") |
+| 비포인트 러쉬 | `/rush` | 주간(일~토 KST) 스탬프 미션 8개, 보상받기 → 포인트 + 룰렛 스탬프, 7개 300P · 8개 500P |
+| 출석체크 | 홈 퀵메뉴 | 1일 1회 10P + 스탬프, 연속 7일마다 +50P |
+| 룰렛 | `/roulette` | 스탬프 10개 = 1회, 서버 가중치 추첨, 경품 확률 관리자 설정 |
+| 매장 미션 | `/missions` | 캐치랭크 제휴 매장 방문·저장·리뷰 — 인증코드 입력 → 포인트 + 스탬프 |
+| 친구초대 | `/invite` | 코드 입력 300P, 초대한 쪽은 친구 첫 퀴즈 완료 시 500P(일 5명) |
+| 지갑·교환 | `/wallet`, `/exchange`, `/history` | 최소 1,000P, 신청 즉시 차감, 관리자 처리(반려 시 자동 환불) |
+| 알림 | `/notifications` | 받을 보상·출석·룰렛·꿀·교환 진행·초대 보상 |
+| 웹뷰 복제 | `/benefits`, `/shop`, `/game`, `/cpq`, `/survey` | 마이비 캡처 기반 1:1 복제(정적 데이터) |
+| 관리자 | `/admin` | 대시보드 · 퀴즈 · 룰렛 확률 · 배지 · 교환 · 수동 지급 · 매장 미션 · 유저 |
 
 ## 구조
 

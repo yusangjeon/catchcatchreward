@@ -104,4 +104,16 @@
   - 전 화면 36장(네이티브 11·웹뷰 12·리워드 6·관리자 7)을 Playwright dpr2 로 캡처해 아티팩트 갤러리로 전달(스크래치 `qa/gallery.js`, 서버는 `CCR_DEV_TOOLS=1 ADMIN_KEY=test-admin-key pnpm start -p 3123`).
   - Vercel: 환경의 `VERCEL_TOKEN` 은 기존 yedulog 프로젝트 범위라 프로젝트 생성 403. 대표님이 팀 전체 범위 토큰으로 교체 예정. 교체 후 `scripts/deploy-vercel.sh`(REST API: 프로젝트 생성→GitHub 연결→ADMIN_KEY upsert→브랜치 프로덕션 배포→URL 출력) 실행. Vercel CLI 는 `/v2/user` 404 로 이 토큰에서 동작 안 함 → API 직접 호출.
   - 주의: Vercel 서버리스에서 인메모리 저장소는 인스턴스별이라 데이터가 리셋될 수 있음(둘러보기 데모용). 영속 필요 시 Supabase 연결이 선행.
-  - 다음 단계: ① Supabase 연결(키 필요) + 어댑터 첫 스모크 ② Vercel 배포(ADMIN_KEY·SUPABASE 환경변수) ③ 실기기 캡처(2x/3x) 받으면 남은 아이콘(퀵메뉴 꿀 충전·상품 타일 3장·탭 활성 상태) 교체 ④ 미션(캐치랭크 매장·제휴 쇼핑 → 스탬프) 등록 UI ⑤ 비포인트 러쉬·bplay·월간미션 웹뷰(추가 mock 필요).
+- 2026-10-27(11차): **마이비 API 캡처 심층 분석 → 러쉬·친구초대·매장 미션·꿀·세그먼트 타깃·스타터팩 구현. Vercel 라이브.**
+  - 라이브: `https://catchcatchreward-git-main-yusang.vercel.app` (Vercel 프로젝트 catchcatchreward, GitHub 연동 main 자동 배포, Deployment Protection 해제). **main = 작업 브랜치 fast-forward** 로 유지(대표님 허용). 환경의 VERCEL_TOKEN 은 yedulog 범위라 API 배포 불가 → 대표님이 vercel.com/new 에서 import.
+  - 캡처 분석(`mock_api.json` 29종): `bpointrush/stamp`(주간 일~토 KST, 스탬프 미션 8개: 출석1/3·퀴즈5/10·만보기·로또·설문30P·게임50P, 7개=300P·8개=500P) · `bpointrush/special`(단계형 게임/설문 카운트 보상) · `user/me`(invitationCode 8자, character INTP, isEnableStarterPack·beginnerEndAt=가입+3일, dailyAttendanceClaimCreditIndex, adPlacementData=adpopcorn 지면 20여 종) · `user-segment/me`(세그먼트별 benefitTabContents) · `reward-banner`(배너 viewCount) · `native-easy`(CPA 팔로우/구독).
+  - `/rush`(`lib/rush`): 주간 스탬프 보드. 미션 8개 = 출석1·출석3·퀴즈5·퀴즈10·룰렛1·배지1·매장1·초대1(만보기·로또·설문·게임 자리를 우리 기능으로 치환, 보상값은 원본 10/20 유지). 진행도는 저장 없이 원천(출석 스탬프·완료·스핀·배지·매장·초대)에서 `kstWeek()` 범위로 집계. 보상받기 = `rush_claims` + 원장 `rush` + 룰렛 스탬프 1(MVP ③). `lib/time.ts kstWeek` 1주차 = 2026-10-25(일). `rushEndsAt` 도 토요일 23:59:59 KST 로 정렬.
+  - `/invite`(`lib/invite`): 초대코드 8자(혼동 문자 제외) `profiles.invite_code`. 코드 입력 즉시 300P, 초대한 쪽은 친구 **첫 퀴즈 세트 완료 시** 500P(일 5명 한도, `referrals`). `?code=` 프리필, Web Share → 복사 폴백.
+  - `/missions`(`lib/missions`): 캐치랭크 매장 미션(방문·저장·리뷰) — 관리자가 매장·인증코드·보상·정원 등록, 유저는 코드 입력으로 완료(1회) → 원장 `store_mission` + 스탬프. 2차: 플레이스 저장/리뷰 API 검증으로 교체.
+  - 꿀 = 하루 퀴즈 세트 8회(`HONEY_PER_DAY`), KST 0시 충전, 초과 시 `NO_HONEY` 409. 스타터팩 = 가입 후 3일 퀴즈 보상 2배(원장 quiz_bonus memo starter_pack). 연속 출석 7일마다 +50P. 보상 화면에 문항별 선택 분포("다른 사람들은?").
+  - 세그먼트 타깃: `quiz_sets.target_badges`(배지 코드) — 보유 유저에게만 노출·제출 허용, 카드에 "내 취향 맞춤" 칩, 관리자 세트 등록 체크박스.
+  - `/notifications`(상태 파생: 받을 러쉬 보상·출석·룰렛·남은 꿀·교환 진행·초대 보상), 홈 종 아이콘 빨간 점. PWA `app/manifest.ts` + `public/icons`. 관리자 `/admin/stores`·`/admin/users`(id → 수동 지급 프리필).
+  - Repo 확장: listStamps · countResponsesByOption · 초대(findProfileByInviteCode/setReferredBy/addReferral/…) · 매장 미션 CRUD/완료 · rush_claims · listProfiles. Supabase `0002_rush_invite_store.sql`(**미연결 검증**, enum 확장은 단독 적용).
+  - QA: typecheck·lint·build, API 스모크(`qa/smoke3.sh`: 초대 SELF/ALREADY/INVALID·첫 완료 보상, 러쉬 claim/ALREADY_CLAIMED/NOT_COMPLETED, 매장 BAD_CODE/ALREADY_DONE/SOLD_OUT 경로, 꿀 8→9번째 NO_HONEY), Playwright(`qa/feat10*.js`) 콘솔 에러 0. 갤러리 아티팩트 46장 갱신.
+  - 주의: Vercel 서버리스 인메모리는 인스턴스마다 따로라 포인트가 리셋될 수 있음 → Supabase 키 연결이 다음 1순위.
+  - 다음 단계: ① Supabase 연결(키 필요) + 어댑터 첫 스모크(0001+0002) ② Vercel 환경변수(ADMIN_KEY 확인·SUPABASE) ③ 실기기 캡처(2x/3x) 받으면 남은 아이콘(퀵메뉴 꿀 충전·상품 타일 3장·탭 활성 상태) 교체 ④ 미션(캐치랭크 매장·제휴 쇼핑 → 스탬프) 등록 UI ⑤ 비포인트 러쉬·bplay·월간미션 웹뷰(추가 mock 필요).
