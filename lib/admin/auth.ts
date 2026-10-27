@@ -12,7 +12,9 @@ export function adminEnabled(): boolean {
   return !!process.env.ADMIN_KEY || process.env.CCR_DEV_TOOLS === "1";
 }
 
-const digest = (key: string) => createHash("sha256").update(key).digest("hex");
+/** 환경변수에 붙어 들어오는 앞뒤 공백·줄바꿈·따옴표는 무시(Vercel 대시보드 붙여넣기 실수 방어) */
+const normalize = (key: string) => key.trim().replace(/^["']|["']$/g, "").trim();
+const digest = (key: string) => createHash("sha256").update(normalize(key)).digest("hex");
 
 export function checkKey(key: string): boolean {
   const expected = process.env.ADMIN_KEY;
