@@ -136,3 +136,11 @@
   - 러쉬(`/rush`, t070·t072): 다크 #191f28, 히어로 그라디언트, "✨ 스페셜 미션" 필, 프리패스 게임/퀴즈 배너, 단계 보상 카드(게임적립 10/10/20·퀴즈 10/10/10), 매장 도전 과제, "🔥 스탬프 미션" 필, 스탬프 7개=300P 보드(톱니 원, 라벨), 번호 미션 리스트(P·핑크 진행 문구·이동하기/받기).
   - QA(Playwright, 로컬 Postgres): spot 레벨 1 완주(5/5 +25P·confetti) → 레벨 2 부분(2/5, 놓친 곳 표시) → 위조 토큰 0점 → 3회 소진; 홈/퀴즈/3일 혜택(퀴즈 3세트 → 1일차 300P, 중복 ALREADY_CLAIMED, 2일차 NOT_COMPLETED); 러쉬 출석→받기. 콘솔 에러 0.
   - 남은 것: 웹푸시(VAPID+SW+Vercel cron) · 월간미션·비플레이 웹뷰 · 갤러리 아티팩트 갱신 · Supabase 연결(대표님 DATABASE_URL) · 카카오 앱 키.
+- 2026-10-27(17차): **웹푸시 · 월간 도전 과제 · 미니게임 아트 · 갤러리 v6.**
+  - 웹푸시(`lib/push/service.ts`, `web-push`): `push_subscriptions` 테이블 + Repo. `GET/POST/DELETE /api/push`(상태·구독·해제), `POST /api/push/test`(내 기기), `GET /api/push/cron`(일일 리마인드: 유저별 알림 파생 1순위 할 일, `CRON_SECRET` Bearer, 없으면 `CCR_DEV_TOOLS=1` 만). `vercel.json` 크론 `0 0 * * *`(09:00 KST). `public/sw.js`(push·notificationclick, 캐시 없음). `components/PushToggle.tsx`(/notifications 상단: SW 등록→권한→구독→저장, 테스트·끄기). `/admin/push`(구독 수·전체 발송). **활성화 조건: `pnpm push:keys` 로 VAPID 키 생성 → Vercel 환경변수 `VAPID_PUBLIC_KEY`·`VAPID_PRIVATE_KEY`(·`VAPID_SUBJECT`) + `CRON_SECRET` → Redeploy.** 키 없으면 토글이 "서버 미설정"으로 표시. iOS 는 홈 화면 추가(PWA) 후에만 수신. 만료 구독(404/410)은 발송 시 자동 삭제(로컬 테스트: 가짜 FCM endpoint → 삭제 확인).
+  - 월간 도전 과제(`/monthly`, `lib/monthly/service.ts`): KST 월 집계 — 퀴즈 30(300P)·출석 15일(500P)·미니게임 30회(300P)·틀린그림 완주 10(500P)·룰렛 3(200P)·매장 3(500P)·초대 3(1,000P) = 최대 3,300P. 원장 `monthly`, refId `YYYY-MM:key` 1회. 러쉬 "월간 도전 과제" 카드·홈 맞춤 서비스·알림(받을 보상)에서 진입. API `GET/POST /api/monthly`.
+  - 알림 파생에 월간·3일 혜택 받을 보상 추가(`lib/notifications.ts`).
+  - 미니게임 아트(`public/games/art`, 같은 이미지 MCP 13장 ≈ 3.25크레딧): 가위바위보 손 3종(흰 배경 knock-out PNG 320) · 복권 심볼 6종(클로버·체리·종·별·다이아·선물, 서버는 여전히 이모지 문자열, 화면에서 `ART` 맵으로 치환) · 게임 허브 타일 4종(2048·복권·가위바위보·카드) webp.
+  - 갤러리 아티팩트 v6(61장): https://claude.ai/artifact/HqaGWbStnGYAuyZc4ZJXF9 — `qa/gallery.js`(틀린그림 v3 플로우는 `spotgen/levels.json` 좌표로 탭, 인자 2개) + `qa/make_gallery.py`.
+  - 이미지 생성 크레딧 사용 합계(이 세션): 장면 8 + 커버 16 + 아트 13 = 37장 ≈ 9.25크레딧(잔액 1,000 중).
+  - 남은 것(대표님 입력 필요): Supabase `DATABASE_URL` → `/admin/db` · 카카오 `KAKAO_REST_API_KEY` · VAPID 키·`CRON_SECRET`. 코드 측 남은 것: 비플레이 웹뷰(mock 없음), 실기기 캡처 기반 아이콘 재보정.

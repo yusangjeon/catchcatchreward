@@ -1,6 +1,8 @@
 import "server-only";
 import { getRepo } from "@/lib/db";
 import { getRush } from "@/lib/rush/service";
+import { getMonthly } from "@/lib/monthly/service";
+import { getNewbie } from "@/lib/quiz/newbie";
 import { HONEY_PER_DAY } from "@/lib/quiz/service";
 import { kstDayKey } from "@/lib/time";
 import { PRODUCTS } from "@/lib/exchange/products";
@@ -19,12 +21,14 @@ export interface Notice {
 export async function getNotifications(userId: string): Promise<{ notices: Notice[]; actionCount: number }> {
   const repo = getRepo();
   const today = kstDayKey();
-  const [rush, redemptions, invites, attended, stamps, completions] = await Promise.all([
-    getRush(userId), repo.listRedemptions(userId), repo.listReferralsByInviter(userId), repo.hasStamp(userId, "attendance", today), repo.countUnconsumedStamps(userId), repo.listCompletions(userId),
+  const [rush, redemptions, invites, attended, stamps, completions, monthly, newbie] = await Promise.all([
+    getRush(userId), repo.listRedemptions(userId), repo.listReferralsByInviter(userId), repo.hasStamp(userId, "attendance", today), repo.countUnconsumedStamps(userId), repo.listCompletions(userId), getMonthly(userId), getNewbie(userId),
   ]);
   const now = new Date().toISOString();
   const notices: Notice[] = [];
   if (rush.claimable > 0) notices.push({ id: "rush", kind: "rush", title: `러쉬 보상 ${rush.claimable}개를 받을 수 있어요`, body: "비포인트 러쉬에서 보상받기를 누르면 포인트와 스탬프가 적립돼요", href: "/rush", at: now, action: true });
+  if (monthly.claimable > 0) notices.push({ id: "monthly", kind: "rush", title: `월간 도전 과제 보상 ${monthly.claimable}개 달성!`, body: "월간 도전 과제에서 받기를 누르면 포인트가 적립돼요", href: "/monthly", at: now, action: true });
+  if (newbie.claimableCount > 0) notices.push({ id: "newbie", kind: "rush", title: "3일 혜택 보상을 받을 수 있어요", body: "오늘 퀴즈 3개를 다 풀었어요. 일차 보상을 받아가세요", href: "/newbie", at: now, action: true });
   if (!attended) notices.push({ id: "attend", kind: "attendance", title: "오늘 출석체크를 아직 안 했어요", body: "10P와 스탬프 1개를 바로 받을 수 있어요", href: "/", at: now, action: true });
   if (stamps >= 10) notices.push({ id: "roulette", kind: "roulette", title: "무료 룰렛을 돌릴 수 있어요", body: `스탬프 ${stamps}개 보유 · 10개마다 1회`, href: "/roulette", at: now, action: true });
   const honey = Math.max(0, HONEY_PER_DAY - completions.filter((c) => c.dayKey === today).length);
