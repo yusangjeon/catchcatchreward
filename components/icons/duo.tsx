@@ -30,7 +30,7 @@ const P: Record<DuoName, { back?: string; front: string; fill?: string }> = {
   pin: { back: "M12 2a7 7 0 0 1 7 7c0 5-7 12-7 12S5 14 5 9a7 7 0 0 1 7-7z", front: "M12 12.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" },
   ticket: { back: "M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z", front: "M9 6v12M9 9h.01M9 12h.01M9 15h.01" },
   people: { back: "M4 20c0-3.5 3-6 7-6h2c4 0 7 2.5 7 6z", front: "M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM16 11a3 3 0 1 0 0-6" },
-  coin: { back: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z", front: "M14.8 9.6a3.6 3.6 0 1 0 0 4.8" },
+  coin: { back: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z", front: "M9.8 16.5V7.5h3a2.6 2.6 0 0 1 0 5.2h-3" },
   bell: { back: "M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z", front: "M10 20a2 2 0 0 0 4 0M12 3v2" },
   lock: { back: "M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z", front: "M8 11V8a4 4 0 0 1 8 0v3M12 15v2.5" },
   search: { back: "M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13z", front: "M15.5 15.5 21 21M10.5 7.5a3 3 0 0 0-3 3" },

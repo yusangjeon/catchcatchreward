@@ -49,7 +49,7 @@ function MeView() {
       </header>
       <div className="flex flex-col gap-4 px-6 pt-[64px]">
         <section className="flex items-center gap-4 rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
-          {me?.avatarUrl ? <img src={me.avatarUrl} alt="" className="h-14 w-14 rounded-full object-cover" /> : <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-myb-soft)] text-[26px]">🙂</span>}
+          {me?.avatarUrl ? <img src={me.avatarUrl} alt="" className="h-14 w-14 rounded-full object-cover" /> : <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-[#eaf2ff]"><img src="/brand/mascot_body.webp" alt="" className="mt-3 h-[72px] w-[72px] object-contain" draggable={false} /></span>}
           <div className="min-w-0 flex-1">
             <p className="truncate text-[18px] font-bold">{me?.loggedIn ? me.nickname ?? "회원" : "게스트"}</p>
             <p className="mt-0.5 text-[12px] text-[#8b94a0]">{me?.loggedIn ? `${me.provider === "kakao" ? "카카오" : "테스트"} 계정 연결됨` : "로그인하면 폰을 바꿔도 포인트가 이어져요"}</p>
