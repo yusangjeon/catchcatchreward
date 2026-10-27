@@ -2,14 +2,19 @@ import "server-only";
 import { rushEndsAt } from "@/lib/benefit/service";
 import { getRepo } from "@/lib/db";
 import { kstDayKey } from "@/lib/time";
-import type { Badge, HomePayload, Persona, PublicQuestion, Quiz, QuizSet, SetCard, SetPayload, SubmitResult, Wallet } from "@/lib/types";
+import { onFirstQuizCompletion } from "@/lib/invite/service";
+import { rushSummary } from "@/lib/rush/service";
+import type { Badge, HomePayload, Persona, PublicQuestion, Quiz, QuizSet, SetCard, SetPayload, SubmitResult, UserBadge, Wallet } from "@/lib/types";
 
 /** 세트 완료 시 랜덤 보너스 후보(가중치 = 등장 횟수). 운영값은 추후 DB로. */
 const RANDOM_BONUS = [0, 0, 0, 10, 10, 20, 30];
 
+/** 꿀 = 하루 퀴즈 세트 참여 횟수(마이비 "보유 꿀 8"). KST 0시에 충전. 광고 시청 충전은 오퍼월 연동 후. */
+export const HONEY_PER_DAY = 8;
+
 export class QuizError extends Error {
   constructor(
-    public code: "NOT_FOUND" | "ALREADY_DONE" | "INCOMPLETE" | "BAD_OPTION",
+    public code: "NOT_FOUND" | "ALREADY_DONE" | "INCOMPLETE" | "BAD_OPTION" | "NO_HONEY",
     message: string,
   ) {
     super(message);
@@ -58,11 +63,23 @@ function toCard(s: QuizSet, counts: Record<string, number>, doneIds: Set<string>
   };
 }
 
+/** 세그먼트 타깃: targetBadges 가 있는 세트는 해당 배지를 가진 유저에게만. 타깃 세트가 앞으로 */
+function visibleSets(sets: QuizSet[], mine: UserBadge[]): QuizSet[] {
+  const owned = new Set(mine.map((b) => b.badgeCode));
+  const ok = sets.filter((s) => !s.targetBadges?.length || s.targetBadges.some((code) => owned.has(code)));
+  return [...ok.filter((s) => s.targetBadges?.length), ...ok.filter((s) => !s.targetBadges?.length)];
+}
+
 async function setCards(userId: string): Promise<SetCard[]> {
   const repo = getRepo();
-  const [sets, counts, done] = await Promise.all([repo.listActiveSets(), repo.countCompletionsBySet(), repo.listCompletions(userId)]);
+  const [sets, counts, done, mine] = await Promise.all([repo.listActiveSets(), repo.countCompletionsBySet(), repo.listCompletions(userId), repo.listUserBadges(userId)]);
   const doneIds = new Set(done.map((d) => d.setId));
-  return sets.map((s) => toCard(s, counts, doneIds));
+  return visibleSets(sets, mine).map((s) => toCard(s, counts, doneIds));
+}
+
+function honeyLeft(done: { dayKey: string }[]): number {
+  const today = kstDayKey();
+  return Math.max(0, HONEY_PER_DAY - done.filter((d) => d.dayKey === today).length);
 }
 
 async function earnedBadges(userId: string) {
@@ -82,9 +99,9 @@ function toPublic(q: Quiz): PublicQuestion {
 // ───────── 조회 ─────────
 export async function getHome(userId: string): Promise<HomePayload> {
   const repo = getRepo();
-  const [sets, w, badges, scores] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId)]);
+  const [sets, w, badges, scores, done, rush] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId), repo.listCompletions(userId), rushSummary(userId)]);
   const attendedToday = await repo.hasStamp(userId, "attendance", kstDayKey());
-  return { wallet: w, honey: sets.filter((s) => !s.done).length, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday };
+  return { wallet: w, honey: honeyLeft(done), honeyMax: HONEY_PER_DAY, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday };
 }
 
 export async function getSetPayload(userId: string, setId: string): Promise<SetPayload> {
@@ -107,6 +124,11 @@ export async function submitSet(userId: string, setId: string, answers: { quizId
   if (!set || !set.active) throw new QuizError("NOT_FOUND", "퀴즈를 찾을 수 없어요");
   const done = await repo.listCompletions(userId);
   if (done.some((d) => d.setId === setId)) throw new QuizError("ALREADY_DONE", "이미 참여한 퀴즈예요");
+  if (honeyLeft(done) <= 0) throw new QuizError("NO_HONEY", `꿀을 모두 썼어요. 내일 0시에 ${HONEY_PER_DAY}개 충전돼요`);
+  if (set.targetBadges?.length) {
+    const owned = new Set((await repo.listUserBadges(userId)).map((b) => b.badgeCode));
+    if (!set.targetBadges.some((c) => owned.has(c))) throw new QuizError("NOT_FOUND", "참여 대상이 아닌 퀴즈예요");
+  }
 
   const quizzes = await repo.listQuizzesBySet(setId);
   const byQuiz = new Map(answers.map((a) => [a.quizId, a.optionId]));
@@ -148,6 +170,9 @@ export async function submitSet(userId: string, setId: string, answers: { quizId
 
   // 4) 스탬프 (룰렛 재료) — 세트 1개 = 스탬프 1개
   await repo.addStamp({ userId, sourceType: "quiz_set", sourceId: completion.id });
+
+  // 5) 첫 세트 완료 → 초대한 친구에게 보상
+  if (done.length === 0) await onFirstQuizCompletion(userId);
 
   const cards = await setCards(userId);
   return {

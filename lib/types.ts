@@ -29,6 +29,8 @@ export interface QuizSet {
   todayOnly: boolean; // "오늘만" 배지
   active: boolean;
   sort: number;
+  /** 타깃 배지 코드. 비어 있으면 전체 노출, 있으면 해당 배지를 하나라도 가진 유저에게만 노출(세그먼트 타깃) */
+  targetBadges?: string[];
 }
 
 export interface QuizResponse {
@@ -61,7 +63,7 @@ export interface UserBadge {
   earnedAt: string;
 }
 
-export type LedgerReason = "quiz_answer" | "quiz_bonus" | "mission" | "roulette" | "redeem" | "admin_adjust" | "referral";
+export type LedgerReason = "quiz_answer" | "quiz_bonus" | "mission" | "rush" | "store_mission" | "roulette" | "redeem" | "admin_adjust" | "referral";
 
 export interface LedgerEntry {
   id: string;
@@ -107,7 +109,54 @@ export interface Profile {
   id: string;
   anonKey: string;
   nickname?: string;
+  inviteCode: string; // 친구초대 코드(8자)
+  referredBy?: string; // 나를 초대한 유저 id
   createdAt: string;
+}
+
+/** 친구초대: 초대받은 유저가 코드 입력 시 생성, 첫 퀴즈 완료 시 초대한 유저에게 보상 */
+export interface Referral {
+  id: string;
+  inviterId: string;
+  inviteeId: string;
+  code: string;
+  status: "pending" | "rewarded";
+  createdAt: string;
+  rewardedAt?: string;
+}
+
+export type StoreMissionKind = "visit" | "save" | "review";
+
+/** 캐치랭크 매장 미션(방문·저장·리뷰). 매장에서 받은 인증코드 입력으로 완료 */
+export interface StoreMission {
+  id: string;
+  storeName: string;
+  kind: StoreMissionKind;
+  title: string;
+  description?: string;
+  rewardPoints: number;
+  code: string; // 인증코드(서버 전용, 클라이언트 비노출)
+  capacity: number; // 선착순 정원(0 = 무제한)
+  active: boolean;
+  sort: number;
+  createdAt: string;
+}
+
+export interface StoreMissionCompletion {
+  id: string;
+  userId: string;
+  missionId: string;
+  completedAt: string;
+}
+
+/** 주간 러쉬 미션/스탬프 보상 수령 기록 */
+export interface RushClaim {
+  id: string;
+  userId: string;
+  weekKey: string; // 주 시작(일요일) KST 날짜
+  missionKey: string; // 미션 키 또는 stamp7/stamp8
+  points: number;
+  claimedAt: string;
 }
 
 // ───────── 클라이언트 페이로드 ─────────
@@ -136,7 +185,9 @@ export interface Wallet {
 
 export interface HomePayload {
   wallet: Wallet;
-  honey: number; // 보유 꿀 = 오늘 남은 세트 수
+  honey: number; // 보유 꿀 = 오늘 남은 퀴즈 횟수(일 HONEY_PER_DAY, KST 0시 충전)
+  honeyMax: number;
+  rush: { stamps: number; total: number; claimable: number }; // 주간 러쉬 요약
   persona: Persona;
   badges: (Badge & { earnedAt: string })[];
   sets: SetCard[];
@@ -187,4 +238,7 @@ export interface AdminStats {
   freeStamps: number;
   spins: number;
   redemptionsRequested: number;
+  storeCompletions: number;
+  referrals: number;
+  rushClaims: number;
 }

@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import type { Repo } from "./repo";
-import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, Redemption, RoulettePrize, RouletteSpin, SetCompletion, Stamp, UserBadge } from "@/lib/types";
+import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge } from "@/lib/types";
+import { SEED_STORE_MISSIONS } from "@/lib/missions/seed";
+import { newInviteCode } from "@/lib/invite/code";
 import { SEED_BADGES, SEED_QUIZZES, SEED_SETS } from "@/lib/quiz/seed";
 import { SEED_PRIZES } from "@/lib/roulette/seed";
 
@@ -18,6 +20,10 @@ interface Store {
   prizes: RoulettePrize[];
   spins: RouletteSpin[];
   redemptions: Redemption[];
+  referrals: Referral[];
+  storeMissions: StoreMission[];
+  storeCompletions: StoreMissionCompletion[];
+  rushClaims: RushClaim[];
 }
 
 // dev 서버 HMR 때 모듈이 재평가돼도 데이터가 유지되도록 globalThis 에 붙인다.
@@ -39,6 +45,10 @@ function store(): Store {
       prizes: structuredClone(SEED_PRIZES),
       spins: [],
       redemptions: [],
+      referrals: [],
+      storeMissions: structuredClone(SEED_STORE_MISSIONS),
+      storeCompletions: [],
+      rushClaims: [],
     };
   }
   return g.__ccrStore;
@@ -51,7 +61,7 @@ export const memoryRepo: Repo = {
     const s = store();
     let p = s.profiles.get(anonKey);
     if (!p) {
-      p = { id: randomUUID(), anonKey, createdAt: now() };
+      p = { id: randomUUID(), anonKey, inviteCode: newInviteCode(), createdAt: now() };
       s.profiles.set(anonKey, p);
     }
     return p;
@@ -156,6 +166,75 @@ export const memoryRepo: Repo = {
     return store().spins.filter((s) => s.userId === userId).sort((a, b) => b.spunAt.localeCompare(a.spunAt));
   },
 
+  async listStamps(userId) {
+    return store().stamps.filter((s) => s.userId === userId);
+  },
+
+  async findProfileByInviteCode(code) {
+    return [...store().profiles.values()].find((p) => p.inviteCode === code) ?? null;
+  },
+  async setReferredBy(userId, inviterId) {
+    const p = [...store().profiles.values()].find((x) => x.id === userId);
+    if (p) p.referredBy = inviterId;
+  },
+  async addReferral(input) {
+    const r: Referral = { ...input, id: randomUUID(), status: "pending", createdAt: now() };
+    store().referrals.push(r);
+    return r;
+  },
+  async findReferralByInvitee(inviteeId) {
+    return store().referrals.find((r) => r.inviteeId === inviteeId) ?? null;
+  },
+  async listReferralsByInviter(inviterId) {
+    return store().referrals.filter((r) => r.inviterId === inviterId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  },
+  async markReferralRewarded(id) {
+    const r = store().referrals.find((x) => x.id === id);
+    if (r) {
+      r.status = "rewarded";
+      r.rewardedAt = now();
+    }
+  },
+
+  async listStoreMissions(activeOnly) {
+    return store().storeMissions.filter((m) => !activeOnly || m.active).sort((a, b) => a.sort - b.sort);
+  },
+  async getStoreMission(id) {
+    return store().storeMissions.find((m) => m.id === id) ?? null;
+  },
+  async createStoreMission(m) {
+    store().storeMissions.push(m);
+    return m;
+  },
+  async updateStoreMission(id, patch) {
+    const m = store().storeMissions.find((x) => x.id === id);
+    if (!m) return null;
+    Object.assign(m, patch);
+    return m;
+  },
+  async listStoreCompletions(userId) {
+    return store().storeCompletions.filter((c) => !userId || c.userId === userId);
+  },
+  async addStoreCompletion(input) {
+    const c: StoreMissionCompletion = { ...input, id: randomUUID(), completedAt: now() };
+    store().storeCompletions.push(c);
+    return c;
+  },
+  async countStoreCompletionsByMission() {
+    const out: Record<string, number> = {};
+    for (const c of store().storeCompletions) out[c.missionId] = (out[c.missionId] ?? 0) + 1;
+    return out;
+  },
+
+  async listRushClaims(userId, weekKey) {
+    return store().rushClaims.filter((c) => c.userId === userId && c.weekKey === weekKey);
+  },
+  async addRushClaim(input) {
+    const c: RushClaim = { ...input, id: randomUUID(), claimedAt: now() };
+    store().rushClaims.push(c);
+    return c;
+  },
+
   async listLedger(userId, limit = 100) {
     return store().ledger.filter((e) => e.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, limit);
   },
@@ -226,6 +305,9 @@ export const memoryRepo: Repo = {
       freeStamps: s.stamps.filter((st) => !st.consumedBy).length,
       spins: s.spins.length,
       redemptionsRequested: s.redemptions.filter((r) => r.status === "requested").length,
+      storeCompletions: s.storeCompletions.length,
+      referrals: s.referrals.length,
+      rushClaims: s.rushClaims.length,
     };
   },
 };

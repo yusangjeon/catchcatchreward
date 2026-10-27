@@ -19,6 +19,9 @@ export default async function AdminHome() {
     ["룰렛 스핀", fmt(stats.spins)],
     ["교환 대기", fmt(stats.redemptionsRequested)],
     ["룰렛 기대값", `${Math.round(ev)}원`],
+    ["매장 미션 완료", fmt(stats.storeCompletions)],
+    ["친구초대", fmt(stats.referrals)],
+    ["러쉬 보상 수령", fmt(stats.rushClaims)],
   ];
   return (
     <div className="flex flex-col gap-6">

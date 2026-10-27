@@ -5,7 +5,7 @@ import { createQuizAction, createSetAction, toggleSetAction } from "../actions";
 export default async function AdminQuizzes() {
   await requireAdmin();
   const repo = getRepo();
-  const [sets, counts] = await Promise.all([repo.listAllSets(), repo.countCompletionsBySet()]);
+  const [sets, counts, badges] = await Promise.all([repo.listAllSets(), repo.countCompletionsBySet(), repo.listBadges()]);
   const quizCounts = Object.fromEntries(await Promise.all(sets.map(async (s) => [s.id, (await repo.listQuizzesBySet(s.id)).length] as const)));
   const input = "h-10 rounded-lg border border-[#dee2e9] px-3 text-[14px]";
   return (
@@ -14,7 +14,7 @@ export default async function AdminQuizzes() {
       <div className="overflow-x-auto rounded-2xl bg-white shadow-sm">
         <table className="w-full text-left text-[14px]">
           <thead className="bg-[#f8f9fc] text-[12px] text-[#8b94a0]">
-            <tr><th className="px-4 py-3">ID</th><th className="px-4 py-3">제목</th><th className="px-4 py-3">보상</th><th className="px-4 py-3">문항</th><th className="px-4 py-3">완료</th><th className="px-4 py-3">오늘만</th><th className="px-4 py-3">상태</th></tr>
+            <tr><th className="px-4 py-3">ID</th><th className="px-4 py-3">제목</th><th className="px-4 py-3">보상</th><th className="px-4 py-3">문항</th><th className="px-4 py-3">완료</th><th className="px-4 py-3">오늘만</th><th className="px-4 py-3">타깃</th><th className="px-4 py-3">상태</th></tr>
           </thead>
           <tbody>
             {sets.map((s) => (
@@ -25,6 +25,7 @@ export default async function AdminQuizzes() {
                 <td className="px-4 py-3 tabular-nums">{quizCounts[s.id] ?? 0}</td>
                 <td className="px-4 py-3 tabular-nums">{counts[s.id] ?? 0}</td>
                 <td className="px-4 py-3">{s.todayOnly ? "예" : "-"}</td>
+                <td className="px-4 py-3 text-[12px]">{s.targetBadges?.length ? s.targetBadges.map((c) => badges.find((b) => b.code === c)?.name ?? c).join(", ") : <span className="text-[#b0b8c1]">전체</span>}</td>
                 <td className="px-4 py-3">
                   <form action={toggleSetAction} className="inline">
                     <input type="hidden" name="id" value={s.id} />
@@ -49,6 +50,12 @@ export default async function AdminQuizzes() {
             <input name="sort" type="number" defaultValue={99} placeholder="정렬" className={input} />
           </div>
           <label className="flex items-center gap-2 text-[14px]"><input name="todayOnly" type="checkbox" /> 오늘만 배지</label>
+          <fieldset className="rounded-lg border border-[#e3e8f0] p-3">
+            <legend className="px-1 text-[12px] text-[#8b94a0]">타깃 배지(세그먼트) — 선택하면 해당 배지 보유 유저에게만 노출</legend>
+            <div className="flex flex-wrap gap-x-4 gap-y-2 text-[13px]">
+              {badges.map((b) => <label key={b.code} className="flex items-center gap-1.5"><input type="checkbox" name="targetBadges" value={b.code} /> {b.emoji} {b.name}</label>)}
+            </div>
+          </fieldset>
           <button type="submit" className="h-10 rounded-lg bg-[#427cff] text-[14px] font-bold text-white">세트 추가</button>
         </form>
         <form action={createQuizAction} className="flex flex-col gap-3 rounded-2xl bg-white p-5 shadow-sm">

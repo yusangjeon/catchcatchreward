@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Repo } from "./repo";
-import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, Redemption, RoulettePrize, SetCompletion, Stamp, UserBadge } from "@/lib/types";
+import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, SetCompletion, Stamp, StoreMission, UserBadge } from "@/lib/types";
+import { newInviteCode } from "@/lib/invite/code";
 
 /**
  * Supabase(Postgres) 구현. 서비스 롤 키로 서버에서만 접근한다.
@@ -18,29 +19,40 @@ function ok<T>(res: { data: T | null; error: unknown }, where: string): T {
 
 type SetRow = {
   id: string; title: string; image_url: string; reward_points: number; capacity: number;
-  base_participants: number; today_only: boolean; active: boolean; sort: number;
+  base_participants: number; today_only: boolean; active: boolean; sort: number; target_badges?: string[] | null;
 };
+type ProfileRow = { id: string; anon_key: string; nickname: string | null; invite_code: string; referred_by: string | null; created_at: string };
+const toProfile = (r: ProfileRow): Profile => ({ id: r.id, anonKey: r.anon_key, nickname: r.nickname ?? undefined, inviteCode: r.invite_code, referredBy: r.referred_by ?? undefined, createdAt: r.created_at });
+type StoreRow = { id: string; store_name: string; kind: StoreMission["kind"]; title: string; description: string | null; reward_points: number; code: string; capacity: number; active: boolean; sort: number; created_at: string };
+const toStore = (r: StoreRow): StoreMission => ({ id: r.id, storeName: r.store_name, kind: r.kind, title: r.title, description: r.description ?? undefined, rewardPoints: r.reward_points, code: r.code, capacity: r.capacity, active: r.active, sort: r.sort, createdAt: r.created_at });
+type RefRow = { id: string; inviter_id: string; invitee_id: string; code: string; status: Referral["status"]; created_at: string; rewarded_at: string | null };
+const toRef = (r: RefRow): Referral => ({ id: r.id, inviterId: r.inviter_id, inviteeId: r.invitee_id, code: r.code, status: r.status, createdAt: r.created_at, rewardedAt: r.rewarded_at ?? undefined });
 type QuizRow = { id: string; set_id: string; question: string; kind: number; active: boolean; sort: number };
 type OptionRow = { id: string; quiz_id: string; label: string; image_url: string | null; tags: string[]; sort: number };
 
 const toSet = (r: SetRow): QuizSet => ({
   id: r.id, title: r.title, imageUrl: r.image_url, rewardPoints: r.reward_points, capacity: r.capacity,
   baseParticipants: r.base_participants, todayOnly: r.today_only, active: r.active, sort: r.sort,
+  targetBadges: r.target_badges ?? undefined,
 });
 
 export function createSupabaseRepo(url: string, serviceRoleKey: string): Repo {
   const sb: SupabaseClient = createClient(url, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-  const SET_COLS = "id, title, image_url, reward_points, capacity, base_participants, today_only, active, sort";
+  const SET_COLS = "id, title, image_url, reward_points, capacity, base_participants, today_only, active, sort, target_badges";
+  const PROFILE_COLS = "id, anon_key, nickname, invite_code, referred_by, created_at";
 
   return {
     async getOrCreateProfile(anonKey): Promise<Profile> {
-      const data = ok<{ id: string; anon_key: string; nickname: string | null; created_at: string }>(
-        await sb.from("profiles").upsert({ anon_key: anonKey }, { onConflict: "anon_key" }).select("id, anon_key, nickname, created_at").single(),
+      const { data: found, error } = await sb.from("profiles").select(PROFILE_COLS).eq("anon_key", anonKey).maybeSingle<ProfileRow>();
+      if (error) throw new Error(`[supabase:profiles.find] ${error.message}`);
+      if (found) return toProfile(found);
+      const data = ok<ProfileRow>(
+        await sb.from("profiles").upsert({ anon_key: anonKey, invite_code: newInviteCode() }, { onConflict: "anon_key" }).select(PROFILE_COLS).single(),
         "profiles.upsert",
       );
-      return { id: data.id, anonKey: data.anon_key, nickname: data.nickname ?? undefined, createdAt: data.created_at };
+      return toProfile(data);
     },
 
     async listActiveSets() {
@@ -195,6 +207,92 @@ export function createSupabaseRepo(url: string, serviceRoleKey: string): Repo {
       return rows.map((r) => ({ id: r.id, userId: r.user_id, prizeId: r.prize_id, roll: r.roll, spunAt: r.spun_at }));
     },
 
+    async listStamps(userId) {
+      const rows = ok<{ id: string; user_id: string; source_type: string; source_id: string | null; created_at: string; consumed_by: string | null }[]>(
+        await sb.from("stamps").select("*").eq("user_id", userId), "stamps.list",
+      );
+      return rows.map((r) => ({ id: r.id, userId: r.user_id, sourceType: r.source_type, sourceId: r.source_id ?? undefined, createdAt: r.created_at, consumedBy: r.consumed_by ?? undefined }));
+    },
+
+    async findProfileByInviteCode(code) {
+      const { data, error } = await sb.from("profiles").select(PROFILE_COLS).eq("invite_code", code).maybeSingle<ProfileRow>();
+      if (error) throw new Error(`[supabase:profiles.byCode] ${error.message}`);
+      return data ? toProfile(data) : null;
+    },
+    async setReferredBy(userId, inviterId) {
+      const { error } = await sb.from("profiles").update({ referred_by: inviterId }).eq("id", userId);
+      if (error) throw new Error(`[supabase:profiles.referredBy] ${error.message}`);
+    },
+    async addReferral(input) {
+      const r = ok<RefRow>(await sb.from("referrals").insert({ inviter_id: input.inviterId, invitee_id: input.inviteeId, code: input.code }).select("*").single(), "referrals.insert");
+      return toRef(r);
+    },
+    async findReferralByInvitee(inviteeId) {
+      const { data, error } = await sb.from("referrals").select("*").eq("invitee_id", inviteeId).maybeSingle<RefRow>();
+      if (error) throw new Error(`[supabase:referrals.byInvitee] ${error.message}`);
+      return data ? toRef(data) : null;
+    },
+    async listReferralsByInviter(inviterId) {
+      return ok<RefRow[]>(await sb.from("referrals").select("*").eq("inviter_id", inviterId).order("created_at", { ascending: false }), "referrals.list").map(toRef);
+    },
+    async markReferralRewarded(id) {
+      const { error } = await sb.from("referrals").update({ status: "rewarded", rewarded_at: new Date().toISOString() }).eq("id", id);
+      if (error) throw new Error(`[supabase:referrals.reward] ${error.message}`);
+    },
+
+    async listStoreMissions(activeOnly) {
+      let q = sb.from("store_missions").select("*").order("sort");
+      if (activeOnly) q = q.eq("active", true);
+      return ok<StoreRow[]>(await q, "store_missions.list").map(toStore);
+    },
+    async getStoreMission(id) {
+      const { data, error } = await sb.from("store_missions").select("*").eq("id", id).maybeSingle<StoreRow>();
+      if (error) throw new Error(`[supabase:store_missions.get] ${error.message}`);
+      return data ? toStore(data) : null;
+    },
+    async createStoreMission(m) {
+      ok(await sb.from("store_missions").insert({ id: m.id, store_name: m.storeName, kind: m.kind, title: m.title, description: m.description ?? null, reward_points: m.rewardPoints, code: m.code, capacity: m.capacity, active: m.active, sort: m.sort }).select("id").single(), "store_missions.insert");
+      return m;
+    },
+    async updateStoreMission(id, patch) {
+      const row: Record<string, unknown> = {};
+      if (patch.active !== undefined) row.active = patch.active;
+      if (patch.rewardPoints !== undefined) row.reward_points = patch.rewardPoints;
+      if (patch.capacity !== undefined) row.capacity = patch.capacity;
+      if (patch.code !== undefined) row.code = patch.code;
+      if (patch.sort !== undefined) row.sort = patch.sort;
+      const { data, error } = await sb.from("store_missions").update(row).eq("id", id).select("*").maybeSingle<StoreRow>();
+      if (error) throw new Error(`[supabase:store_missions.update] ${error.message}`);
+      return data ? toStore(data) : null;
+    },
+    async listStoreCompletions(userId) {
+      let q = sb.from("store_mission_completions").select("*");
+      if (userId) q = q.eq("user_id", userId);
+      const rows = ok<{ id: string; user_id: string; mission_id: string; completed_at: string }[]>(await q, "store_mission_completions.list");
+      return rows.map((r) => ({ id: r.id, userId: r.user_id, missionId: r.mission_id, completedAt: r.completed_at }));
+    },
+    async addStoreCompletion(input) {
+      const d = ok<{ id: string; completed_at: string }>(await sb.from("store_mission_completions").insert({ user_id: input.userId, mission_id: input.missionId }).select("id, completed_at").single(), "store_mission_completions.insert");
+      return { ...input, id: d.id, completedAt: d.completed_at };
+    },
+    async countStoreCompletionsByMission() {
+      const rows = ok<{ mission_id: string }[]>(await sb.from("store_mission_completions").select("mission_id"), "store_mission_completions.count");
+      const out: Record<string, number> = {};
+      for (const r of rows) out[r.mission_id] = (out[r.mission_id] ?? 0) + 1;
+      return out;
+    },
+
+    async listRushClaims(userId, weekKey) {
+      const rows = ok<{ id: string; user_id: string; week_key: string; mission_key: string; points: number; claimed_at: string }[]>(
+        await sb.from("rush_claims").select("*").eq("user_id", userId).eq("week_key", weekKey), "rush_claims.list",
+      );
+      return rows.map((r) => ({ id: r.id, userId: r.user_id, weekKey: r.week_key, missionKey: r.mission_key, points: r.points, claimedAt: r.claimed_at }));
+    },
+    async addRushClaim(input) {
+      const d = ok<{ id: string; claimed_at: string }>(await sb.from("rush_claims").insert({ user_id: input.userId, week_key: input.weekKey, mission_key: input.missionKey, points: input.points }).select("id, claimed_at").single(), "rush_claims.insert");
+      return { ...input, id: d.id, claimedAt: d.claimed_at };
+    },
+
     async listLedger(userId, limit = 100) {
       const rows = ok<{ id: number; user_id: string; delta: number; reason: LedgerEntry["reason"]; ref_type: string | null; ref_id: string | null; memo: string | null; created_at: string }[]>(
         await sb.from("point_ledger").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(limit),
@@ -223,7 +321,7 @@ export function createSupabaseRepo(url: string, serviceRoleKey: string): Repo {
       return ok<SetRow[]>(await sb.from("quiz_sets").select("*").order("sort"), "quiz_sets.all").map(toSet);
     },
     async createSet(set) {
-      ok(await sb.from("quiz_sets").insert({ id: set.id, title: set.title, image_url: set.imageUrl, reward_points: set.rewardPoints, capacity: set.capacity, base_participants: set.baseParticipants, today_only: set.todayOnly, active: set.active, sort: set.sort }).select("id").single(), "quiz_sets.insert");
+      ok(await sb.from("quiz_sets").insert({ id: set.id, title: set.title, image_url: set.imageUrl, reward_points: set.rewardPoints, capacity: set.capacity, base_participants: set.baseParticipants, today_only: set.todayOnly, active: set.active, sort: set.sort, target_badges: set.targetBadges ?? [] }).select("id").single(), "quiz_sets.insert");
       return set;
     },
     async updateSet(id, patch) {
@@ -235,6 +333,7 @@ export function createSupabaseRepo(url: string, serviceRoleKey: string): Repo {
       if (patch.todayOnly !== undefined) row.today_only = patch.todayOnly;
       if (patch.active !== undefined) row.active = patch.active;
       if (patch.sort !== undefined) row.sort = patch.sort;
+      if (patch.targetBadges !== undefined) row.target_badges = patch.targetBadges;
       const { data, error } = await sb.from("quiz_sets").update(row).eq("id", id).select("*").maybeSingle();
       if (error) throw new Error(`[supabase:quiz_sets.update] ${error.message}`);
       return data ? toSet(data as SetRow) : null;
@@ -263,8 +362,8 @@ export function createSupabaseRepo(url: string, serviceRoleKey: string): Repo {
       return out;
     },
     async findProfile(idOrAnonKey) {
-      const { data } = await sb.from("profiles").select("*").or(`id.eq.${idOrAnonKey},anon_key.eq.${idOrAnonKey}`).maybeSingle();
-      return data ? { id: data.id, anonKey: data.anon_key, nickname: data.nickname ?? undefined, createdAt: data.created_at } : null;
+      const { data } = await sb.from("profiles").select(PROFILE_COLS).or(`id.eq.${idOrAnonKey},anon_key.eq.${idOrAnonKey}`).maybeSingle<ProfileRow>();
+      return data ? toProfile(data) : null;
     },
     async adminStats(dayKey) {
       const count = async (q: PromiseLike<{ count: number | null; error: unknown }>) => {
@@ -282,6 +381,9 @@ export function createSupabaseRepo(url: string, serviceRoleKey: string): Repo {
         freeStamps: await count(sb.from("stamps").select("id", head).is("consumed_by", null)),
         spins: await count(sb.from("roulette_spins").select("id", head)),
         redemptionsRequested: await count(sb.from("redemptions").select("id", head).eq("status", "requested")),
+        storeCompletions: await count(sb.from("store_mission_completions").select("id", head)),
+        referrals: await count(sb.from("referrals").select("id", head)),
+        rushClaims: await count(sb.from("rush_claims").select("id", head)),
       };
     },
   };

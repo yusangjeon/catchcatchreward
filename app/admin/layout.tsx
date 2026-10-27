@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/quizzes", label: "퀴즈" },
   { href: "/admin/roulette", label: "룰렛 확률" },
   { href: "/admin/badges", label: "배지" },
+  { href: "/admin/stores", label: "매장 미션" },
   { href: "/admin/redemptions", label: "교환 신청" },
   { href: "/admin/grant", label: "수동 지급" },
 ];

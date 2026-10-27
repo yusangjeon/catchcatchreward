@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { checkKey, clearAdminCookie, requireAdmin, setAdminCookie } from "@/lib/admin/auth";
 import { getRepo } from "@/lib/db";
-import type { Quiz, QuizSet, RoulettePrize } from "@/lib/types";
+import type { Quiz, QuizSet, RoulettePrize, StoreMission } from "@/lib/types";
 
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 const num = (fd: FormData, k: string, d = 0) => {
@@ -45,6 +45,7 @@ export async function createSetAction(fd: FormData) {
     todayOnly: fd.get("todayOnly") === "on",
     active: true,
     sort: num(fd, "sort", 99),
+    targetBadges: fd.getAll("targetBadges").map(String).filter(Boolean),
   };
   await getRepo().createSet(set);
   revalidatePath("/admin/quizzes");
@@ -121,4 +122,35 @@ export async function grantAction(fd: FormData): Promise<void> {
   if (points !== 0) await repo.addLedger({ userId: profile.id, delta: points, reason: "admin_adjust", refType: "admin", memo });
   for (let i = 0; i < stamps; i++) await repo.addStamp({ userId: profile.id, sourceType: "admin", sourceId: `${randomUUID()}` });
   redirect(`/admin/grant?ok=1&user=${encodeURIComponent(profile.id)}&points=${points}&stamps=${stamps}`);
+}
+
+/** 매장 미션 등록(캐치랭크 매장 방문·저장·리뷰). 인증코드는 4~8자 */
+export async function createStoreMissionAction(fd: FormData) {
+  await requireAdmin();
+  const storeName = str(fd, "storeName");
+  const title = str(fd, "title");
+  const code = str(fd, "code");
+  const kind = str(fd, "kind") as StoreMission["kind"];
+  if (!storeName || !title || code.length < 4) return;
+  const m: StoreMission = {
+    id: `sm-${randomUUID().slice(0, 8)}`,
+    storeName,
+    kind: ["visit", "save", "review"].includes(kind) ? kind : "visit",
+    title,
+    description: str(fd, "description") || undefined,
+    rewardPoints: Math.max(0, num(fd, "rewardPoints", 300)),
+    code,
+    capacity: Math.max(0, num(fd, "capacity", 0)),
+    active: true,
+    sort: num(fd, "sort", 99),
+    createdAt: new Date().toISOString(),
+  };
+  await getRepo().createStoreMission(m);
+  revalidatePath("/admin/stores");
+}
+
+export async function toggleStoreMissionAction(fd: FormData) {
+  await requireAdmin();
+  await getRepo().updateStoreMission(str(fd, "id"), { active: fd.get("active") === "1" });
+  revalidatePath("/admin/stores");
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useHome, fmt } from "@/hooks/useHome";
 import { useToast } from "@/components/motion/Toast";
 import { ChevronRight, PCoin } from "@/components/icons";
@@ -14,14 +15,15 @@ import { NumberFlow } from "@/components/motion/NumberFlow";
 const BANNERS = ["/myb/up/2025-12-19T03_30_12.125Z_banner.webp", "/myb/up/2025-12-29T08_07_33.114Z_133.webp", "/myb/up/2025-12-29T08_07_50.926Z_banner.webp", "/myb/up/2026-02-11T05-23-58.433Z_2509_myb_quizpass-banner_v1_327x72.webp", "/myb/up/2026-04-24T07-33-12.788Z_2604_myb_manboki-banner_v1_327x72-1.webp", "/myb/up/2026-04-24T07-33-32.380Z_2604_myb_manboki-banner_v1_327x72.webp", "/myb/up/2026-04-27T01-55-48.943Z_2604_myb_manboki-banner_v1_327x72.webp"];
 
 /** 퀵메뉴 아이콘 — 앱스토어 스크린샷 원본 픽셀(꿀 충전은 툴팁에 가려져 꿀단지 아이콘으로 대체) */
-const QUICK = [
+const QUICK: { icon: string; label: string; href?: string; tip?: string }[] = [
   { icon: "/myb/native/qm_attend.png", label: "출석체크" },
-  { icon: "/myb/native/qm_minigame.png", label: "미니게임" },
-  { icon: "/myb/native/ic_honey_jar.png", label: "꿀 충전", tip: "903개 충전 가능" },
-  { icon: "/myb/native/qm_invite.png", label: "친구초대" },
+  { icon: "/myb/native/qm_minigame.png", label: "미니게임", href: "/roulette" },
+  { icon: "/myb/native/ic_honey_jar.png", label: "꿀 충전", tip: "매일 0시 충전" },
+  { icon: "/myb/native/qm_invite.png", label: "친구초대", href: "/invite" },
 ];
 
 export default function HomePage() {
+  const router = useRouter();
   const { data, error, reload } = useHome();
   const { show } = useToast();
   const sets = data?.sets ?? [];
@@ -61,9 +63,9 @@ export default function HomePage() {
           <img src="/myb/bh/ic_bpointrush.webp" alt="비포인트 러쉬" height={22} className="h-[22px] w-auto" draggable={false} />
           <span className="ml-1 text-[12px] font-semibold">{data ? `${Math.max(1, Math.ceil((new Date(data.rushEndsAt).getTime() - Date.now()) / 86400_000))}일 남음` : "—"}</span>
         </p>
-        <Link href="/roulette" className="relative flex h-[26px] items-center gap-0.5 rounded-lg bg-gradient-to-r from-[#8e5cf0] to-[#b56cf3] px-2.5 text-[11px] font-bold text-white">
-          무료 룰렛 돌리기 <ChevronRight size={12} />
-          {data && data.wallet.stamps >= 10 && <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />}
+        <Link href="/rush" className="relative flex h-[26px] items-center gap-0.5 rounded-lg bg-gradient-to-r from-[#8e5cf0] to-[#b56cf3] px-2.5 text-[11px] font-bold text-white">
+          {data ? `스탬프 ${data.rush.stamps}/${data.rush.total}` : "미션 보기"} <ChevronRight size={12} />
+          {data && (data.rush.claimable > 0 || data.wallet.stamps >= 10) && <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />}
         </Link>
       </div>
 
@@ -71,19 +73,19 @@ export default function HomePage() {
       <section className="px-5 pt-[26px]">
         <div className="flex items-center justify-between">
           <h2 className="text-[20px] font-bold">오늘의 루틴</h2>
-          <button type="button" className="flex h-7 items-center gap-0.5 rounded-full border border-[#dfe3ea] px-2.5 text-[12px] text-ink-2">
+          <Link href="/rush" className="flex h-7 items-center gap-0.5 rounded-full border border-[#dfe3ea] px-2.5 text-[12px] text-ink-2">
             더보기 <ChevronRight size={12} />
-          </button>
+          </Link>
         </div>
         <div className="mt-[12px] flex h-[70px] items-center gap-3 rounded-2xl border-2 border-[#ffcf6b] bg-[#fffbf1] px-4">
           <img src="/myb/native/ic_honey_jar.png" alt="" className="h-[36px] w-[30px] object-contain" />
           <div className="flex-1">
-            <p className="text-[15px] font-semibold">첫번째 무료 꿀 <b className="font-extrabold">받기</b></p>
-            <p className="mt-0.5 text-[13px] text-muted">퀴즈 푸는데 필요해요</p>
+            <p className="text-[15px] font-semibold">오늘의 꿀 <b className="font-extrabold">{data ? `${data.honey}/${data.honeyMax}` : "—"}</b></p>
+            <p className="mt-0.5 text-[13px] text-muted">{data && data.honey === 0 ? "내일 0시에 다시 충전돼요" : "퀴즈 푸는데 필요해요"}</p>
           </div>
           <Link href="/quiz" className="relative flex h-8 items-center rounded-lg bg-myb px-4 text-[13px] font-bold text-white">
             이동
-            <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />
+            {data && data.honey > 0 && <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />}
           </Link>
         </div>
       </section>
@@ -113,7 +115,12 @@ export default function HomePage() {
         <div className="mx-5 mt-2 border-t border-[#e3e7ee]" />
         <ul className="mt-[14px] grid grid-cols-4 px-3">
           {QUICK.map((qk) => (
-            <li key={qk.label} className="relative flex flex-col items-center gap-1" onClick={qk.label === "출석체크" ? () => void attend() : undefined} role={qk.label === "출석체크" ? "button" : undefined}>
+            <li
+              key={qk.label}
+              className="relative flex cursor-pointer flex-col items-center gap-1"
+              role="button"
+              onClick={qk.label === "출석체크" ? () => void attend() : qk.href ? () => router.push(qk.href!) : () => show(`꿀은 매일 0시에 ${data?.honeyMax ?? 8}개 충전돼요`, "info")}
+            >
               {qk.label === "출석체크" && data?.attendedToday && <span className="absolute -top-1 right-3 flex h-4 w-4 items-center justify-center rounded-full bg-myb text-[10px] text-white">✓</span>}
               {qk.tip && (
                 <span className="absolute -top-6 whitespace-nowrap rounded-full bg-[#ff8a3d] px-2.5 py-1 text-[11px] font-bold text-white after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-[#ff8a3d]">

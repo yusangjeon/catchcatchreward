@@ -7,10 +7,14 @@ import type {
   QuizResponse,
   QuizSet,
   Redemption,
+  Referral,
   RoulettePrize,
   RouletteSpin,
+  RushClaim,
   SetCompletion,
   Stamp,
+  StoreMission,
+  StoreMissionCompletion,
   UserBadge,
 } from "@/lib/types";
 
@@ -53,6 +57,29 @@ export interface Repo {
   listPrizes(): Promise<RoulettePrize[]>;
   saveSpin(input: RouletteSpin): Promise<RouletteSpin>;
   listSpins(userId: string): Promise<RouletteSpin[]>;
+  /** 유저의 전체 스탬프(소비 포함) — 주간 출석 일수 집계용 */
+  listStamps(userId: string): Promise<Stamp[]>;
+
+  // ── 친구초대 ──
+  findProfileByInviteCode(code: string): Promise<Profile | null>;
+  setReferredBy(userId: string, inviterId: string): Promise<void>;
+  addReferral(input: Omit<Referral, "id" | "createdAt" | "status" | "rewardedAt">): Promise<Referral>;
+  findReferralByInvitee(inviteeId: string): Promise<Referral | null>;
+  listReferralsByInviter(inviterId: string): Promise<Referral[]>;
+  markReferralRewarded(id: string): Promise<void>;
+
+  // ── 매장 미션 ──
+  listStoreMissions(activeOnly: boolean): Promise<StoreMission[]>;
+  getStoreMission(id: string): Promise<StoreMission | null>;
+  createStoreMission(m: StoreMission): Promise<StoreMission>;
+  updateStoreMission(id: string, patch: Partial<Pick<StoreMission, "active" | "rewardPoints" | "capacity" | "code" | "sort">>): Promise<StoreMission | null>;
+  listStoreCompletions(userId?: string): Promise<StoreMissionCompletion[]>;
+  addStoreCompletion(input: Omit<StoreMissionCompletion, "id" | "completedAt">): Promise<StoreMissionCompletion>;
+  countStoreCompletionsByMission(): Promise<Record<string, number>>;
+
+  // ── 주간 러쉬 ──
+  listRushClaims(userId: string, weekKey: string): Promise<RushClaim[]>;
+  addRushClaim(input: Omit<RushClaim, "id" | "claimedAt">): Promise<RushClaim>;
 
   listLedger(userId: string, limit?: number): Promise<LedgerEntry[]>;
 
@@ -63,7 +90,7 @@ export interface Repo {
   // ── 관리자 ──
   listAllSets(): Promise<QuizSet[]>;
   createSet(set: QuizSet): Promise<QuizSet>;
-  updateSet(id: string, patch: Partial<Pick<QuizSet, "title" | "imageUrl" | "rewardPoints" | "capacity" | "todayOnly" | "active" | "sort">>): Promise<QuizSet | null>;
+  updateSet(id: string, patch: Partial<Pick<QuizSet, "title" | "imageUrl" | "rewardPoints" | "capacity" | "todayOnly" | "active" | "sort" | "targetBadges">>): Promise<QuizSet | null>;
   createQuiz(quiz: Quiz): Promise<Quiz>;
   listAllPrizes(): Promise<RoulettePrize[]>;
   createPrize(p: RoulettePrize): Promise<RoulettePrize>;
