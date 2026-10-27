@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BenefitIcon, GameIcon, HomeIcon, QuizIcon, WalletIcon } from "@/components/icons";
+import { BenefitIcon, HomeIcon, QuizIcon, WalkIcon, WalletIcon } from "@/components/icons";
 
-const TAB_ICON: Record<string, (p: { className?: string; size?: number }) => React.ReactNode> = { "/": HomeIcon, "/quiz": QuizIcon, "/benefits": BenefitIcon, "/wallet": WalletIcon, "/games": GameIcon };
+const TAB_ICON: Record<string, (p: { className?: string; size?: number }) => React.ReactNode> = { "/": HomeIcon, "/quiz": QuizIcon, "/benefits": BenefitIcon, "/wallet": WalletIcon, "/walk": WalkIcon };
 
 const TABS = [
   { href: "/", label: "홈" },
   { href: "/quiz", label: "퀴즈" },
   { href: "/benefits", label: "혜택" },
   { href: "/wallet", label: "지갑" },
-  { href: "/games", label: "게임", highlight: true },
+  { href: "/walk", label: "만보기", highlight: true },
 ] as const;
 
 /** 마이비 5탭 셸. 폰 폭(최대 430px) 중앙 정렬. 퀴즈 풀기/보상(/quiz/:id)·쇼핑적립 웹뷰(/shop)에서는 탭바 숨김 */

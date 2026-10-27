@@ -7,8 +7,7 @@ import { NumberFlow } from "@/components/motion/NumberFlow";
 import { Countdown } from "@/components/motion/Countdown";
 import { useHome, fmt } from "@/hooks/useHome";
 import { useEffect, useState } from "react";
-import type { BenefitGame } from "@/lib/benefit/types";
-import type { SurveyItem } from "@/lib/survey/types";
+import type { BenefitGame, BenefitSurvey } from "@/lib/benefit/types";
 import type { CpqItem } from "@/lib/cpq/types";
 
 /* eslint-disable @next/next/no-img-element */
@@ -22,22 +21,25 @@ const EARN: { name: DuoName; tone: Tone; title: string; sub: string; href: strin
   { name: "bolt", tone: "blue", title: "만보기", sub: "걷기만 해도 하루 최대 210P · 1,000걸음마다 보상", href: "/walk", chip: "NEW" },
   { name: "quiz", tone: "blue", title: "취향 퀴즈", sub: "세트 완료마다 포인트 + 랜덤 보너스 + 스탬프", href: "/quiz", chip: "HOT" },
   { name: "search", tone: "violet", title: "틀린그림찾기", sub: "하루 3판 · LV1→3 점점 어려워져요 · 완주 보너스", href: "/games/spot", chip: "NEW" },
-  { name: "gamepad", tone: "violet", title: "미니게임", sub: "2048 · 복권 · 가위바위보 · 카드 뒤집기", href: "/games" },
+  { name: "gamepad", tone: "violet", title: "미니게임", sub: "2048 · 복권 · 가위바위보 · 카드 뒤집기 · 틀린그림", href: "/games", chip: "HOT" },
   { name: "wheel", tone: "amber", title: "무료 룰렛", sub: "스탬프 10개 = 1회 · 최대 편의점 5,000원", href: "/roulette" },
   { name: "people", tone: "pink", title: "친구 초대", sub: "친구 300P · 친구가 첫 퀴즈 완료하면 나는 500P", href: "/invite", chip: "500P" },
   { name: "pin", tone: "teal", title: "플레이스 방문하기", sub: "동네 플레이스 방문·저장·리뷰 인증하고 포인트 + 스탬프", href: "/missions" },
   { name: "bag", tone: "blue", title: "쇼핑 방문 적립", sub: "제휴 쇼핑몰 방문만 해도 하루 5P", href: "/shop" },
 ];
 
-interface Offers { games: BenefitGame[]; surveys: SurveyItem[]; surveyTotal: number; cpq: CpqItem[] }
+interface Offers { hero: BenefitGame; games: BenefitGame[]; surveys: BenefitSurvey[]; surveyTotal: number; cpq: CpqItem[]; rushEndsAt: string }
+
+/** 게임 히어로 배경 — 원본(벤핏허브)의 네이비→연회색 그라디언트를 우리 bg 로 끝나게 */
+const HERO_BG = "linear-gradient(#12141f 8%, #131722 24%, #1a263e 40%, #203051 50%, #273c64 61%, #4e668c 71%, #9dadc8 82%, #e3e4ea 92%, #faf9f7 100%)";
 
 /** 혜택 탭 — 우리 기능 허브(오늘 할 일 · 진행 중 이벤트 · 적립 메뉴 · 준비 중 제휴) */
 export default function BenefitsPage() {
   const { data } = useHome();
   const [offers, setOffers] = useState<Offers | null>(null);
   useEffect(() => {
-    Promise.all([fetch("/api/game").then((r) => r.json()), fetch("/api/survey").then((r) => r.json()), fetch("/api/cpq").then((r) => r.json())])
-      .then(([g, sv, c]) => setOffers({ games: [g.hero, ...g.games], surveys: sv.hot, surveyTotal: sv.totalAvailable, cpq: c.list }))
+    Promise.all([fetch("/api/benefit").then((r) => r.json()), fetch("/api/survey").then((r) => r.json()), fetch("/api/cpq").then((r) => r.json())])
+      .then(([b, sv, c]) => setOffers({ hero: b.hero, games: b.games, surveys: b.surveys, surveyTotal: sv.totalAvailable, cpq: c.list, rushEndsAt: b.rushEndsAt }))
       .catch(() => {});
   }, []);
   const todayDone = data?.todayDone ?? 0;
@@ -56,7 +58,85 @@ export default function BenefitsPage() {
         </Link>
       </header>
 
-      <div className="flex flex-col gap-8 px-5 pb-10 pt-[64px]">
+      {/* 오늘의 AI 추천 게임 — 원본 벤핏허브 구조(카운트다운 띠 → 히어로 게임 → 추가 보상 CTA → 게임 카드 → 더 많은 게임) */}
+      <section className="relative pt-[48px]" style={{ background: HERO_BG }}>
+        {offers ? <Countdown endsAt={offers.rushEndsAt} /> : <div className="h-[74px] bg-white/[0.08]" />}
+        <div className="relative flex flex-col items-center px-6 pt-7">
+          <p className="flex items-center gap-1.5 text-[15px] font-bold tracking-[-0.3px] text-white"><DuoIcon name="sparkle" size={14} className="text-gold" />오늘의 AI 추천 게임<DuoIcon name="sparkle" size={14} className="text-gold" /></p>
+          <div className="mt-4 flex w-full flex-col items-center gap-7">
+            {offers ? (
+              <Link href={`/game/${offers.hero.id}`} className="myb-press flex w-full flex-col items-center gap-3">
+                <img src={offers.hero.icon} width={141} height={141} alt="" className="myb-pop-in h-[141px] w-[141px] rounded-[28px] object-cover" style={{ boxShadow: "0 12px 30px rgba(0,0,0,.35)" }} />
+                <div className="flex w-full flex-col items-center gap-1">
+                  <p className="w-full truncate text-center text-[17px] font-bold text-white">{offers.hero.title}</p>
+                  <p className="text-[14px] font-medium text-[#dee2e9]">{offers.hero.missionText}</p>
+                </div>
+              </Link>
+            ) : (
+              <div className="flex w-full flex-col items-center gap-3"><div className="myb-skeleton h-[141px] w-[141px] rounded-[28px]" /><div className="myb-skeleton h-[22px] w-32 rounded" /><div className="myb-skeleton h-[19px] w-24 rounded" /></div>
+            )}
+            <div className="relative w-full">
+              <span className="absolute left-1/2 top-[-16px] z-10 flex h-[26px] -translate-x-1/2 items-center justify-center gap-1 whitespace-nowrap rounded-full px-3 text-[13px] font-bold text-ink" style={{ background: "linear-gradient(#ffd147 0%, #ff9d00 100%)" }}>
+                <DuoIcon name="bolt" size={13} />지금 아니면 혜택 끝!<DuoIcon name="bolt" size={13} />
+              </span>
+              <Link href={offers ? `/game/${offers.hero.id}` : "/game"} className="myb-press flex h-[52px] w-full items-center justify-center gap-1 rounded-[14px] bg-myb text-[16px] font-bold text-white shadow-[0_8px_20px_rgba(255,90,45,.35)]">
+                <span className="flex items-center gap-1"><PCoin size={18} />{offers ? fmt(offers.hero.missionPoint) : "—"}</span>
+                <span className="mx-0.5">+</span>
+                <span className="flex items-center gap-1"><PCoin size={18} />{offers ? fmt(offers.hero.bonusPoint) : "1,000"} 추가 보상!</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 px-5 pb-4 pt-8">
+          <h2 className="text-[20px] font-semibold leading-[23px] text-white">이런 게임도 있어요</h2>
+          <span className="flex h-[21px] items-center gap-0.5 rounded-full bg-white/15 px-2 text-[11px] font-bold text-white"><DuoIcon name="sparkle" size={11} className="text-gold" />AI 추천</span>
+        </div>
+        <div className="no-scrollbar flex gap-3 overflow-x-auto px-6">
+          {offers ? offers.games.map((g) => (
+            <Link key={g.id} href={`/game/${g.id}`} className="myb-press flex h-[220px] w-[150px] shrink-0 flex-col items-center justify-between overflow-hidden rounded-[18px] bg-white px-4 pb-4 pt-5" style={{ boxShadow: CARD_SHADOW }}>
+              <div className="flex w-full flex-col items-center gap-[10px]">
+                <img src={g.icon} width={84} height={84} alt="" className="h-[84px] w-[84px] rounded-[18px] object-cover" />
+                <div className="flex w-full flex-col items-center gap-[2px]">
+                  <p className="w-full truncate text-center text-[15px] font-bold text-ink">{g.title}</p>
+                  <p className="w-full truncate text-center text-[13px] font-medium text-ink-2">{g.missionText}</p>
+                </div>
+              </div>
+              <span className="flex h-9 w-full items-center justify-center gap-[2px] rounded-[10px] bg-myb-soft text-[14px] font-bold text-myb-dark">
+                <span className="flex items-center gap-[3px]"><PCoin size={14} />{fmt(g.missionPoint)}</span>+{fmt(g.bonusPoint)}
+              </span>
+            </Link>
+          )) : [0, 1, 2].map((i) => <div key={i} className="myb-skeleton h-[220px] w-[150px] shrink-0 rounded-[18px]" />)}
+        </div>
+        <Link href="/game" className="my-3 flex h-[58px] w-full items-center justify-center gap-1 text-[16px] font-semibold text-ink">
+          더 많은 게임 보기 <ChevronRight size={20} />
+        </Link>
+      </section>
+
+      {/* 지금 가장 Hot한 설문 — 원본 랭킹 리스트(메달 1~3위) */}
+      <section className="px-5 pb-2 pt-2">
+        <div className="flex items-center justify-between pb-3">
+          <h2 className="flex items-center gap-1.5 text-[20px] font-semibold leading-[23px]">지금 가장 Hot한 설문 <DuoIcon name="flame" size={20} className="text-myb" /></h2>
+          <Link href="/survey" aria-label="설문 보상" className="text-ink-2"><ChevronRight size={24} /></Link>
+        </div>
+        <div className="flex flex-col gap-5 rounded-[20px] bg-white px-5 pb-6 pt-5" style={{ boxShadow: CARD_SHADOW }}>
+          {offers ? offers.surveys.map((sv, i) => (
+            <Link key={sv.id} href="/survey" className="flex h-12 w-full items-center gap-[14px]">
+              <span className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-[15px] font-bold ${i === 0 ? "bg-[#fff1c2] text-[#b07a00]" : i === 1 ? "bg-[#eef1f6] text-[#6b7686]" : i === 2 ? "bg-[#fde9dc] text-[#b5602a]" : "text-muted"}`}>{i + 1}</span>
+              <span className="flex min-w-0 flex-1 flex-col gap-[6px]">
+                <span className="truncate text-[16px] font-medium">{sv.title}</span>
+                <span className="flex gap-1">
+                  <span className="flex h-5 items-center rounded-full bg-blue-soft px-[6px] text-[12px] font-medium text-blue">{sv.loi}분</span>
+                  {sv.label && <span className="flex h-5 items-center rounded-full px-[6px] text-[12px] font-medium" style={{ background: sv.label.bg, color: sv.label.color }}>{sv.label.text}</span>}
+                </span>
+              </span>
+              <span className="flex h-[26px] shrink-0 items-center gap-[3px] rounded-full bg-myb px-2.5 text-[14px] font-semibold text-white"><PCoin size={14} />{fmt(sv.reward)}</span>
+            </Link>
+          )) : [0, 1, 2, 3, 4].map((i) => <div key={i} className="myb-skeleton h-12 rounded-lg" />)}
+        </div>
+      </section>
+
+      <div className="flex flex-col gap-8 px-5 pb-10 pt-6">
         {/* 오늘 할 일 */}
         <section className="relative overflow-hidden rounded-[22px] p-5 text-white" style={{ background: "linear-gradient(135deg,#2f6fed 0%,#5b8cff 70%,#7fa6ff 100%)", boxShadow: "0 10px 28px rgba(47,111,237,.28)" }}>
           <DuoIcon name="sparkle" size={96} className="pointer-events-none absolute -right-2 -top-3 text-white/25" />
@@ -117,46 +197,7 @@ export default function BenefitsPage() {
           </ul>
         </section>
 
-        {/* 제휴 오퍼(연동 전 미리보기): 게임 · 설문 · 초간단 */}
-        <section>
-          <div className="flex items-end justify-between">
-            <h2 className="text-[18px] font-bold">게임하고 적립 <span className="ml-1 text-[12px] font-medium text-muted">첫 미션 +1,000P</span></h2>
-            <Link href="/game" className="text-[13px] font-semibold text-ink-2">전체보기 ›</Link>
-          </div>
-          <div className="no-scrollbar -mx-5 mt-3 flex gap-3 overflow-x-auto px-5">
-            {(offers?.games ?? []).slice(0, 6).map((g) => (
-              <Link key={g.id} href={`/game/${g.id}`} className="w-[132px] shrink-0 rounded-[18px] bg-white p-3" style={{ boxShadow: CARD_SHADOW }}>
-                <img src={g.icon} alt="" width={108} height={108} className="h-[108px] w-[108px] rounded-[16px] object-cover" />
-                <p className="mt-2 truncate text-[13px] font-bold">{g.title}</p>
-                <p className="truncate text-[11px] text-ink-2">{g.missionText}</p>
-                <p className="mt-1 flex items-center gap-1 text-[13px] font-bold text-myb-dark"><PCoin size={13} />{fmt(g.missionPoint + g.bonusPoint)}</p>
-              </Link>
-            ))}
-            {!offers && [0, 1, 2].map((i) => <div key={i} className="h-[196px] w-[132px] shrink-0 animate-pulse rounded-[18px] bg-white" />)}
-          </div>
-        </section>
-
-        <section>
-          <div className="flex items-end justify-between">
-            <h2 className="text-[18px] font-bold">설문 보상 <span className="ml-1 text-[12px] font-medium text-muted">오늘 {fmt(offers?.surveyTotal ?? 0)}P 가능</span></h2>
-            <Link href="/survey" className="text-[13px] font-semibold text-ink-2">전체보기 ›</Link>
-          </div>
-          <ul className="mt-3 flex flex-col gap-2.5">
-            {(offers?.surveys ?? []).slice(0, 3).map((sv) => (
-              <li key={sv.id}>
-                <Link href="/survey" className="flex items-center gap-3 rounded-[18px] bg-white p-3.5" style={{ boxShadow: CARD_SHADOW }}>
-                  <IconTile name="doc" tone="violet" size={44} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[14px] font-bold">{sv.title}</span>
-                    <span className="mt-0.5 block text-[11px] text-muted">약 {Math.max(1, sv.loi)}분</span>
-                  </span>
-                  <span className="flex shrink-0 items-center gap-1 text-[15px] font-bold text-myb-dark"><PCoin size={16} />{fmt(sv.reward)}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-
+        {/* 초간단 적립(연동 전 미리보기) */}
         <section>
           <div className="flex items-end justify-between">
             <h2 className="text-[18px] font-bold">초간단 적립 <span className="ml-1 text-[12px] font-medium text-muted">1분 미션</span></h2>

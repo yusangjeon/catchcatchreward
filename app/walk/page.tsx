@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DuoIcon, IconTile } from "@/components/icons/duo";
 import { PCoin } from "@/components/icons";
-import { OfferHeader } from "@/components/offers/Preview";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { useToast } from "@/components/motion/Toast";
 import { fmt } from "@/hooks/useHome";
@@ -99,7 +98,12 @@ export default function WalkPage() {
 
   return (
     <div className="min-h-dvh bg-[var(--color-bg)] pb-12">
-      <OfferHeader title="만보기" right={<Link href="/wallet" className="flex items-center gap-1 text-[14px] font-bold"><PCoin size={16} /><span id="hdr-balance">{data ? <NumberFlow value={data.balance} /> : "—"}</span></Link>} />
+      {/* 탭 화면 헤더(뒤로 없음): 제목 + 잔액 */}
+      <header className="fixed left-1/2 top-0 z-20 flex h-12 w-full max-w-[430px] -translate-x-1/2 items-center justify-between bg-[var(--color-bg)] px-6">
+        <h1 className="text-[26px] font-semibold leading-[31px] text-ink">만보기</h1>
+        <Link href="/wallet" className="flex items-center gap-1 text-[14px] font-bold"><PCoin size={16} /><span id="hdr-balance">{data ? <NumberFlow value={data.balance} /> : "—"}</span></Link>
+      </header>
+      <div className="h-12" />
 
       {/* 링 게이지 */}
       <section className="relative mx-5 mt-2 overflow-hidden rounded-[26px] px-5 pb-6 pt-6 text-white" style={{ background: "linear-gradient(160deg,#2f6fed 0%,#1f4fc8 60%,#173c9c 100%)", boxShadow: "0 14px 34px rgba(47,111,237,.3)" }}>
