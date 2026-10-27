@@ -184,9 +184,9 @@ export default function SpotPage() {
   );
 
   return (
-    <div className="min-h-dvh bg-[#f8f9fc] pb-8 text-[#191f28]">
+    <div className="flex min-h-dvh flex-col bg-[#f8f9fc] pb-4 text-[#191f28]">
       <GameHeader title="틀린그림 찾기" right={phase === "play" ? <span className={`text-[20px] font-extrabold tabular-nums ${left <= 10 ? "text-[#ff3939]" : "text-[#427cff]"}`}>{left}s</span> : data ? <span className="text-[13px] text-[#8b94a0]">{data.left}회 남음</span> : null} />
-      <div className="flex flex-col gap-2.5 px-3 pt-[56px]">
+      <div className="flex flex-1 flex-col gap-2.5 px-3 pt-[56px]">
         <div className="flex items-center justify-between px-1">
           <div className="min-w-0">
             <p className="truncate text-[15px] font-bold">{data ? `${data.level.name}` : "불러오는 중…"} <span className="text-[12px] font-semibold text-[#8b94a0]">LEVEL {data ? data.level.index + 1 : "-"}/3</span></p>
@@ -243,7 +243,31 @@ export default function SpotPage() {
             </div>
           </div>
         )}
-        <p className="px-1 text-[11px] text-[#b0b8c1]">위·아래 그림 아무 데나 탭하면 돼요. 틀리면 진동과 함께 {MISS_PENALTY}초가 줄어요. 30초 안에 전부 찾으면 ⚡ 스피드 보너스. 매일 0시에 새 그림 3장.</p>
+        {data && phase !== "play" && phase !== "count" && (
+          <section className="rounded-[16px] bg-white p-4" style={{ boxShadow: "0 2px 10px 0 rgba(0, 43, 141, 0.06)" }}>
+            <div className="flex items-center justify-between">
+              <p className="text-[14px] font-bold">오늘의 3레벨</p>
+              <p className="text-[12px] text-[#8b94a0]">오늘 <b className="text-[#427cff]">+{fmt(data.todayPoints)}P</b>{data.best ? ` · 최단 ${data.best.seconds}초(${data.best.level})` : ""}</p>
+            </div>
+            <ul className="mt-3 grid grid-cols-3 gap-2">
+              {data.today.map((t) => (
+                <li key={t.index} className={`overflow-hidden rounded-xl border ${t.status === "current" ? "border-[#427cff]" : "border-[#eef0f4]"}`}>
+                  <div className="relative aspect-[3/2] bg-[#e5e8ee]">
+                    <img src={t.thumb} alt="" className={`h-full w-full object-cover ${t.status === "locked" ? "blur-[3px] opacity-70" : ""}`} loading="lazy" />
+                    {t.status === "done" && <span className="absolute inset-0 flex items-center justify-center bg-black/35 text-[20px]">{t.found === data.total ? "🏆" : "✓"}</span>}
+                    {t.status === "locked" && <span className="absolute inset-0 flex items-center justify-center text-[18px]">🔒</span>}
+                    <span className="absolute left-1 top-1 rounded-full bg-black/55 px-1.5 text-[10px] font-bold text-white">LV {t.index + 1}</span>
+                  </div>
+                  <div className="px-2 py-1.5">
+                    <p className="truncate text-[12px] font-semibold">{t.name}</p>
+                    <p className="text-[11px] text-[#8b94a0]">{t.status === "done" ? `${t.found}/${data.total} · +${t.points}P` : t.status === "current" ? "진행 중" : "다음 레벨"}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        <p className="mt-auto px-1 text-[11px] text-[#b0b8c1]">위·아래 그림 아무 데나 탭하면 돼요. 틀리면 진동과 함께 {MISS_PENALTY}초가 줄어요. 30초 안에 전부 찾으면 ⚡ 스피드 보너스. 매일 0시에 새 그림 3장.</p>
       </div>
     </div>
   );

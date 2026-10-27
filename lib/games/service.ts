@@ -105,6 +105,9 @@ function validFound(userId: string, day: string, levelId: string, tokens: { id: 
 export interface SpotPayload {
   dayKey: string; level: { id: string; name: string; a: string; b: string; index: number }; total: number; limitSec: number;
   played: number; left: number; pointPerDiff: number; completeBonus: number; speedBonus: number; recent: { level: string; result: string; points: number }[];
+  today: { index: number; id: string; name: string; thumb: string; status: "done" | "current" | "locked"; found?: number; points?: number; seconds?: number }[];
+  todayPoints: number;
+  best: { seconds: number; level: string } | null; // 완주 최단 기록(전체 기간)
 }
 /** 오늘 다음 레벨(좌표는 내려주지 않음) */
 export async function getSpot(userId: string): Promise<SpotPayload> {
@@ -112,7 +115,21 @@ export async function getSpot(userId: string): Promise<SpotPayload> {
   const plays = (await getRepo().listGamePlays(userId)).filter((x) => x.game === "spot" && x.dayKey === day);
   const idx = Math.min(plays.length, GAME_LIMITS.spot - 1);
   const lv = spotLevelFor(day, idx);
+  const ordered = [...plays].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const today = Array.from({ length: GAME_LIMITS.spot }, (_, i) => {
+    const l = spotLevelFor(day, i);
+    const p = ordered[i];
+    const m = p ? /^[^:]+:(\d+)\/\d+:(\d+)s/.exec(p.result) : null;
+    return { index: i, id: l.id, name: l.name, thumb: `/games/spot/${l.id}/a.webp`, status: p ? ("done" as const) : i === plays.length ? ("current" as const) : ("locked" as const), found: m ? Number(m[1]) : undefined, points: p?.points, seconds: m ? Number(m[2]) : undefined };
+  });
+  const all = (await getRepo().listGamePlays(userId)).filter((x) => x.game === "spot");
+  let best: { seconds: number; level: string } | null = null;
+  for (const p of all) {
+    const m = /^([^:]+):(\d+)\/(\d+):(\d+)s/.exec(p.result);
+    if (m && m[2] === m[3] && (!best || Number(m[4]) < best.seconds)) best = { seconds: Number(m[4]), level: SPOT_LEVELS.find((x) => x.id === m[1])?.name ?? m[1] };
+  }
   return {
+    today, todayPoints: plays.reduce((a, p) => a + p.points, 0), best,
     dayKey: day, level: { id: lv.id, name: lv.name, a: `/games/spot/${lv.id}/a.webp`, b: `/games/spot/${lv.id}/b.webp`, index: idx },
     total: SPOT_DIFFS, limitSec: SPOT_LIMIT_SEC, played: plays.length, left: Math.max(0, GAME_LIMITS.spot - plays.length),
     pointPerDiff: SPOT_POINT_PER_DIFF, completeBonus: SPOT_COMPLETE_BONUS, speedBonus: SPOT_SPEED_BONUS,
