@@ -61,9 +61,9 @@ export function RewardLayer() {
       {big ? (
         <>
           <div className="rw-rise mt-[max(56px,env(safe-area-inset-top))] flex h-[44px] items-center gap-2 rounded-full bg-white px-5 text-[13px] text-ink-2 shadow-[0_8px_24px_rgba(0,0,0,.25)]" style={{ animationDelay: ".08s" }}>
-            내 포인트 <span className="flex items-center gap-1.5 text-[18px] font-extrabold text-ink"><PCoin size={20} /><Odometer from={from} to={to} /></span>
+            내 포인트 <span className="flex items-center gap-1.5 text-[18px] font-bold text-ink"><PCoin size={20} /><Odometer from={from} to={to} /></span>
           </div>
-          <h2 className="rw-title mt-[52px] text-[36px] font-black leading-none" style={{ animationDelay: ".3s", background: "linear-gradient(90deg,#ffd86a 0%,#ffb13d 50%,#ff8a5c 100%)", WebkitBackgroundClip: "text", color: "transparent", filter: "drop-shadow(0 4px 14px rgba(255,138,92,.45))" }}>
+          <h2 className="rw-title mt-[52px] text-[36px] font-extrabold leading-none" style={{ animationDelay: ".3s", background: "linear-gradient(90deg,#ffd86a 0%,#ffb13d 50%,#ff8a5c 100%)", WebkitBackgroundClip: "text", color: "transparent", filter: "drop-shadow(0 4px 14px rgba(255,138,92,.45))" }}>
             {item.title ?? "보상 지급!"}
           </h2>
           <p className="rw-rise mt-3 text-[15px] font-medium text-white/80" style={{ animationDelay: ".36s" }}>{item.subtitle ?? "축하해요! 보상을 받았어요"}</p>
@@ -73,16 +73,16 @@ export function RewardLayer() {
             <img src={item.image ?? "/brand/coins_hero.webp"} alt="" className="rw-coin relative h-[220px] w-[220px] object-contain" style={{ animationDelay: ".42s" }} draggable={false} />
           </div>
           <div className="rw-rise mt-[26px] flex h-[52px] items-center gap-2 rounded-full bg-white px-6 text-[17px] font-bold text-ink shadow-[0_10px_30px_rgba(0,0,0,.3)]" style={{ animationDelay: ".7s" }}>
-            <PCoin size={26} /> <span className="text-[22px] font-black text-myb">{unit === "P" ? "" : unit}{item.points.toLocaleString("ko-KR")}{unit === "P" ? "P" : ""}</span> 를 받았어요!
+            <PCoin size={26} /> <span className="text-[22px] font-extrabold text-myb">{unit === "P" ? "" : unit}{item.points.toLocaleString("ko-KR")}{unit === "P" ? "P" : ""}</span> 를 받았어요!
           </div>
         </>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center pb-10">
-          <h2 className="rw-title text-[26px] font-black text-white" style={{ animationDelay: ".05s", textShadow: "0 4px 18px rgba(255,138,92,.5)" }}>{item.title ?? "보상 지급!"}</h2>
+          <h2 className="rw-title text-[26px] font-extrabold text-white" style={{ animationDelay: ".05s", textShadow: "0 4px 18px rgba(255,138,92,.5)" }}>{item.title ?? "보상 지급!"}</h2>
           <div className="relative mt-5 flex h-[230px] w-[230px] items-center justify-center">
             <div className="rw-rays absolute inset-[-30px] rounded-full" style={{ background: "conic-gradient(from 0deg, rgba(255,197,61,0) 0deg, rgba(255,197,61,.5) 20deg, rgba(255,197,61,0) 40deg, rgba(255,197,61,0) 90deg, rgba(255,197,61,.5) 110deg, rgba(255,197,61,0) 130deg, rgba(255,197,61,0) 180deg, rgba(255,197,61,.5) 200deg, rgba(255,197,61,0) 220deg, rgba(255,197,61,0) 270deg, rgba(255,197,61,.5) 290deg, rgba(255,197,61,0) 310deg)", mask: "radial-gradient(circle, #000 25%, transparent 70%)", WebkitMask: "radial-gradient(circle, #000 25%, transparent 70%)" }} />
             <img src={item.image ?? "/brand/coins.webp"} alt="" className="rw-coin relative h-[220px] w-[220px] object-contain" style={{ animationDelay: ".1s" }} draggable={false} />
-            <span className="rw-sticker absolute -right-2 top-4 rotate-12 rounded-xl bg-gold px-2.5 py-1 text-[14px] font-black text-ink shadow-md" style={{ animationDelay: ".45s" }}>+{item.points.toLocaleString("ko-KR")}{unit}</span>
+            <span className="rw-sticker absolute -right-2 top-4 rotate-12 rounded-xl bg-gold px-2.5 py-1 text-[14px] font-extrabold text-ink shadow-md" style={{ animationDelay: ".45s" }}>+{item.points.toLocaleString("ko-KR")}{unit}</span>
             <span className="rw-sticker absolute -left-3 bottom-10 -rotate-12 rounded-xl bg-white px-2 py-0.5 text-[12px] font-bold text-myb shadow-md" style={{ animationDelay: ".6s" }}>{item.subtitle ?? "굿잡!"}</span>
           </div>
         </div>

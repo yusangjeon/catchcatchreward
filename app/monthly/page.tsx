@@ -47,7 +47,7 @@ export default function MonthlyPage() {
       <div className="px-4 pt-[60px]">
         <section className="relative overflow-hidden rounded-[24px] px-6 pb-6 pt-6 text-white" style={{ background: "linear-gradient(135deg,#2b3a67 0%,#3f5aa6 60%,#5b78c7 100%)" }}>
           <span className="inline-flex h-6 items-center rounded-full bg-white/20 px-2.5 text-[12px] font-bold">{data ? `${data.monthLabel} · D-${daysLeft}` : "—"}</span>
-          <h2 className="mt-2 text-[22px] font-extrabold leading-[30px]">달성할 때마다<br />엄청난 혜택이</h2>
+          <h2 className="mt-2 text-[22px] font-bold leading-[30px]">달성할 때마다<br />엄청난 혜택이</h2>
           <DuoIcon name="trophy" size={110} className="pointer-events-none absolute -bottom-4 -right-2 text-white/20" />
           <p className="mt-2 text-[13px] text-white/85">이번 달 받은 보상 <b className="text-[var(--color-gold)]">{fmt(data?.earned ?? 0)}P</b> / 최대 {fmt(data?.totalMax ?? 3300)}P</p>
           {data && data.claimable > 0 && <span className="absolute right-5 top-5 rounded-full bg-white px-3 py-1 text-[12px] font-bold text-[var(--color-myb)]">받을 보상 {data.claimable}</span>}
@@ -64,7 +64,7 @@ export default function MonthlyPage() {
                     <p className="text-[16px] font-bold">{m.title}</p>
                     <p className="mt-0.5 truncate text-[12px] text-[#8b94a0]">{m.desc}</p>
                   </div>
-                  <p className="flex shrink-0 items-center gap-1 text-[17px] font-extrabold text-ink"><PCoin size={16} />{fmt(m.reward)}</p>
+                  <p className="flex shrink-0 items-center gap-1 text-[17px] font-bold text-ink"><PCoin size={16} />{fmt(m.reward)}</p>
                 </div>
                 <div className="mt-4 flex items-center gap-3">
                   <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#f1efec]"><div className="myb-progress h-full rounded-full" style={{ width: `${m.claimed ? 100 : pct}%`, background: "linear-gradient(90deg,#6b55e6,#9d8cff)" }} /></div>

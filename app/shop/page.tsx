@@ -126,7 +126,7 @@ export default function ShopPage() {
                   <Link key={id} href={`/shop/${id}`} className="flex w-[82px] shrink-0 flex-col items-center">
                     <div className="relative mb-3 h-[70px] w-[70px] rounded-full">
                       <img src={m.logoCircle} width={70} height={70} alt="" className="h-[70px] w-[70px] rounded-full" />
-                      <span className="absolute right-0 top-0 flex h-[19px] w-7 items-center justify-center rounded-[100px] border border-black bg-[#ec58d4] text-[9px] font-extrabold leading-[10.35px] tracking-[-0.2px] text-white">MY</span>
+                      <span className="absolute right-0 top-0 flex h-[19px] w-7 items-center justify-center rounded-[100px] border border-black bg-[#ec58d4] text-[9px] font-bold leading-[10.35px] tracking-[-0.2px] text-white">MY</span>
                     </div>
                     <p className="mb-1 h-[14px] w-full overflow-hidden whitespace-nowrap text-center text-[12px] font-medium leading-[14px] text-[#8b94a0]">{m.name}</p>
                     <p className="flex h-4 items-center justify-center gap-1 text-[14px] font-semibold leading-4 text-[#33363f]">
@@ -146,7 +146,7 @@ export default function ShopPage() {
           </div>
           <div className="relative mx-6 mt-4 h-[78px] overflow-hidden rounded-xl bg-[var(--color-myb-soft)]">
             <img src="/myb/shop/img_welcome_2x.png" width={40} height={40} alt="" className="absolute left-3 top-[19px] h-10 w-10 object-contain" />
-            <span className="absolute left-[33px] top-[46px] flex h-[15px] w-6 items-center justify-center whitespace-nowrap rounded-[40px] px-[6px] py-[2px] text-[9px] font-black text-white" style={{ background: "linear-gradient(to left, rgb(66, 195, 255), rgb(66, 124, 255))" }}>2X</span>
+            <span className="absolute left-[33px] top-[46px] flex h-[15px] w-6 items-center justify-center whitespace-nowrap rounded-[40px] px-[6px] py-[2px] text-[9px] font-extrabold text-white" style={{ background: "linear-gradient(to left, rgb(66, 195, 255), rgb(66, 124, 255))" }}>2X</span>
             <div className="absolute left-[67px] top-1/2 flex w-[261px] -translate-y-1/2 flex-col gap-2">
               <p className="whitespace-nowrap text-[15px] font-bold leading-[15px] tracking-[-0.3px] text-[#191f28]">
                 <span className="text-[var(--color-myb)]">웰컴 2배 적립 혜택</span> ✨

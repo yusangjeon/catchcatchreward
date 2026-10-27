@@ -166,5 +166,5 @@ export function PSvg({ size = 16, className, fill = "#FFFFFF" }: P & { fill?: st
 export function Avatar({ seed, size = 50, className }: P & { seed: string }) {
   const hues = [215, 150, 260, 330, 190, 35];
   let h = 0; for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) % 6;
-  return <span className={`inline-flex items-center justify-center rounded-full font-black text-white ${className ?? ""}`} style={{ width: size, height: size, fontSize: size * 0.4, background: `hsl(${hues[h]} 70% 55%)` }}>{seed.slice(0, 1)}</span>;
+  return <span className={`inline-flex items-center justify-center rounded-full font-extrabold text-white ${className ?? ""}`} style={{ width: size, height: size, fontSize: size * 0.4, background: `hsl(${hues[h]} 70% 55%)` }}>{seed.slice(0, 1)}</span>;
 }

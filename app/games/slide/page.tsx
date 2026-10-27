@@ -94,7 +94,7 @@ export default function SlidePage() {
       <GameHeader title="2048 퍼즐" right={left === null ? null : <span>{left > 0 ? "오늘 1회 보상" : "보상 완료"}</span>} />
       <div className="flex flex-col gap-4 px-5 pt-[64px]">
         <div className="grid grid-cols-3 gap-2 text-center">
-          {[["점수", fmt(score)], ["최고 타일", fmt(maxTile)], ["최고 기록", fmt(best)]].map(([k, v]) => <div key={k} className="rounded-xl bg-white py-2" style={{ boxShadow: "0 2px 8px rgba(40,24,14,.06)" }}><p className="text-[11px] text-[#8b94a0]">{k}</p><p className="text-[18px] font-extrabold tabular-nums">{v}</p></div>)}
+          {[["점수", fmt(score)], ["최고 타일", fmt(maxTile)], ["최고 기록", fmt(best)]].map(([k, v]) => <div key={k} className="rounded-xl bg-white py-2" style={{ boxShadow: "0 2px 8px rgba(40,24,14,.06)" }}><p className="text-[11px] text-[#8b94a0]">{k}</p><p className="text-[18px] font-bold tabular-nums">{v}</p></div>)}
         </div>
         <div
           className="relative select-none rounded-2xl bg-[#bbc3d4] p-2 touch-none"
@@ -103,10 +103,10 @@ export default function SlidePage() {
         >
           <div className="grid grid-cols-4 gap-2">
             {grid.flat().map((v, i) => (
-              <div key={i} className={`flex aspect-square items-center justify-center rounded-xl font-extrabold tabular-nums transition-all ${v ? "myb-pop-in" : ""}`} style={{ background: v ? COLOR[v] ?? "#191f28" : "#cdd3e0", color: v >= 2048 ? "#fff" : v >= 8 && v < 128 ? "#fff" : "#191f28", fontSize: v >= 1024 ? 20 : v >= 128 ? 24 : 28 }}>{v || ""}</div>
+              <div key={i} className={`flex aspect-square items-center justify-center rounded-xl font-bold tabular-nums transition-all ${v ? "myb-pop-in" : ""}`} style={{ background: v ? COLOR[v] ?? "#191f28" : "#cdd3e0", color: v >= 2048 ? "#fff" : v >= 8 && v < 128 ? "#fff" : "#191f28", fontSize: v >= 1024 ? 20 : v >= 128 ? 24 : 28 }}>{v || ""}</div>
             ))}
           </div>
-          {over && <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-black/50 text-white"><p className="text-[22px] font-extrabold">게임 종료</p><p className="mt-1 text-[14px]">{fmt(score)}점 · 최고 타일 {maxTile}</p></div>}
+          {over && <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-black/50 text-white"><p className="text-[22px] font-bold">게임 종료</p><p className="mt-1 text-[14px]">{fmt(score)}점 · 최고 타일 {maxTile}</p></div>}
         </div>
         <div className="grid grid-cols-2 gap-2">
           <button type="button" onClick={reset} className="myb-press h-12 rounded-xl border border-[#dee2e9] bg-white text-[14px] font-bold">새 게임</button>

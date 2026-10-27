@@ -45,7 +45,7 @@ export default function AttendancePage() {
       <div className="flex flex-col gap-4 px-5 pt-[64px]">
         <section className="rounded-[20px] bg-gradient-to-r from-[var(--color-myb)] to-[var(--color-myb-line)] p-5 text-white">
           <p className="text-[12px] font-semibold text-white/80">연속 출석</p>
-          <p className="mt-1 text-[32px] font-extrabold leading-none">{streak}<span className="ml-1 text-[16px] font-bold">일</span></p>
+          <p className="mt-1 text-[32px] font-bold leading-none">{streak}<span className="ml-1 text-[16px] font-bold">일</span></p>
           <p className="mt-2 text-[12px] text-white/85">{streak > 0 && streak % 7 === 0 ? "오늘 7일 보너스를 받았어요! 내일부터 새 주기" : `${toBonus}일 더 출석하면 보너스 +50P`}</p>
           <div className="mt-3 flex gap-1">{Array.from({ length: 7 }).map((_, i) => <span key={i} className={`h-2 flex-1 rounded-full ${i < streak % 7 || (streak > 0 && streak % 7 === 0) ? "bg-[var(--color-gold)]" : "bg-white/30"}`} />)}</div>
         </section>

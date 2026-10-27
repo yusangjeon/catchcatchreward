@@ -88,7 +88,7 @@ export function MerchantView({ merchantId }: { merchantId: string }) {
             <div className="mt-4 flex flex-col gap-3">
               {(data?.detail.guide ?? []).map((line, i) => (
                 <div key={i} className="flex gap-2">
-                  <span className="mt-[3px] flex h-5 w-5 shrink-0 items-center justify-center rounded-[100px] bg-[#5c6573] text-[12px] font-extrabold leading-5 text-white">{i + 1}</span>
+                  <span className="mt-[3px] flex h-5 w-5 shrink-0 items-center justify-center rounded-[100px] bg-[#5c6573] text-[12px] font-bold leading-5 text-white">{i + 1}</span>
                   <p className="flex flex-wrap text-[16px] font-semibold leading-6 text-[#33363f]">
                     {line.map((t, j) => (
                       <span key={j} className={t.accent ? "text-[var(--color-myb)]" : ""}>{t.text.replace(/ /g, " ")}</span>

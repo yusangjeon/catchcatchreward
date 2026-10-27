@@ -150,7 +150,7 @@ export default function RoulettePage() {
           <div className="flex items-center justify-between text-white">
             <div>
               <p className="text-[12px] font-semibold text-white/70">{data?.freeSpin ? "첫 룰렛은 무료예요" : `스탬프 ${needed}개 = 1회`}</p>
-              <p className="mt-0.5 text-[18px] font-extrabold">최대 <span className="text-[#ffd45c]">편의점 5,000원권</span></p>
+              <p className="mt-0.5 text-[18px] font-bold">최대 <span className="text-[#ffd45c]">편의점 5,000원권</span></p>
             </div>
             <span className={`flex h-[30px] items-center gap-1.5 rounded-full px-3 text-[12px] font-bold ${data?.canSpin ? "bg-[#ffd45c] text-[#5a3300]" : "bg-white/15 text-white"}`}>
               <DuoIcon name="ticket" size={14} />{data ? (data.freeSpin ? "무료 1회" : `${Math.floor(stamps / needed)}회 가능`) : "—"}
@@ -209,7 +209,7 @@ export default function RoulettePage() {
                   <circle cx={R} cy={R} r={R - 1.5} fill="none" stroke="#fff" strokeWidth="3" />
                 </svg>
                 {/* 허브(고정) */}
-                <button type="button" onClick={() => void onSpin()} disabled={!data || spinning} aria-label="룰렛 돌리기" className={`absolute left-1/2 top-1/2 flex h-[76px] w-[76px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[15px] font-black tracking-wide text-[#5a3300] ${spinning ? "" : "rl-hub-pulse"}`} style={{ background: "radial-gradient(circle at 40% 35%, #ffe9a8 0%, #ffc53d 55%, #e88a00 100%)", boxShadow: "0 6px 0 #b86a00, 0 10px 22px rgba(0,0,0,.35), inset 0 2px 4px rgba(255,255,255,.7)" }}>
+                <button type="button" onClick={() => void onSpin()} disabled={!data || spinning} aria-label="룰렛 돌리기" className={`absolute left-1/2 top-1/2 flex h-[76px] w-[76px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[15px] font-extrabold tracking-wide text-[#5a3300] ${spinning ? "" : "rl-hub-pulse"}`} style={{ background: "radial-gradient(circle at 40% 35%, #ffe9a8 0%, #ffc53d 55%, #e88a00 100%)", boxShadow: "0 6px 0 #b86a00, 0 10px 22px rgba(0,0,0,.35), inset 0 2px 4px rgba(255,255,255,.7)" }}>
                   {spinning ? "GO!" : "SPIN"}
                 </button>
               </div>
@@ -293,7 +293,7 @@ export default function RoulettePage() {
               {result.prize.kind !== "none" && <div className="rl-rays pointer-events-none absolute left-1/2 top-[90px] h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2" />}
               <img src={result.prize.kind === "none" ? "/brand/mascot_5.webp" : "/brand/mascot_2.webp"} alt="" width={150} height={150} className="myb-pop-in relative mx-auto h-[150px] w-[150px] object-contain" />
               <p className="relative mt-3 text-[20px] font-bold">{result.prize.kind === "none" ? "아쉬워요, 다음 기회에!" : result.prize.kind === "gifticon" ? "대박! 기프티콘 당첨" : "축하해요! 당첨됐어요"}</p>
-              <p className="relative mt-2 flex items-center justify-center gap-1.5 text-[28px] font-extrabold text-[var(--color-myb)]">
+              <p className="relative mt-2 flex items-center justify-center gap-1.5 text-[28px] font-bold text-[var(--color-myb)]">
                 {result.prize.kind === "points" && <PCoin size={28} />}
                 {result.prize.kind === "points" ? `+${fmt(result.prize.value)}` : result.prize.kind === "gifticon" ? result.prize.name : ""}
               </p>

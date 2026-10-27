@@ -212,10 +212,10 @@ export default function SpotPage() {
         </svg>
       ))}
       {misses.map((m) => (
-        <span key={m.k} className="spot-miss pointer-events-none absolute text-[34px] font-black leading-none text-[#ff3b6b] drop-shadow-[0_2px_0_rgba(255,255,255,.9)]" style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, transform: "translate(-50%,-50%)" }}>✕</span>
+        <span key={m.k} className="spot-miss pointer-events-none absolute text-[34px] font-extrabold leading-none text-[#ff3b6b] drop-shadow-[0_2px_0_rgba(255,255,255,.9)]" style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, transform: "translate(-50%,-50%)" }}>✕</span>
       ))}
       {floats.map((f) => (
-        <span key={f.k} className={`spot-float pointer-events-none absolute whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-extrabold text-white shadow-md ${f.ok ? "bg-[#22c55e]" : "bg-[#ff3b6b]"}`} style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%` }}>{f.text}</span>
+        <span key={f.k} className={`spot-float pointer-events-none absolute whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-bold text-white shadow-md ${f.ok ? "bg-[#22c55e]" : "bg-[#ff3b6b]"}`} style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%` }}>{f.text}</span>
       ))}
       {flash && <span className="spot-flash pointer-events-none absolute inset-0 bg-[#ff3b6b]" />}
       <span className={`absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[11px] font-bold text-white ${top ? "bg-black/45" : "bg-[var(--color-myb)]"}`}>{label}</span>
@@ -224,12 +224,12 @@ export default function SpotPage() {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-[var(--color-bg)] text-[#191f28]">
-      <GameHeader title="틀린그림 찾기" right={phase === "play" ? <span className={`text-[22px] font-extrabold tabular-nums ${left <= 10 ? "text-[#ff3939]" : "text-[var(--color-myb)]"}`}>{left}</span> : null} />
+      <GameHeader title="틀린그림 찾기" right={phase === "play" ? <span className={`text-[22px] font-bold tabular-nums ${left <= 10 ? "text-[#ff3939]" : "text-[var(--color-myb)]"}`}>{left}</span> : null} />
       <div className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-3 pt-[52px]">
         {/* 상태 줄: 레벨 칩 · 찾은 개수 5개 · 타이머 바 */}
         <div className="flex shrink-0 items-center justify-between px-0.5">
           <span className="rounded-full bg-[var(--color-myb-soft)] px-2.5 py-1 text-[12px] font-bold text-[var(--color-myb)]">LV {data ? data.level.index + 1 : "-"}<span className="font-medium text-[var(--color-myb-line)]">/3</span>{data && <span className="ml-1 font-medium text-[var(--color-myb-line)]">· {data.limitSec}초</span>}</span>
-          <div className="flex items-center gap-2">{Array.from({ length: total }).map((_, i) => <span key={i} ref={(el) => { dots.current[i] = el; }} className={`flex h-[20px] w-[20px] items-center justify-center rounded-full border-2 text-[11px] font-black text-white transition-all duration-300 ${i < found ? "border-[#22c55e] bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,.6)]" : "border-[#dee2e9] bg-white"}`}>{i < found ? "✓" : ""}</span>)}</div>
+          <div className="flex items-center gap-2">{Array.from({ length: total }).map((_, i) => <span key={i} ref={(el) => { dots.current[i] = el; }} className={`flex h-[20px] w-[20px] items-center justify-center rounded-full border-2 text-[11px] font-extrabold text-white transition-all duration-300 ${i < found ? "border-[#22c55e] bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,.6)]" : "border-[#dee2e9] bg-white"}`}>{i < found ? "✓" : ""}</span>)}</div>
           <span className="w-[52px] text-right text-[12px] font-semibold text-[#8b94a0]">{data ? data.level.name : ""}</span>
         </div>
         <div className="h-1 w-full shrink-0 overflow-hidden rounded-full bg-[#e5e8ee]"><div className="h-full rounded-full transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%`, background: left <= 10 ? "#ff3939" : "linear-gradient(90deg,var(--color-myb),var(--color-gold))" }} /></div>
@@ -240,13 +240,13 @@ export default function SpotPage() {
             {renderImage(data.level.b, "여기서 찾기", phase === "idle" || phase === "count", false)}
             {phase === "count" && (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                <span key={count} className="spot-count flex h-[120px] w-[120px] items-center justify-center rounded-full bg-[var(--color-myb)] text-[64px] font-black text-white shadow-[0_12px_40px_rgba(255,90,45,.5)]">{count}</span>
+                <span key={count} className="spot-count flex h-[120px] w-[120px] items-center justify-center rounded-full bg-[var(--color-myb)] text-[64px] font-extrabold text-white shadow-[0_12px_40px_rgba(255,90,45,.5)]">{count}</span>
               </div>
             )}
             {phase === "idle" && (
               <div className="absolute inset-0 flex items-center justify-center">
                 {data.left > 0 ? (
-                  <button type="button" onClick={start} disabled={imgReady < 2} className="myb-press flex h-14 items-center gap-2 rounded-full bg-[var(--color-myb)] px-8 text-[17px] font-extrabold text-white shadow-[0_8px_30px_rgba(255,90,45,.45)] disabled:opacity-60">
+                  <button type="button" onClick={start} disabled={imgReady < 2} className="myb-press flex h-14 items-center gap-2 rounded-full bg-[var(--color-myb)] px-8 text-[17px] font-bold text-white shadow-[0_8px_30px_rgba(255,90,45,.45)] disabled:opacity-60">
                     {imgReady < 2 ? "준비 중…" : <><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5.5v13l10-6.5z" /></svg>시작</>}
                   </button>
                 ) : (
@@ -292,8 +292,8 @@ export default function SpotPage() {
           <div className="myb-fade-in fixed inset-0 z-[999] bg-black/55" />
           <div className="myb-modal-in fixed left-1/2 top-1/2 z-[1000] w-[calc(100%-56px)] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-[24px] bg-white px-6 pb-6 pt-7 text-center">
             <p className="flex justify-center"><StarRating earned={stars} size={46} /></p>
-            <p className="mt-2 text-[24px] font-extrabold">{result.all ? "완벽해요!" : `${result.found}/${result.total} 찾았어요`}</p>
-            <p className="mt-2 flex items-center justify-center gap-1 text-[20px] font-extrabold text-[var(--color-myb)]"><PCoin size={20} />+{fmt(result.points)}</p>
+            <p className="mt-2 text-[24px] font-bold">{result.all ? "완벽해요!" : `${result.found}/${result.total} 찾았어요`}</p>
+            <p className="mt-2 flex items-center justify-center gap-1 text-[20px] font-bold text-[var(--color-myb)]"><PCoin size={20} />+{fmt(result.points)}</p>
             <p className="mt-1 text-[12px] text-[#8b94a0]">{result.seconds}초{result.speedBonus ? <> · <DuoIcon name="bolt" size={12} className="inline text-[#d98a00]" /> 스피드 +{result.speedBonus}P</> : ""}{!result.all ? " · 놓친 곳은 분홍 점선" : ""}</p>
             <div className="mt-5 grid grid-cols-2 gap-2">
               <button type="button" onClick={() => router.push("/games")} className="myb-press h-12 rounded-xl border border-[#dee2e9] text-[14px] font-bold">나가기</button>

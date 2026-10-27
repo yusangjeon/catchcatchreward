@@ -45,9 +45,9 @@ export default function NewbiePage() {
       <div className="px-5 pt-[60px]">
         <section className="relative overflow-hidden rounded-[20px] px-5 pb-6 pt-7 text-white" style={{ background: "linear-gradient(135deg,var(--color-myb) 0%,#ff8a5c 100%)" }}>
           <p className="text-[13px] font-semibold text-white/80">신규 유저 전용 · 가입 후 3일</p>
-          <p className="mt-1 text-[24px] font-extrabold leading-[32px]">매일 퀴즈 3개 풀고<br />최대 <span className="text-[var(--color-gold)]">{fmt(data?.totalMax ?? 1500)}P</span> 받아요</p>
+          <p className="mt-1 text-[24px] font-bold leading-[32px]">매일 퀴즈 3개 풀고<br />최대 <span className="text-[var(--color-gold)]">{fmt(data?.totalMax ?? 1500)}P</span> 받아요</p>
           <p className="mt-3 text-[12px] text-white/70">{data ? (data.active ? `지금 ${data.dayNo}일차 · 받은 보상 ${fmt(data.claimedTotal)}P` : "3일 혜택 기간이 끝났어요") : "…"}</p>
-          <span className="absolute -right-2 -top-2 text-[96px] font-black italic leading-none text-white/15">3일</span>
+          <span className="absolute -right-2 -top-2 text-[96px] font-extrabold italic leading-none text-white/15">3일</span>
         </section>
 
         <ul className="mt-5 flex flex-col gap-3">
@@ -55,7 +55,7 @@ export default function NewbiePage() {
             <li key={d.day} className={`rounded-[18px] bg-white p-5 ${d.today ? "ring-2 ring-[var(--color-myb)]" : ""}`} style={{ boxShadow: "0 4px 16px rgba(40,24,14,.06)" }}>
               <div className="flex items-center justify-between">
                 <p className="text-[17px] font-bold">{d.day}일차 {d.today && <span className="ml-1 rounded-full bg-[var(--color-myb-soft)] px-2 py-0.5 text-[11px] font-bold text-[var(--color-myb)]">오늘</span>}</p>
-                <p className="flex items-center gap-1 text-[18px] font-extrabold"><PCoin size={18} />{fmt(d.reward)}</p>
+                <p className="flex items-center gap-1 text-[18px] font-bold"><PCoin size={18} />{fmt(d.reward)}</p>
               </div>
               <p className="mt-1 text-[13px] text-[#5c6573]">퀴즈 {d.goal}개 완료하기 <span className="font-bold text-[var(--color-myb)]">{d.done}/{d.goal}</span></p>
               <div className="mt-3 flex gap-1.5">{[0, 1, 2].map((i) => <i key={i} className={`h-2 flex-1 rounded-full ${d.done > i ? "bg-[var(--color-myb)]" : "bg-[var(--color-myb-soft)]"}`} />)}</div>

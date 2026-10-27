@@ -98,7 +98,7 @@ export default function RushPage() {
         <div className="flex items-center justify-between px-6 pb-3 pt-5">
           <div>
             <span className="inline-flex h-6 items-center rounded-full bg-white/20 px-2.5 text-[12px] font-bold">{data ? `${data.weekNo}주차` : "—"}</span>
-            <h2 className="mt-2 text-[22px] font-extrabold leading-[30px]">미션 완료하고<br />스탬프 모으면 최대 <b className="text-[var(--color-gold)]">500P</b></h2>
+            <h2 className="mt-2 text-[22px] font-bold leading-[30px]">미션 완료하고<br />스탬프 모으면 최대 <b className="text-[var(--color-gold)]">500P</b></h2>
             <p className="mt-1 text-[13px] text-white/80">매주 일요일 0시에 새로 시작해요</p>
           </div>
           <img src="/brand/coins.webp" width={110} height={110} alt="" className="h-[110px] w-[110px] shrink-0" draggable={false} />
@@ -113,7 +113,7 @@ export default function RushPage() {
           <Link key={b.sub} href={b.href} className="mt-3 flex items-center gap-3 rounded-[18px] px-4 py-4 text-white" style={{ background: "linear-gradient(90deg,#ff7a3d 0%,var(--color-myb) 45%,#ff8a5c 100%)" }}>
             <span className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[14px] bg-white/20 text-white"><DuoIcon name={b.icon} size={26} /></span>
             <span className="min-w-0 flex-1">
-              <p className="text-[20px] font-black leading-[24px]">{b.title} <span className="text-[15px] font-semibold">{b.sub}</span>{b.beta && <span className="ml-1 rounded-full bg-[#ffe9b0] px-2 py-0.5 text-[11px] font-bold italic text-[#b06a00]">Beta</span>}</p>
+              <p className="text-[20px] font-extrabold leading-[24px]">{b.title} <span className="text-[15px] font-semibold">{b.sub}</span>{b.beta && <span className="ml-1 rounded-full bg-[#ffe9b0] px-2 py-0.5 text-[11px] font-bold italic text-[#b06a00]">Beta</span>}</p>
               <p className="mt-1 truncate text-[13px] text-white/90">{b.desc}</p>
             </span>
             <span className="rounded-[12px] bg-gradient-to-r from-[var(--color-myb)] to-[#ffb13d] px-5 py-3 text-[15px] font-bold shadow-md">이동</span>

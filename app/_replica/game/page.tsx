@@ -124,7 +124,7 @@ export default function GamePage() {
 }
 
 function DoubleBadge() {
-  return <span className="absolute right-4 top-[-8px] z-[3] whitespace-nowrap rounded-full bg-[#ec58d4] px-3 py-[3px] text-[14px] font-extrabold leading-[18.9px] tracking-[-0.14px] text-white">2배</span>;
+  return <span className="absolute right-4 top-[-8px] z-[3] whitespace-nowrap rounded-full bg-[#ec58d4] px-3 py-[3px] text-[14px] font-bold leading-[18.9px] tracking-[-0.14px] text-white">2배</span>;
 }
 
 function GameRow({ g }: { g: BenefitGame }) {

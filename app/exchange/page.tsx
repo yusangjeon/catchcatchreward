@@ -65,7 +65,7 @@ export default function ExchangePage() {
       <div className="flex flex-col gap-6 px-6 pt-[64px]">
         <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           <p className="text-[14px] text-[#5c6573]">교환 가능 포인트</p>
-          <p className="mt-1 flex items-center gap-2 text-[26px] font-extrabold"><PCoin size={26} /><NumberFlow value={balance} /></p>
+          <p className="mt-1 flex items-center gap-2 text-[26px] font-bold"><PCoin size={26} /><NumberFlow value={balance} /></p>
           <p className="mt-2 text-[12px] leading-[17px] text-[#8b94a0]">{fmt(data?.minRedeem ?? 1000)}P부터 교환할 수 있어요. 신청 즉시 포인트가 차감되고, 기프티콘은 영업일 3일 내 문자로 발송돼요.</p>
         </section>
 
@@ -111,7 +111,7 @@ export default function ExchangePage() {
               <span className="flex h-16 w-16 items-center justify-center rounded-xl text-[32px]" style={{ background: pick.bg }} aria-hidden>{pick.emoji}</span>
               <div>
                 <p className="text-[16px] font-semibold">{pick.name}</p>
-                <p className="mt-1 flex items-center gap-1 text-[18px] font-extrabold"><PCoin size={18} />{fmt(pick.points)}</p>
+                <p className="mt-1 flex items-center gap-1 text-[18px] font-bold"><PCoin size={18} />{fmt(pick.points)}</p>
               </div>
             </div>
             <div className="mt-5 rounded-xl bg-[var(--color-bg)] p-4 text-[13px] leading-[19px] text-[#5c6573]">

@@ -54,20 +54,20 @@ export default function RspPage() {
       <div className="flex flex-col items-center gap-5 px-5 pt-[64px]">
         <div className="flex w-full items-center justify-between rounded-2xl bg-white/5 px-4 py-3">
           <div className="flex items-center gap-2"><Avatar seed={OPP[opp]} size={34} /><div><p className="text-[13px] font-bold">{OPP[opp]}</p><p className="text-[11px] text-white/60">오늘의 상대</p></div></div>
-          <div className="text-right"><p className="text-[11px] text-white/60">연승</p><p className="text-[18px] font-extrabold text-[var(--color-gold)]">{streak}</p></div>
+          <div className="text-right"><p className="text-[11px] text-white/60">연승</p><p className="text-[18px] font-bold text-[var(--color-gold)]">{streak}</p></div>
         </div>
         <div className="relative flex h-[230px] w-full items-center justify-center overflow-hidden rounded-[24px] bg-gradient-to-b from-[#1e293b] to-[#0b1220]">
-          {phase === "count" && <p key={count} className="myb-pop-in text-[44px] font-extrabold tracking-wider text-[var(--color-gold)]">{count}</p>}
+          {phase === "count" && <p key={count} className="myb-pop-in text-[44px] font-bold tracking-wider text-[var(--color-gold)]">{count}</p>}
           {phase === "result" && round && (
             <div className="flex items-center gap-6">
               <div className="text-center"><p className="text-[12px] text-white/60">나</p><img src={HAND[round.choice]} alt={EMOJI[round.choice]} className="myb-pop-in h-[96px] w-[96px] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,.45)]" /></div>
-              <p className={`text-[22px] font-extrabold ${round.result === "win" ? "text-[#4ade80]" : round.result === "draw" ? "text-[#fbbf24]" : "text-white/50"}`}>{title}</p>
+              <p className={`text-[22px] font-bold ${round.result === "win" ? "text-[#4ade80]" : round.result === "draw" ? "text-[#fbbf24]" : "text-white/50"}`}>{title}</p>
               <div className="text-center"><p className="text-[12px] text-white/60">{OPP[opp]}</p><img src={HAND[round.cpu]} alt={EMOJI[round.cpu]} className="myb-pop-in h-[96px] w-[96px] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,.45)]" style={{ transform: "scaleX(-1)" }} /></div>
             </div>
           )}
           {phase === "idle" && <p className="text-[15px] text-white/60">{left === 0 ? "오늘 3판 다 했어요. 내일 또 해요!" : "아래에서 하나를 고르면 바로 시작!"}</p>}
         </div>
-        {round && round.points > 0 && <p className="text-[18px] font-extrabold text-[#4ade80]">+{fmt(round.points)}P {round.bonus ? <span className="text-[13px] text-[var(--color-gold)]">연승 보너스 +{round.bonus}</span> : null}</p>}
+        {round && round.points > 0 && <p className="text-[18px] font-bold text-[#4ade80]">+{fmt(round.points)}P {round.bonus ? <span className="text-[13px] text-[var(--color-gold)]">연승 보너스 +{round.bonus}</span> : null}</p>}
         <div className="grid w-full grid-cols-3 gap-3">
           {(["scissors", "rock", "paper"] as C[]).map((c) => (
             <button key={c} type="button" disabled={phase === "count" || left === 0} onClick={() => void play(c)} className="myb-press flex h-[112px] flex-col items-center justify-center rounded-2xl bg-white/10 transition hover:bg-white/15 disabled:opacity-40">

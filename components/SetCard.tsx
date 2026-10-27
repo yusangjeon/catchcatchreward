@@ -23,7 +23,7 @@ export function SetCard({ s, size = 145 }: { s: SetCardT; size?: number }) {
         <HeartIcon size={22} className="absolute bottom-2 right-2 text-white drop-shadow" />
       </div>
       <p className="mt-2.5 line-clamp-2 text-[14px] font-medium leading-[1.4] text-ink">{s.title}</p>
-      <p className="mt-1.5 flex items-center gap-1 text-[18px] font-extrabold text-ink"><PCoin size={18} />{fmt(s.rewardPoints)}</p>
+      <p className="mt-1.5 flex items-center gap-1 text-[18px] font-bold text-ink"><PCoin size={18} />{fmt(s.rewardPoints)}</p>
       <p className="mt-0.5 text-[12px] text-muted">{fmt(s.participants)}명 참여</p>
     </Link>
   );
@@ -39,7 +39,7 @@ export function SetGridCard({ s }: { s: SetCardT }) {
         {s.done && <span className="absolute inset-x-0 bottom-0 bg-black/55 py-1 text-center text-[12px] font-bold text-white">참여 완료</span>}
       </div>
       <p className="mt-2.5 line-clamp-2 text-[14px] font-medium leading-[1.4]">{s.title}</p>
-      <p className="mt-1.5 flex items-center gap-1 text-[18px] font-extrabold"><PCoin size={18} />{fmt(s.rewardPoints)}</p>
+      <p className="mt-1.5 flex items-center gap-1 text-[18px] font-bold"><PCoin size={18} />{fmt(s.rewardPoints)}</p>
       <p className="mt-0.5 text-[12px] text-muted">{fmt(s.capacity)}명 가능 · {fmt(s.participants)}명 참여</p>
     </Link>
   );

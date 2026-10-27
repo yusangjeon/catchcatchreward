@@ -97,10 +97,10 @@ export function QuizPlay({ setId }: { setId: string }) {
       {/* 하단 파란 영역 */}
       <div className="flex flex-1 flex-col bg-myb px-[40px] pt-[38px] pb-28">
         <div className="flex items-center gap-3">
-          <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-white text-[15px] font-black tracking-wide text-myb ring-[3px] ring-white/60">{data.persona.code.replace(/\?/g, "").slice(0, 2) || "NEW"}</span>
+          <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-white text-[15px] font-extrabold tracking-wide text-myb ring-[3px] ring-white/60">{data.persona.code.replace(/\?/g, "").slice(0, 2) || "NEW"}</span>
           <div>
             <p className="text-[13px] font-medium text-white">
-              {data.persona.title} · <b className="font-extrabold">{data.persona.code}</b>
+              {data.persona.title} · <b className="font-bold">{data.persona.code}</b>
             </p>
             <div className="mt-1.5 flex gap-2">
               <span className="flex h-[26px] items-center rounded-full bg-white px-3.5 text-[12px] tracking-widest text-ink-2">•••</span>
@@ -186,7 +186,7 @@ function RewardScreen({ result }: { result: SubmitResult }) {
       </div>
       <div className="mt-[20px] flex justify-center">
         <span className="flex h-[42px] items-center gap-3 rounded-full bg-[var(--color-myb-soft)] px-6 text-[13px] text-ink-2">
-          내 포인트 <span className="flex items-center gap-1.5 text-[17px] font-extrabold text-ink"><PCoin size={20} />{fmt(result.wallet.balance)}</span>
+          내 포인트 <span className="flex items-center gap-1.5 text-[17px] font-bold text-ink"><PCoin size={20} />{fmt(result.wallet.balance)}</span>
         </span>
       </div>
 
@@ -208,18 +208,18 @@ function RewardScreen({ result }: { result: SubmitResult }) {
 
       <div className="mx-5 mt-[30px] rounded-2xl border border-[#e3e8f0] p-[18px]">
         <div className="flex items-center justify-around text-[14px] text-ink-2">
-          <span className="flex items-center gap-3">포인트 <span className="flex items-center gap-1.5 text-[20px] font-extrabold text-ink"><PCoin size={22} />{fmt(result.points)}</span></span>
+          <span className="flex items-center gap-3">포인트 <span className="flex items-center gap-1.5 text-[20px] font-bold text-ink"><PCoin size={22} />{fmt(result.points)}</span></span>
           <span className="h-7 w-px bg-line" />
-          <span className="flex items-center gap-3">스탬프 <span className="flex items-center gap-1.5 text-[20px] font-extrabold text-ink"><CXCoin size={22} />+1</span></span>
+          <span className="flex items-center gap-3">스탬프 <span className="flex items-center gap-1.5 text-[20px] font-bold text-ink"><CXCoin size={22} />+1</span></span>
         </div>
         {result.starterBonus > 0 && (
           <p className="mt-4 flex h-[42px] items-center justify-center gap-1.5 rounded-xl bg-[#fff6e5] text-[13px] text-[#9a5b00]">
-            <DuoIcon name="gift" size={18} className="text-[#d98a00]" /> 뉴비 스타터팩 2배로 <PCoin size={18} /> <b className="text-[16px] font-extrabold text-[#ff8a3d]">+{fmt(result.starterBonus)}</b> 더 받았어요
+            <DuoIcon name="gift" size={18} className="text-[#d98a00]" /> 뉴비 스타터팩 2배로 <PCoin size={18} /> <b className="text-[16px] font-bold text-[#ff8a3d]">+{fmt(result.starterBonus)}</b> 더 받았어요
           </p>
         )}
         {result.bonus > 0 && (
           <p className="mt-4 flex h-[42px] items-center justify-center gap-1.5 rounded-xl bg-[var(--color-myb-soft)] text-[13px] text-ink-2">
-            랜덤 보상으로 <PCoin size={18} /> <b className="text-[16px] font-extrabold text-myb-dark">+{result.bonus}</b> 더 받았어요
+            랜덤 보상으로 <PCoin size={18} /> <b className="text-[16px] font-bold text-myb-dark">+{result.bonus}</b> 더 받았어요
           </p>
         )}
         {result.newBadges.length > 0 && (

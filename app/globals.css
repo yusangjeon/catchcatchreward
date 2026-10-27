@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Pretendard Variable 자체 호스팅(jsDelivr 의존 제거 — 폰에서 폰트가 안 떠 시스템 서체로 보이던 문제) */
+@font-face {
+  font-family: "Pretendard Variable";
+  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations"), url("/fonts/PretendardVariable.woff2") format("woff2");
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* 캐치캐치 브랜드 토큰(2026-10-28 A안 "캐치 오렌지"). 레이아웃 규칙은 마이비 실측, 색만 우리 것.
    주색을 바꾸려면 --color-myb* 5줄만 바꾸면 전 화면이 따라온다(클래스명 myb 는 호환을 위해 유지). */
 @theme {
@@ -31,6 +40,7 @@
   --color-purple: #7b3fe4;
   --color-honey: #ffb02e;
   --color-pink: #ff3d9a;
+  --color-pink-soft: #ffe9f1;
   --color-red: #ff3b30;
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto,
     "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
@@ -41,6 +51,9 @@ body {
   background: #efece8; /* 폰 폭 밖 영역 */
   color: var(--color-ink);
   font-family: var(--font-sans);
+  letter-spacing: -0.012em; /* 토스·마이비 톤: 살짝 좁게 */
+  word-break: keep-all;
+  text-rendering: optimizeLegibility;
   -webkit-tap-highlight-color: transparent;
   letter-spacing: -0.01em;
 }

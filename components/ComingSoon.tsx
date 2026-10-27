@@ -19,7 +19,7 @@ export function ComingSoon({ title, desc, icon = "sparkle", alt }: { title: stri
       <div className="flex flex-1 flex-col items-center px-6 pt-[92px]">
         <IconTile name={icon} tone="gray" size={120} icon={64} round />
         <span className="mt-4 rounded-full bg-myb-soft px-3 py-1 text-[12px] font-bold text-myb-dark">제휴사 연동 준비 중</span>
-        <p className="mt-3 text-center text-[20px] font-extrabold">{title}은 곧 열려요</p>
+        <p className="mt-3 text-center text-[20px] font-bold">{title}은 곧 열려요</p>
         <p className="mt-2 text-center text-[13px] leading-[20px] text-ink-2">{desc}</p>
         <ul className="mt-8 flex w-full flex-col gap-3">
           {alt.map((a) => (

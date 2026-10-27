@@ -28,7 +28,7 @@ export default function GamesPage() {
       <div className="flex flex-col gap-4 px-5 pt-[64px]">
         <section className="relative overflow-hidden rounded-[20px] bg-[#191f28] p-5 text-white">
           <p className="text-[12px] font-semibold text-[var(--color-myb-line)]">매일 0시 리셋 · 오늘 남은 플레이 {leftTotal}회</p>
-          <p className="mt-1 text-[20px] font-extrabold leading-[26px]">오늘 게임으로 <span className="text-[var(--color-gold)]">{fmt(todayPoints)}P</span> 모았어요</p>
+          <p className="mt-1 text-[20px] font-bold leading-[26px]">오늘 게임으로 <span className="text-[var(--color-gold)]">{fmt(todayPoints)}P</span> 모았어요</p>
           <p className="mt-2 text-[12px] text-white/60">이번 주 {data?.weekPlays ?? 0}회 플레이 · 3회마다 러쉬 스탬프 미션 달성 · 진동·효과음은 {muted ? "꺼짐" : "켜짐"}</p>
           <span className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-[var(--color-myb)]/30 blur-2xl" />
         </section>

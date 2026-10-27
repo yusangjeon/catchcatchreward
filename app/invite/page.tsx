@@ -91,14 +91,14 @@ function InviteView() {
         <section className="flex items-center gap-4 rounded-[20px] bg-gradient-to-r from-[#e23d7b] to-[#ff8fb8] p-5 text-white">
           <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20"><DuoIcon name="people" size={32} /></span>
           <div>
-            <p className="text-[18px] font-extrabold leading-[24px]">친구 초대하고<br />둘 다 포인트 받기</p>
+            <p className="text-[18px] font-bold leading-[24px]">친구 초대하고<br />둘 다 포인트 받기</p>
             <p className="mt-1 text-[12px] text-white/85">친구는 바로 {fmt(data?.rewards.invitee ?? 300)}P, 나는 친구가 첫 퀴즈를 풀면 {fmt(data?.rewards.inviter ?? 500)}P</p>
           </div>
         </section>
 
         <section className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           <p className="text-[13px] font-medium text-[#8b94a0]">내 초대코드</p>
-          <p className="mt-1 text-[28px] font-extrabold tracking-[0.12em] tabular-nums">{data?.code ?? "────────"}</p>
+          <p className="mt-1 text-[28px] font-bold tracking-[0.12em] tabular-nums">{data?.code ?? "────────"}</p>
           <div className="mt-4 grid grid-cols-2 gap-2">
             <button type="button" onClick={() => data && void copy(data.code, "초대코드")} className="myb-press h-11 rounded-xl border border-[#dee2e9] text-[14px] font-bold">코드 복사</button>
             <button type="button" onClick={() => void share()} className="myb-press h-11 rounded-xl bg-[var(--color-myb)] text-[14px] font-bold text-white">링크 공유</button>

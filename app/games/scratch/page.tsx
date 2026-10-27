@@ -93,7 +93,7 @@ export default function ScratchPage() {
       <div className="flex flex-col items-center gap-4 px-5 pt-[64px]">
         <div className="relative w-full overflow-hidden rounded-[24px] p-4" style={{ background: "linear-gradient(135deg,#ffe9a8,#ffb86b 60%,#ff8a3d)", boxShadow: "0 10px 30px rgba(255,138,61,.35)" }}>
           <div className="flex items-center justify-between px-1">
-            <p className="text-[13px] font-extrabold tracking-wide text-[#7a3f00]">캐치캐치 복권</p>
+            <p className="text-[13px] font-bold tracking-wide text-[#7a3f00]">캐치캐치 복권</p>
             <p className="text-[11px] font-bold text-[#7a3f00]/70">같은 그림 3개 = 당첨</p>
           </div>
           <div className="relative mt-3 rounded-2xl bg-white p-3">
@@ -110,7 +110,7 @@ export default function ScratchPage() {
             {ticket && !revealed && <span>{Math.round(pct * 100)}% 긁음</span>}
           </div>
         </div>
-        {revealed && ticket && <p className={`text-[22px] font-extrabold ${ticket.points > 0 ? "text-[#ff8a3d]" : "text-[#8b94a0]"}`}>{ticket.points > 0 ? `${fmt(ticket.points)}P 당첨!` : "꽝 — 내일 또 도전"}</p>}
+        {revealed && ticket && <p className={`text-[22px] font-bold ${ticket.points > 0 ? "text-[#ff8a3d]" : "text-[#8b94a0]"}`}>{ticket.points > 0 ? `${fmt(ticket.points)}P 당첨!` : "꽝 — 내일 또 도전"}</p>}
         {!ticket ? (
           <button type="button" disabled={busy || left === 0} onClick={() => void buy()} className="myb-press h-[52px] w-full rounded-xl bg-[var(--color-myb)] text-[16px] font-bold text-white disabled:opacity-40">{left === 0 ? "오늘은 다 긁었어요" : "오늘의 복권 받기 (무료)"}</button>
         ) : revealed ? (

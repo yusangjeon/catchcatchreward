@@ -131,7 +131,7 @@ export default function HomePage() {
         </span>
         <div className="absolute bottom-[14px] right-3"><Mascot size={124} /></div>
         <p className="pr-[120px] text-[14px] font-medium text-ink-2">오늘도 만나서 반가워요</p>
-        <p className="mt-1 pr-[120px] text-[22px] font-extrabold leading-[30px]">
+        <p className="mt-1 pr-[120px] text-[22px] font-bold leading-[30px]">
           <span className="text-myb">{data?.newbie.active ? `${data.newbie.dayNo}일차 퀴즈 ${data.newbie.goal}개` : "오늘의 퀴즈 3개"}</span>로<br />시작해요!
         </p>
         {(() => {
@@ -210,10 +210,10 @@ export default function HomePage() {
                   </div>
                   <p className="mt-2.5 text-[12px] text-muted">{p.brand}</p>
                   <p className="mt-0.5 text-[15px] font-medium">{p.name}</p>
-                  <p className="mt-1 flex items-center gap-1 text-[16px] font-extrabold"><PCoin size={16} />{p.price}</p>
+                  <p className="mt-1 flex items-center gap-1 text-[16px] font-bold"><PCoin size={16} />{p.price}</p>
                 </Link>
               ))}
-              <span className="pointer-events-none absolute left-1/2 top-[90px] flex h-[38px] w-[38px] -translate-x-1/2 items-center justify-center rounded-full bg-gold text-[12px] font-black text-ink shadow-[0_3px_8px_rgba(40,24,14,.18)]">VS</span>
+              <span className="pointer-events-none absolute left-1/2 top-[90px] flex h-[38px] w-[38px] -translate-x-1/2 items-center justify-center rounded-full bg-gold text-[12px] font-extrabold text-ink shadow-[0_3px_8px_rgba(40,24,14,.18)]">VS</span>
             </div>
           </>
         )}
@@ -225,7 +225,7 @@ export default function HomePage() {
               </div>
               <p className="mt-2.5 text-[12px] text-muted">{p.brand}</p>
               <p className="mt-0.5 truncate text-[15px] font-medium">{p.name}</p>
-              <p className="mt-1 flex items-center gap-1 text-[16px] font-extrabold"><PCoin size={16} />{fmt(p.points)}</p>
+              <p className="mt-1 flex items-center gap-1 text-[16px] font-bold"><PCoin size={16} />{fmt(p.points)}</p>
             </Link>
           ))}
         </div>
@@ -293,7 +293,7 @@ export default function HomePage() {
           <div className="myb-fade-in fixed inset-0 z-[999] bg-black/60" onClick={() => setWelcome(false)} />
           <div className="myb-modal-in fixed bottom-0 left-1/2 z-[1000] w-full max-w-[430px] -translate-x-1/2 rounded-t-[24px] bg-white px-6 pb-8 pt-7 text-center">
             <img src="/brand/coins.webp" alt="" className="mx-auto h-[120px] w-[120px]" />
-            <p className="mt-2 text-[22px] font-extrabold">환영해요! 가입 보너스 <span className="text-myb">{fmt(data.welcome.points)}P</span></p>
+            <p className="mt-2 text-[22px] font-bold">환영해요! 가입 보너스 <span className="text-myb">{fmt(data.welcome.points)}P</span></p>
             <p className="mt-2 text-[13px] leading-[19px] text-muted">
               {data.starter.active ? `지금부터 ${Math.max(1, Math.ceil((new Date(data.starter.endsAt).getTime() - Date.now()) / 86400_000))}일 동안 퀴즈 보상이 2배예요.` : "취향 퀴즈 풀고 포인트 받아보세요."}<br />
               매일 출석하고 러쉬 미션으로 스탬프를 모으면 룰렛도 돌릴 수 있어요.
@@ -319,7 +319,7 @@ function QuickMenu({ items, attended, onTap }: { items: typeof QUICK; attended: 
               {qk.tip && <span className="absolute -top-0 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-myb px-2.5 py-1 text-[11px] font-bold text-white after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-myb">{qk.tip}</span>}
               {qk.key === "attend" && attended && <span className="absolute right-2 top-[22px] flex h-4 w-4 items-center justify-center rounded-full bg-myb text-[10px] text-white">✓</span>}
               {qk.key === "newbie" ? (
-                <span className="flex h-[48px] w-[48px] items-center justify-center rounded-full text-[15px] font-black" style={{ background: "#fff3d6", color: "#d98a00" }}>3일</span>
+                <span className="flex h-[48px] w-[48px] items-center justify-center rounded-full text-[15px] font-extrabold" style={{ background: "#fff3d6", color: "#d98a00" }}>3일</span>
               ) : (
                 <IconTile name={qk.name ?? "star"} tone={qk.tone ?? "gray"} size={48} round />
               )}

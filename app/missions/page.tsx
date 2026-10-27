@@ -63,7 +63,7 @@ export default function MissionsPage() {
         <section className="relative overflow-hidden rounded-[20px] bg-[#e2f6f8] p-5 pr-[100px]">
           <DuoIcon name="store" size={96} className="pointer-events-none absolute -bottom-3 right-2 text-[#0f9bb0]/25" />
           <p className="text-[12px] font-semibold text-[#0f9bb0]">캐치랭크 제휴 매장</p>
-          <p className="mt-1 text-[18px] font-extrabold leading-[24px]">동네 매장 방문·저장·리뷰하고<br />포인트와 스탬프 받기</p>
+          <p className="mt-1 text-[18px] font-bold leading-[24px]">동네 매장 방문·저장·리뷰하고<br />포인트와 스탬프 받기</p>
           <p className="mt-2 text-[12px] text-ink-2">완료한 미션 <b className="text-ink">{data?.doneCount ?? 0}</b>개 · 매장에서 받은 인증코드를 입력하면 바로 적립돼요</p>
         </section>
 
@@ -120,7 +120,7 @@ export default function MissionsPage() {
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\s/g, "").slice(0, 8))}
               placeholder="인증코드 입력"
-              className="mt-4 h-14 w-full rounded-xl border border-[#dee2e9] text-center text-[24px] font-extrabold tracking-[0.3em] outline-none focus:border-[var(--color-myb)]"
+              className="mt-4 h-14 w-full rounded-xl border border-[#dee2e9] text-center text-[24px] font-bold tracking-[0.3em] outline-none focus:border-[var(--color-myb)]"
             />
             <button type="button" disabled={busy || code.length < 4} onClick={() => void submit()} className="myb-press mt-4 h-[52px] w-full rounded-xl bg-[var(--color-myb)] text-[16px] font-bold text-white disabled:opacity-40">
               {busy ? "확인 중…" : `인증하고 ${fmt(target.rewardPoints)}P 받기`}

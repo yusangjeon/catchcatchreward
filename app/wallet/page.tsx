@@ -56,7 +56,7 @@ export default function WalletPage() {
         <section className="animate-pop">
           <h2 className="mt-[36px] flex items-center gap-1.5 text-[17px] font-bold">총 보상 잔액 <Info /></h2>
           <div className="mt-[18px] flex items-center justify-between">
-            <p className="flex items-center gap-2"><PXCoin size={30} /><span className="text-[26px] font-extrabold tabular-nums"><NumberFlow value={balance} /> 원</span></p>
+            <p className="flex items-center gap-2"><PXCoin size={30} /><span className="text-[26px] font-bold tabular-nums"><NumberFlow value={balance} /> 원</span></p>
             <Link href="/history" className="flex items-center text-[13px] text-muted">내역 <ChevronRight size={15} /></Link>
           </div>
           <Link href="/roulette" className="mt-[14px] flex h-[42px] items-center justify-between rounded-xl border border-line px-3 text-[12px]">
@@ -70,7 +70,7 @@ export default function WalletPage() {
 
           <Link href="/shop" className="mt-[30px] flex h-[46px] items-center justify-between rounded-xl bg-[#e8f1ff] px-4 text-[13px]">
             <span className="flex items-center gap-1.5"><DuoIcon name="bag" size={18} className="text-[#2f6fed]" /> 쇼핑 방문 적립</span>
-            <span className="flex items-center gap-1 text-[14px] font-extrabold"><PCoinPink size={16} />하루 5P <ChevronRight size={15} className="text-muted" /></span>
+            <span className="flex items-center gap-1 text-[14px] font-bold"><PCoinPink size={16} />하루 5P <ChevronRight size={15} className="text-muted" /></span>
           </Link>
 
           <Link href="/exchange" className="mt-2 flex h-[84px] items-center justify-between rounded-2xl border border-line px-4">
@@ -78,7 +78,7 @@ export default function WalletPage() {
               <p className="flex items-center gap-2 text-[14px] font-bold text-[#c98a00]">
                 <span className="rounded-full border border-[#e3a300] px-2 py-0.5 text-[11px]">교환</span> 포인트로 상품 교환
               </p>
-              <p className="mt-1.5 flex items-center gap-1 whitespace-nowrap text-[18px] font-extrabold"><DuoIcon name="ticket" size={22} className="text-[#2f6fed]" /> {fmt(balance)}P <span className="ml-1 text-[12px] font-medium text-ink-2">최소 1,000P부터</span></p>
+              <p className="mt-1.5 flex items-center gap-1 whitespace-nowrap text-[18px] font-bold"><DuoIcon name="ticket" size={22} className="text-[#2f6fed]" /> {fmt(balance)}P <span className="ml-1 text-[12px] font-medium text-ink-2">최소 1,000P부터</span></p>
             </div>
             <ChevronRight className="text-muted" />
           </Link>
@@ -100,7 +100,7 @@ export default function WalletPage() {
           <h2 className="mt-[34px] text-[18px] font-bold">인기 브랜드 상품을 모아봤어요</h2>
           <div className="no-scrollbar mt-[18px] flex gap-[14px] overflow-x-auto">
             {BRANDS.map((b, i) => (
-              <span key={b.name} className={`flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-white text-center text-[9px] font-extrabold shadow-sm ${b.bg ?? ""} ${i === 0 ? "ring-2 ring-myb ring-offset-2" : ""}`}>
+              <span key={b.name} className={`flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-white text-center text-[9px] font-bold shadow-sm ${b.bg ?? ""} ${i === 0 ? "ring-2 ring-myb ring-offset-2" : ""}`}>
                 {b.icon ? <IconTile name={b.icon} tone={b.tone ?? "gray"} size={58} round /> : b.img ? <img src={b.img} alt={b.name} className="h-full w-full object-cover" /> : <span className="text-[24px]">{b.label}</span>}
               </span>
             ))}
@@ -175,7 +175,7 @@ function AssetRow({ icon, name, value }: { icon: React.ReactNode; name: string; 
         <span className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-bg-2">{icon}</span>
         <div>
           <p className="flex items-center gap-0.5 text-[12px] text-muted">{name} <ChevronRight size={13} /></p>
-          <p className="text-[18px] font-extrabold tabular-nums">{value}</p>
+          <p className="text-[18px] font-bold tabular-nums">{value}</p>
         </div>
       </div>
       <Link href="/exchange" className="flex h-8 items-center rounded-lg bg-myb px-4 text-[13px] font-bold text-white">교환</Link>

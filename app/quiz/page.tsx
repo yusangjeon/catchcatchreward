@@ -81,7 +81,7 @@ export default function QuizTabPage() {
                   </span>
                   <span className="min-w-0 flex-1">
                     <p className="line-clamp-2 text-[15px] font-medium leading-[1.4]">{s.title}</p>
-                    <p className="mt-1.5 flex items-center gap-1 text-[16px] font-extrabold"><PCoin size={16} />{fmt(s.rewardPoints)} <span className="ml-1 text-[12px] font-normal text-muted">| {fmt(s.participants)}명 참여</span></p>
+                    <p className="mt-1.5 flex items-center gap-1 text-[16px] font-bold"><PCoin size={16} />{fmt(s.rewardPoints)} <span className="ml-1 text-[12px] font-normal text-muted">| {fmt(s.participants)}명 참여</span></p>
                   </span>
                   <HeartIcon size={24} className="shrink-0 text-[#dfe3ea]" />
                 </Link>

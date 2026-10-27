@@ -39,7 +39,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             role="status"
             className={`myb-toast ${t.leaving ? "myb-toast-out" : "myb-toast-in"} pointer-events-auto flex w-fit items-center justify-center gap-[10px] rounded-[100px] bg-ink py-3 pl-3 pr-[26px] text-[14px] font-medium text-white`}
           >
-            {t.icon === "info" ? <span className="mr-[10px] flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-white/15 text-[16px] font-extrabold">!</span> : <PCoin size={30} className="mr-[10px] shrink-0" />}
+            {t.icon === "info" ? <span className="mr-[10px] flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-white/15 text-[16px] font-bold">!</span> : <PCoin size={30} className="mr-[10px] shrink-0" />}
             {t.text}
           </div>
         ))}

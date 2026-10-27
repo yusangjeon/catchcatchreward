@@ -19,7 +19,7 @@ export function Banners({ slides, className }: { slides: BannerSlide[]; classNam
           <SwiperSlide key={b.title}>
             <Link href={b.href} className={`flex h-full items-center justify-between pl-4 pr-3 ${b.dark ? "text-white" : "text-ink"}`} style={{ background: b.bg }}>
               <span>
-                <p className="text-[14px] font-extrabold leading-[18px]">{b.title}</p>
+                <p className="text-[14px] font-bold leading-[18px]">{b.title}</p>
                 <p className={`mt-0.5 text-[11px] leading-[14px] ${b.dark ? "text-white/80" : "text-ink-2"}`}>{b.sub}</p>
               </span>
               {b.icon ? <IconTile name={b.icon} tone={b.tone ?? "blue"} size={48} round /> : <img src={b.img} alt="" className="h-[56px] w-[56px] object-contain" draggable={false} />}

@@ -6,6 +6,12 @@ import { PCoin, ChevronRight } from "@/components/icons";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { Countdown } from "@/components/motion/Countdown";
 import { useHome, fmt } from "@/hooks/useHome";
+import { useEffect, useState } from "react";
+import type { BenefitGame } from "@/lib/benefit/types";
+import type { SurveyItem } from "@/lib/survey/types";
+import type { CpqItem } from "@/lib/cpq/types";
+
+/* eslint-disable @next/next/no-img-element */
 
  
 
@@ -22,15 +28,17 @@ const EARN: { name: DuoName; tone: Tone; title: string; sub: string; href: strin
   { name: "bag", tone: "blue", title: "쇼핑 방문 적립", sub: "제휴 쇼핑몰 방문만 해도 하루 5P", href: "/shop" },
 ];
 
-const SOON: { name: DuoName; title: string; sub: string; href: string }[] = [
-  { name: "gamepad", title: "게임적립", sub: "게임 설치·플레이 보상", href: "/game" },
-  { name: "chat", title: "설문 보상", sub: "설문 참여하고 포인트", href: "/survey" },
-  { name: "bolt", title: "초간단적립", sub: "앱 설치·가입 참여", href: "/cpq" },
-];
+interface Offers { games: BenefitGame[]; surveys: SurveyItem[]; surveyTotal: number; cpq: CpqItem[] }
 
 /** 혜택 탭 — 우리 기능 허브(오늘 할 일 · 진행 중 이벤트 · 적립 메뉴 · 준비 중 제휴) */
 export default function BenefitsPage() {
   const { data } = useHome();
+  const [offers, setOffers] = useState<Offers | null>(null);
+  useEffect(() => {
+    Promise.all([fetch("/api/game").then((r) => r.json()), fetch("/api/survey").then((r) => r.json()), fetch("/api/cpq").then((r) => r.json())])
+      .then(([g, sv, c]) => setOffers({ games: [g.hero, ...g.games], surveys: sv.hot, surveyTotal: sv.totalAvailable, cpq: c.list }))
+      .catch(() => {});
+  }, []);
   const todayDone = data?.todayDone ?? 0;
   const todo = [
     { label: `퀴즈 ${Math.min(3, todayDone)}/3`, done: todayDone >= 3, href: "/quiz", pts: "세트당 P" },
@@ -52,7 +60,7 @@ export default function BenefitsPage() {
         <section className="relative overflow-hidden rounded-[22px] p-5 text-white" style={{ background: "linear-gradient(135deg,#2f6fed 0%,#5b8cff 70%,#7fa6ff 100%)", boxShadow: "0 10px 28px rgba(47,111,237,.28)" }}>
           <DuoIcon name="sparkle" size={96} className="pointer-events-none absolute -right-2 -top-3 text-white/25" />
           <p className="text-[13px] font-medium text-white/85">{data?.newbie.active ? `${data.newbie.dayNo}일차 · 3일 혜택 진행 중` : "오늘 할 일"}</p>
-          <p className="mt-1 text-[22px] font-extrabold leading-[28px]">오늘 다 하면<br />최대 {fmt(data?.newbie.active ? 300 + 10 + 30 + 60 : 10 + 30 + 60)}P 이상</p>
+          <p className="mt-1 text-[22px] font-bold leading-[28px]">오늘 다 하면<br />최대 {fmt(data?.newbie.active ? 300 + 10 + 30 + 60 : 10 + 30 + 60)}P 이상</p>
           <ul className="mt-4 flex flex-col gap-2">
             {todo.map((t) => (
               <li key={t.label}>
@@ -72,18 +80,18 @@ export default function BenefitsPage() {
             {data?.newbie.active && (
               <Link href="/newbie" className="flex w-[220px] shrink-0 flex-col justify-between rounded-[18px] bg-white p-4" style={{ boxShadow: CARD_SHADOW }}>
                 <span className="w-fit rounded-full bg-gold-soft px-2 py-0.5 text-[11px] font-bold text-[#9a5b00]">신규 유저</span>
-                <p className="mt-2 text-[16px] font-extrabold">3일 혜택 최대 {fmt(data.newbie.totalMax)}P</p>
+                <p className="mt-2 text-[16px] font-bold">3일 혜택 최대 {fmt(data.newbie.totalMax)}P</p>
                 <p className="mt-1 text-[12px] text-ink-2">{data.newbie.dayNo}일차 퀴즈 {data.newbie.doneToday}/{data.newbie.goal}{data.newbie.claimableCount > 0 ? " · 받을 보상 있음" : ""}</p>
               </Link>
             )}
             <Link href="/rush" className="flex w-[220px] shrink-0 flex-col justify-between rounded-[18px] bg-white p-4" style={{ boxShadow: CARD_SHADOW }}>
               <span className="flex items-center justify-between"><span className="w-fit rounded-full bg-myb-soft px-2 py-0.5 text-[11px] font-bold text-myb-dark">주간 러쉬</span>{data && <Countdown endsAt={data.rushEndsAt} compact />}</span>
-              <p className="mt-2 text-[16px] font-extrabold">스탬프 {data?.rush.stamps ?? 0}/{data?.rush.total ?? 7}</p>
+              <p className="mt-2 text-[16px] font-bold">스탬프 {data?.rush.stamps ?? 0}/{data?.rush.total ?? 7}</p>
               <p className="mt-1 text-[12px] text-ink-2">{data && data.rush.claimable > 0 ? `받을 보상 ${data.rush.claimable}개` : "7개 모으면 300P"}</p>
             </Link>
             <Link href="/monthly" className="flex w-[220px] shrink-0 flex-col justify-between rounded-[18px] bg-white p-4" style={{ boxShadow: CARD_SHADOW }}>
               <span className="w-fit rounded-full bg-[#eeeaff] px-2 py-0.5 text-[11px] font-bold text-[#6b55e6]">월간</span>
-              <p className="mt-2 text-[16px] font-extrabold">월간 도전 과제 3,300P</p>
+              <p className="mt-2 text-[16px] font-bold">월간 도전 과제 3,300P</p>
               <p className="mt-1 text-[12px] text-ink-2">퀴즈·출석·게임·룰렛·초대</p>
             </Link>
           </div>
@@ -108,20 +116,66 @@ export default function BenefitsPage() {
           </ul>
         </section>
 
-        {/* 준비 중 */}
+        {/* 제휴 오퍼(연동 전 미리보기): 게임 · 설문 · 초간단 */}
         <section>
-          <h2 className="text-[18px] font-bold">곧 열려요 <span className="ml-1 text-[12px] font-medium text-muted">제휴사 연동 준비 중</span></h2>
-          <ul className="mt-3 grid grid-cols-3 gap-3">
-            {SOON.map((m) => (
-              <li key={m.href}>
-                <Link href={m.href} className="flex flex-col items-center rounded-[16px] bg-white px-2 py-4 text-center" style={{ boxShadow: CARD_SHADOW }}>
-                  <IconTile name={m.name} tone="gray" size={40} />
-                  <p className="mt-2 text-[13px] font-bold">{m.title}</p>
-                  <p className="mt-0.5 text-[11px] text-muted">{m.sub}</p>
+          <div className="flex items-end justify-between">
+            <h2 className="text-[18px] font-bold">게임하고 적립 <span className="ml-1 text-[12px] font-medium text-muted">첫 미션 +1,000P</span></h2>
+            <Link href="/game" className="text-[13px] font-semibold text-ink-2">전체보기 ›</Link>
+          </div>
+          <div className="no-scrollbar -mx-5 mt-3 flex gap-3 overflow-x-auto px-5">
+            {(offers?.games ?? []).slice(0, 6).map((g) => (
+              <Link key={g.id} href={`/game/${g.id}`} className="w-[132px] shrink-0 rounded-[18px] bg-white p-3" style={{ boxShadow: CARD_SHADOW }}>
+                <img src={g.icon} alt="" width={108} height={108} className="h-[108px] w-[108px] rounded-[16px] object-cover" />
+                <p className="mt-2 truncate text-[13px] font-bold">{g.title}</p>
+                <p className="truncate text-[11px] text-ink-2">{g.missionText}</p>
+                <p className="mt-1 flex items-center gap-1 text-[13px] font-bold text-myb-dark"><PCoin size={13} />{fmt(g.missionPoint + g.bonusPoint)}</p>
+              </Link>
+            ))}
+            {!offers && [0, 1, 2].map((i) => <div key={i} className="h-[196px] w-[132px] shrink-0 animate-pulse rounded-[18px] bg-white" />)}
+          </div>
+        </section>
+
+        <section>
+          <div className="flex items-end justify-between">
+            <h2 className="text-[18px] font-bold">설문 보상 <span className="ml-1 text-[12px] font-medium text-muted">오늘 {fmt(offers?.surveyTotal ?? 0)}P 가능</span></h2>
+            <Link href="/survey" className="text-[13px] font-semibold text-ink-2">전체보기 ›</Link>
+          </div>
+          <ul className="mt-3 flex flex-col gap-2.5">
+            {(offers?.surveys ?? []).slice(0, 3).map((sv) => (
+              <li key={sv.id}>
+                <Link href="/survey" className="flex items-center gap-3 rounded-[18px] bg-white p-3.5" style={{ boxShadow: CARD_SHADOW }}>
+                  <IconTile name="doc" tone="violet" size={44} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[14px] font-bold">{sv.title}</span>
+                    <span className="mt-0.5 block text-[11px] text-muted">약 {Math.max(1, sv.loi)}분</span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1 text-[15px] font-bold text-myb-dark"><PCoin size={16} />{fmt(sv.reward)}</span>
                 </Link>
               </li>
             ))}
           </ul>
+        </section>
+
+        <section>
+          <div className="flex items-end justify-between">
+            <h2 className="text-[18px] font-bold">초간단 적립 <span className="ml-1 text-[12px] font-medium text-muted">1분 미션</span></h2>
+            <Link href="/cpq" className="text-[13px] font-semibold text-ink-2">전체보기 ›</Link>
+          </div>
+          <ul className="mt-3 flex flex-col gap-2.5">
+            {(offers?.cpq ?? []).slice(0, 3).map((c) => (
+              <li key={c.id}>
+                <Link href="/cpq" className="flex items-center gap-3 rounded-[18px] bg-white p-3.5" style={{ boxShadow: CARD_SHADOW }}>
+                  <img src={c.icon} alt="" width={44} height={44} className="h-11 w-11 shrink-0 rounded-[12px] bg-bg-2 object-cover" />
+                  <span className="min-w-0 flex-1">
+                    <span className="inline-block rounded-full bg-bg-2 px-2 py-0.5 text-[10px] font-bold text-ink-2">{c.type}</span>
+                    <span className="mt-1 block truncate text-[14px] font-bold">{c.title}</span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1 text-[15px] font-bold text-myb-dark"><PCoin size={16} />+{fmt(c.price)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-center text-[11px] text-muted">게임·설문·초간단 적립은 제휴사 연동 전 미리보기예요</p>
         </section>
       </div>
     </div>

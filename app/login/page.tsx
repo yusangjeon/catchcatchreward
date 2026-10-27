@@ -9,7 +9,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <div className="min-h-dvh bg-white px-6 pb-10 pt-14 text-[#191f28]">
       <Link href="/" className="text-[14px] text-[#8b94a0]">← 홈</Link>
-      <h1 className="mt-8 text-[26px] font-extrabold leading-[34px]">로그인하면<br />포인트를 안전하게 지켜요</h1>
+      <h1 className="mt-8 text-[26px] font-bold leading-[34px]">로그인하면<br />포인트를 안전하게 지켜요</h1>
       <p className="mt-3 text-[14px] leading-[21px] text-[#5c6573]">지금까지 모은 포인트·스탬프·배지는 로그인해도 그대로 이어져요. 폰을 바꿔도, 앱을 지워도 계정으로 돌아옵니다.</p>
       {error && <p className="mt-4 rounded-xl bg-[#ffecf1] px-4 py-3 text-[13px] text-[#ff3d71]">{error === "not_configured" ? "카카오 로그인이 아직 설정되지 않았어요." : error === "state" ? "로그인 요청이 만료됐어요. 다시 시도해 주세요." : "로그인에 실패했어요. 다시 시도해 주세요."}</p>}
       <div className="mt-8 flex flex-col gap-3">
