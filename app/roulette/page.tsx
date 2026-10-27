@@ -16,7 +16,7 @@ import type { PublicPrize, RoulettePayload, SpinResult } from "@/lib/roulette/ty
 /* eslint-disable @next/next/no-img-element */
 
 /**
- * 룰렛 — 첫 1회 무료, 이후 스탬프 10개 = 1회. 결과는 서버(/api/roulette/spin)가 정하고 휠은 그 조각으로 멈추는 연출만 한다.
+ * 룰렛 — 하루 1회 무료, 이후 스탬프 10개 = 1회. 결과는 서버(/api/roulette/spin)가 정하고 휠은 그 조각으로 멈추는 연출만 한다.
  * 연출: rAF 로 각도를 직접 굴리며(당김 → 가속 → 긴 감속 → 살짝 넘겼다 되돌아옴) 조각 경계를 지날 때마다 포인터가 튕기고 틱 소리·진동.
  *      림 전구 24개가 도는 동안 체이스, 당첨 시 전체 점멸 + 당첨 조각 펄스 + 컨페티/코인/보상 오버레이. 꽝은 휠 흔들림 + 멋쩍은 마스코트.
  */
@@ -149,11 +149,11 @@ export default function RoulettePage() {
         <section className="relative overflow-hidden rounded-[24px] px-4 pb-5 pt-5" style={{ background: "linear-gradient(180deg,#1b2440 0%,#2b3a67 100%)", boxShadow: "0 10px 30px rgba(27,36,64,.25)" }}>
           <div className="flex items-center justify-between text-white">
             <div>
-              <p className="text-[12px] font-semibold text-white/70">{data?.freeSpin ? "첫 룰렛은 무료예요" : `스탬프 ${needed}개 = 1회`}</p>
+              <p className="text-[12px] font-semibold text-white/70">{data?.freeSpin ? "오늘 무료 1회 · 추가는 스탬프 10개" : `스탬프 ${needed}개 = 1회`}</p>
               <p className="mt-0.5 text-[18px] font-bold">최대 <span className="text-[#ffd45c]">편의점 5,000원권</span></p>
             </div>
             <span className={`flex h-[30px] items-center gap-1.5 rounded-full px-3 text-[12px] font-bold ${data?.canSpin ? "bg-[#ffd45c] text-[#5a3300]" : "bg-white/15 text-white"}`}>
-              <DuoIcon name="ticket" size={14} />{data ? (data.freeSpin ? "무료 1회" : `${Math.floor(stamps / needed)}회 가능`) : "—"}
+              <DuoIcon name="ticket" size={14} />{data ? (data.freeSpin ? "오늘 무료 1회" : `${Math.floor(stamps / needed)}회 가능`) : "—"}
             </span>
           </div>
 
@@ -222,7 +222,7 @@ export default function RoulettePage() {
             disabled={!data || spinning}
             className={`myb-press mt-5 flex h-[54px] w-full items-center justify-center gap-2 rounded-[14px] text-[16px] font-bold transition ${!data || spinning ? "bg-white/20 text-white/70" : data.canSpin ? "bg-[var(--color-myb)] text-white shadow-[0_6px_18px_rgba(255,90,45,.45)]" : "bg-white/15 text-white"}`}
           >
-            {spinning ? "돌아가는 중…" : !data ? "불러오는 중" : data.freeSpin ? "무료로 돌리기" : data.canSpin ? `룰렛 돌리기 · 스탬프 ${needed}개 사용` : `스탬프 ${left}개 더 모으면 돌릴 수 있어요`}
+            {spinning ? "돌아가는 중…" : !data ? "불러오는 중" : data.freeSpin ? "오늘의 무료 룰렛 돌리기" : data.canSpin ? `룰렛 돌리기 · 스탬프 ${needed}개 사용` : `스탬프 ${left}개 더 모으면 돌릴 수 있어요`}
           </button>
           {error && <p className="mt-2 text-center text-[13px] text-[#ffb4a6]">{error}</p>}
         </section>

@@ -38,7 +38,7 @@ export const RUSH_MISSIONS: MissionDef[] = [
   { key: "quiz10", metric: "quiz", title: "퀴즈", stepTitle: "퀴즈 10개 완료하기", hintLabel: "퀴즈 완료", value: 10, reward: 20, action: "link", href: "/quiz", icon: "quiz" },
   { key: "roulette1", metric: "roulette", title: "룰렛", stepTitle: "무료 룰렛 돌리기", hintLabel: "룰렛 참여", value: 1, reward: 20, action: "link", href: "/roulette", icon: "gamepad" },
   { key: "game3", metric: "game", title: "미니게임", stepTitle: "미니게임 3회 하기", hintLabel: "게임 플레이", value: 3, reward: 20, action: "link", href: "/games", icon: "gamepad" },
-  { key: "store1", metric: "store", title: "매장미션", stepTitle: "매장 미션 완료하기", hintLabel: "매장 미션", value: 1, reward: 30, action: "link", href: "/missions", icon: "pin" },
+  { key: "store1", metric: "store", title: "플레이스 방문", stepTitle: "플레이스 방문하기 완료", hintLabel: "플레이스 방문", value: 1, reward: 30, action: "link", href: "/missions", icon: "pin" },
   { key: "invite1", metric: "invite", title: "친구초대", stepTitle: "친구 1명 초대하기", hintLabel: "초대 완료", value: 1, reward: 50, action: "link", href: "/invite", icon: "people" },
 ];
 
@@ -67,7 +67,7 @@ async function metrics(userId: string, w: KstWeek): Promise<Record<Metric, numbe
     attendance: stamps.filter((s) => s.sourceType === "attendance" && s.sourceId && days.has(s.sourceId)).length,
     quiz: completions.filter((c) => inRange(c.completedAt, w)).length,
     roulette: spins.filter((s) => inRange(s.spunAt, w)).length,
-    game: games.filter((g) => g.game !== "walk" && inRange(g.createdAt, w)).length,
+    game: games.filter((g) => g.game !== "walk" && g.game !== "roulette" && inRange(g.createdAt, w)).length,
     store: store.filter((c) => inRange(c.completedAt, w)).length,
     invite: invites.filter((r) => inRange(r.createdAt, w)).length,
   };

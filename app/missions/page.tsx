@@ -7,17 +7,20 @@ import { useCallback, useEffect, useState } from "react";
 import { PCoin } from "@/components/icons";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { useToast } from "@/components/motion/Toast";
+import { usePreviewTap } from "@/components/offers/Preview";
 import { fmt } from "@/hooks/useHome";
 import type { MissionsPayload, PublicStoreMission } from "@/lib/missions/service";
+import type { PublicCatchMission } from "@/lib/missions/catchmission";
 
 /* eslint-disable @next/next/no-img-element */
 
 const KIND_COLOR: Record<string, string> = { visit: "bg-[var(--color-myb-soft)] text-[var(--color-myb)]", save: "bg-[#e9f7ef] text-[#1aa260]", review: "bg-[var(--color-myb-soft)] text-[var(--color-myb)]" };
 
-/** 매장 미션 — 캐치랭크 제휴 매장 방문·저장·리뷰. 인증코드 입력으로 완료 */
+/** 플레이스 방문하기 — ① 캐치미션(파트너 앱 송출 미션, 포스트백 적립) ② 캐치랭크 제휴 매장 인증코드 미션 */
 export default function MissionsPage() {
   const router = useRouter();
   const { show } = useToast();
+  const [tab, setTab] = useState<"catch" | "store">("catch");
   const [data, setData] = useState<MissionsPayload | null>(null);
   const [target, setTarget] = useState<PublicStoreMission | null>(null);
   const [code, setCode] = useState("");
@@ -52,7 +55,7 @@ export default function MissionsPage() {
         <button type="button" onClick={() => router.back()} aria-label="뒤로" className="flex h-7 w-7 items-center justify-center">
           <img src="/brand/ic_left.svg" width={28} height={28} alt="" className="h-7 w-7" />
         </button>
-        <h1 className="text-[18px] font-semibold">매장 미션</h1>
+        <h1 className="text-[18px] font-semibold">플레이스 방문하기</h1>
         <Link href="/wallet" className="flex items-center gap-[6px]">
           <PCoin size={18} />
           <span className="text-[18px] font-semibold leading-[18px] text-[#33363f]">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span>
@@ -61,13 +64,36 @@ export default function MissionsPage() {
 
       <div className="flex flex-col gap-4 px-6 pt-[64px]">
         <section className="relative overflow-hidden rounded-[20px] bg-[#e2f6f8] p-5 pr-[100px]">
-          <DuoIcon name="store" size={96} className="pointer-events-none absolute -bottom-3 right-2 text-[#0f9bb0]/25" />
-          <p className="text-[12px] font-semibold text-[#0f9bb0]">캐치랭크 제휴 매장</p>
-          <p className="mt-1 text-[18px] font-bold leading-[24px]">동네 매장 방문·저장·리뷰하고<br />포인트와 스탬프 받기</p>
-          <p className="mt-2 text-[12px] text-ink-2">완료한 미션 <b className="text-ink">{data?.doneCount ?? 0}</b>개 · 매장에서 받은 인증코드를 입력하면 바로 적립돼요</p>
+          <DuoIcon name="pin" size={96} className="pointer-events-none absolute -bottom-3 right-2 text-[#0f9bb0]/25" />
+          <p className="text-[12px] font-semibold text-[#0f9bb0]">캐치미션 · 캐치랭크 제휴</p>
+          <p className="mt-1 text-[18px] font-bold leading-[24px]">플레이스 찾고 방문하면<br />미션마다 포인트와 스탬프</p>
+          <p className="mt-2 text-[12px] text-ink-2">오늘 적립 <b className="text-ink">{fmt(data?.catch.todayPoints ?? 0)}P</b> · 완료한 미션 <b className="text-ink">{(data?.catch.totalDone ?? 0) + (data?.doneCount ?? 0)}</b>개</p>
         </section>
 
-        <ul className="flex flex-col gap-3">
+        <div className="flex rounded-[14px] bg-[var(--color-bg-3)] p-1">
+          {([["catch", "캐치미션"], ["store", "매장 인증"]] as const).map(([k, label]) => (
+            <button key={k} type="button" onClick={() => setTab(k)} className={`h-10 flex-1 rounded-[11px] text-[14px] font-bold transition-colors ${tab === k ? "bg-white text-ink shadow-[0_2px_8px_rgba(0,0,0,.06)]" : "text-[#8b94a0]"}`}>{label}</button>
+          ))}
+        </div>
+
+        {tab === "catch" && (
+          <>
+            <ul className="flex flex-col gap-3">
+              {(data?.catch.items ?? []).map((m) => <CatchRow key={m.id} m={m} ready={!!data?.catch.partnerReady} />)}
+              {!data && [0, 1, 2, 3].map((i) => <li key={i} className="h-[84px] animate-pulse rounded-[18px] bg-white" />)}
+            </ul>
+            <section className="rounded-[16px] bg-[var(--color-bg-3)] p-4 text-[12px] leading-[18px] text-[#5c6573]">
+              <p className="font-semibold text-[#33363f]">캐치미션 안내</p>
+              <ul className="mt-1 list-disc pl-4">
+                <li>참여하기를 누르면 캐치미션에서 미션을 진행해요. 성공하면 몇 초 안에 여기 포인트로 들어와요.</li>
+                <li>미션마다 하루 참여 횟수 제한이 있어요. 같은 미션 결과는 한 번만 적립돼요.</li>
+                {data && !data.catch.partnerReady && <li>지금은 미리보기예요. 제휴 연동이 끝나면 바로 참여할 수 있어요.</li>}
+              </ul>
+            </section>
+          </>
+        )}
+
+        {tab === "store" && <ul className="flex flex-col gap-3">
           {(data?.missions ?? []).map((m) => (
             <li key={m.id} className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
               <div className="flex items-center justify-between">
@@ -95,16 +121,18 @@ export default function MissionsPage() {
             </li>
           ))}
           {!data && [0, 1, 2].map((i) => <li key={i} className="h-[150px] animate-pulse rounded-[20px] bg-white" />)}
-          {data && data.missions.length === 0 && <li className="py-10 text-center text-[14px] text-[#8b94a0]">진행 중인 매장 미션이 없어요</li>}
-        </ul>
+          {data && data.missions.length === 0 && <li className="py-10 text-center text-[14px] text-[#8b94a0]">진행 중인 매장 인증 미션이 없어요</li>}
+        </ul>}
 
-        <section className="rounded-[16px] bg-[var(--color-bg-3)] p-4 text-[12px] leading-[18px] text-[#5c6573]">
-          <p className="font-semibold text-[#33363f]">유의사항</p>
-          <ul className="mt-1 list-disc pl-4">
-            <li>미션은 매장당 1회만 참여할 수 있어요.</li>
-            <li>인증코드는 매장 안내문 또는 직원에게 확인하세요. 코드 공유·무단 사용 시 보상이 회수돼요.</li>
-          </ul>
-        </section>
+        {tab === "store" && (
+          <section className="rounded-[16px] bg-[var(--color-bg-3)] p-4 text-[12px] leading-[18px] text-[#5c6573]">
+            <p className="font-semibold text-[#33363f]">유의사항</p>
+            <ul className="mt-1 list-disc pl-4">
+              <li>미션은 매장당 1회만 참여할 수 있어요.</li>
+              <li>인증코드는 매장 안내문 또는 직원에게 확인하세요. 코드 공유·무단 사용 시 보상이 회수돼요.</li>
+            </ul>
+          </section>
+        )}
       </div>
 
       {target && (
@@ -129,5 +157,30 @@ export default function MissionsPage() {
         </>
       )}
     </div>
+  );
+}
+
+/** 캐치미션 행 — 아이콘 타일 + 제목/설명 + 보상 + 참여하기(파트너 링크 새 탭, 미연동이면 안내) */
+function CatchRow({ m, ready }: { m: PublicCatchMission; ready: boolean }) {
+  const preview = usePreviewTap();
+  const left = Math.max(0, m.dailyLimit - m.todayDone);
+  const soldOut = left === 0;
+  const button = soldOut ? (
+    <span className="flex h-9 items-center rounded-lg bg-[var(--color-bg-3)] px-3 text-[12px] font-bold text-[#b0b8c1]">오늘 마감</span>
+  ) : ready && m.href ? (
+    <a href={m.href} target="_blank" rel="noopener noreferrer" className="myb-press flex h-9 items-center rounded-lg bg-[var(--color-myb)] px-3.5 text-[13px] font-bold text-white">참여하기</a>
+  ) : (
+    <button type="button" onClick={preview} className="myb-press flex h-9 items-center rounded-lg bg-[var(--color-myb)] px-3.5 text-[13px] font-bold text-white">참여하기</button>
+  );
+  return (
+    <li className="flex items-center gap-3 rounded-[18px] bg-white p-4" style={{ boxShadow: "0 4px 14px rgba(40,24,14,.06)" }}>
+      <IconTile name={m.icon} tone={m.tone} size={48} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[15px] font-bold text-ink">{m.title}</p>
+        <p className="mt-0.5 truncate text-[12px] text-[#8b94a0]">{m.sub}</p>
+        <p className="mt-1 flex items-center gap-1 text-[13px] font-bold text-[var(--color-myb)]"><PCoin size={14} />{m.points}P <span className="font-medium text-[#8b94a0]">· 오늘 {m.todayDone}/{m.dailyLimit}회</span></p>
+      </div>
+      {button}
+    </li>
   );
 }

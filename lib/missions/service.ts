@@ -1,6 +1,7 @@
 import "server-only";
 import { getRepo } from "@/lib/db";
 import type { StoreMissionKind, Wallet } from "@/lib/types";
+import { getCatchMissions, type CatchSummary } from "./catchmission";
 
 /**
  * 매장 미션(캐치랭크 Axis A 연결) — 매장 인증코드 입력으로 완료.
@@ -31,6 +32,7 @@ export interface PublicStoreMission {
 export interface MissionsPayload {
   missions: PublicStoreMission[];
   doneCount: number;
+  catch: CatchSummary; // 캐치미션(파트너 앱 송출 미션 + 포스트백 적립)
   wallet: Wallet;
 }
 
@@ -42,7 +44,7 @@ async function wallet(userId: string): Promise<Wallet> {
 
 export async function getMissions(userId: string): Promise<MissionsPayload> {
   const repo = getRepo();
-  const [list, counts, mine, wal] = await Promise.all([repo.listStoreMissions(true), repo.countStoreCompletionsByMission(), repo.listStoreCompletions(userId), wallet(userId)]);
+  const [list, counts, mine, wal, catchSummary] = await Promise.all([repo.listStoreMissions(true), repo.countStoreCompletionsByMission(), repo.listStoreCompletions(userId), wallet(userId), getCatchMissions(userId)]);
   const doneIds = new Set(mine.map((c) => c.missionId));
   const missions = list.map((m) => {
     const completedCount = counts[m.id] ?? 0;
@@ -51,7 +53,7 @@ export async function getMissions(userId: string): Promise<MissionsPayload> {
       capacity: m.capacity, completedCount, done: doneIds.has(m.id), soldOut: m.capacity > 0 && completedCount >= m.capacity,
     };
   });
-  return { missions, doneCount: doneIds.size, wallet: wal };
+  return { missions, doneCount: doneIds.size, catch: catchSummary, wallet: wal };
 }
 
 export async function completeMission(userId: string, missionId: string, code: string): Promise<{ ok: true; points: number; wallet: Wallet }> {

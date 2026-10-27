@@ -15,7 +15,7 @@ export interface RoulettePayload {
   stamps: number;
   needed: number;
   canSpin: boolean;
-  freeSpin: boolean; // 첫 룰렛 1회 무료(스핀 기록 없음)
+  freeSpin: boolean; // 오늘 무료 1회 남음(KST 일 1회)
   prizes: PublicPrize[];
   history: { id: string; prizeName: string; kind: PrizeKind; value: number; spunAt: string }[];
   wallet: Wallet;

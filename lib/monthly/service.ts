@@ -14,7 +14,7 @@ export const MONTHLY_MISSIONS: MonthlyDef[] = [
   { key: "game30", metric: "game", title: "미니게임 30회", desc: "틀린그림·2048·복권·가위바위보·카드", value: 30, reward: 300, href: "/games", emoji: "🎮" },
   { key: "spot10", metric: "spot", title: "틀린그림 10레벨 완주", desc: "5개 전부 찾은 레벨 10번", value: 10, reward: 500, href: "/games/spot", emoji: "🔍" },
   { key: "roulette3", metric: "roulette", title: "룰렛 3회", desc: "스탬프 모아 무료 룰렛 3번", value: 3, reward: 200, href: "/roulette", emoji: "🎡" },
-  { key: "store3", metric: "store", title: "매장 미션 3회", desc: "동네 매장 방문·저장·리뷰", value: 3, reward: 500, href: "/missions", emoji: "📍" },
+  { key: "store3", metric: "store", title: "플레이스 방문 3회", desc: "동네 매장 방문·저장·리뷰", value: 3, reward: 500, href: "/missions", emoji: "📍" },
   { key: "invite3", metric: "invite", title: "친구 3명 초대", desc: "초대 코드로 가입한 친구 3명", value: 3, reward: 1000, href: "/invite", emoji: "🤝" },
 ];
 
@@ -45,7 +45,7 @@ async function metrics(userId: string, startsAt: string, endsAt: string): Promis
     attendance: stamps.filter((s) => s.sourceType === "attendance" && s.sourceId?.startsWith(prefix)).length,
     quiz: completions.filter((c) => inRange(c.completedAt)).length,
     roulette: spins.filter((s) => inRange(s.spunAt)).length,
-    game: games.filter((g) => g.game !== "walk" && inRange(g.createdAt)).length,
+    game: games.filter((g) => g.game !== "walk" && g.game !== "roulette" && inRange(g.createdAt)).length,
     spot: games.filter((g) => g.game === "spot" && inRange(g.createdAt) && /:5\/5:/.test(g.result)).length,
     store: store.filter((c) => inRange(c.completedAt)).length,
     invite: invites.filter((r) => inRange(r.createdAt)).length,

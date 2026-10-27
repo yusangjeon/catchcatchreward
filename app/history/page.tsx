@@ -16,7 +16,7 @@ const REASON: Record<LedgerEntry["reason"], string> = {
   quiz_bonus: "랜덤 보너스",
   mission: "미션",
   rush: "캐치 러쉬",
-  store_mission: "매장 미션",
+  store_mission: "플레이스 방문",
   roulette: "룰렛 당첨",
   redeem: "포인트 교환",
   admin_adjust: "운영 조정",

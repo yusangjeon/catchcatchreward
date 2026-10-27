@@ -156,7 +156,7 @@ export interface StoreMissionCompletion {
 export interface GamePlay {
   id: string;
   userId: string;
-  game: "spot" | "rsp" | "scratch" | "memory" | "slide" | "walk";
+  game: "spot" | "rsp" | "scratch" | "memory" | "slide" | "walk" | "roulette"; // roulette = 일일 무료 스핀 사용 기록
   dayKey: string;
   result: string; // win/draw/lose, found:5, prize:50 …
   points: number;
@@ -210,6 +210,7 @@ export interface HomePayload {
   sets: SetCard[];
   rushEndsAt: string; // 캐치 러쉬 주차 종료(ISO)
   attendedToday: boolean; // 오늘 출석체크 완료 여부(KST)
+  rouletteFree: boolean; // 오늘 무료 룰렛 남음(KST 일 1회)
   starter: { active: boolean; endsAt: string; multiplier: number }; // 뉴비 스타터팩(가입 후 3일 퀴즈 보상 2배)
   badgeProgress: { code: string; name: string; emoji: string; description: string; current: number; min: number; earned: boolean }[]; // 전체 배지 진행도
   welcome: { justNow: boolean; points: number }; // 가입 보너스(첫 방문 시 1회)

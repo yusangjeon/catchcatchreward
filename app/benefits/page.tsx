@@ -25,7 +25,7 @@ const EARN: { name: DuoName; tone: Tone; title: string; sub: string; href: strin
   { name: "gamepad", tone: "violet", title: "미니게임", sub: "2048 · 복권 · 가위바위보 · 카드 뒤집기", href: "/games" },
   { name: "wheel", tone: "amber", title: "무료 룰렛", sub: "스탬프 10개 = 1회 · 최대 편의점 5,000원", href: "/roulette" },
   { name: "people", tone: "pink", title: "친구 초대", sub: "친구 300P · 친구가 첫 퀴즈 완료하면 나는 500P", href: "/invite", chip: "500P" },
-  { name: "pin", tone: "teal", title: "매장 미션", sub: "매장 방문·저장·리뷰 인증하고 포인트 + 스탬프", href: "/missions" },
+  { name: "pin", tone: "teal", title: "플레이스 방문하기", sub: "동네 플레이스 방문·저장·리뷰 인증하고 포인트 + 스탬프", href: "/missions" },
   { name: "bag", tone: "blue", title: "쇼핑 방문 적립", sub: "제휴 쇼핑몰 방문만 해도 하루 5P", href: "/shop" },
 ];
 

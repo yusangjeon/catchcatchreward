@@ -192,7 +192,7 @@ export default function SpotPage() {
   const found = tokens.length;
   const pct = data ? (left / data.limitSec) * 100 : 100;
   const stars = result ? (result.all ? (result.speedBonus ? 3 : 2) : result.found >= 3 ? 1 : 0) : 0;
-  const renderImage = (src: string, label: string, blur: boolean, top: boolean) => (
+  const renderImage = (src: string, label: string, blur: boolean) => (
     <div className={`relative mx-auto overflow-hidden rounded-[14px] bg-[#e5e8ee] ${shake ? "spot-shake" : ""}`} style={dim ? { width: dim.w, height: dim.h, boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" } : { aspectRatio: "1024 / 688", boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }} onClick={tap}>
       <img src={src} alt={label} draggable={false} onLoad={() => setImgReady((n) => n + 1)} className={`block h-full w-full select-none transition-[filter] duration-300 ${blur ? "blur-[6px]" : ""}`} />
       {marks.map((m) => (
@@ -218,7 +218,6 @@ export default function SpotPage() {
         <span key={f.k} className={`spot-float pointer-events-none absolute whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-bold text-white shadow-md ${f.ok ? "bg-[#22c55e]" : "bg-[#ff3b6b]"}`} style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%` }}>{f.text}</span>
       ))}
       {flash && <span className="spot-flash pointer-events-none absolute inset-0 bg-[#ff3b6b]" />}
-      <span className={`absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[11px] font-bold text-white ${top ? "bg-black/45" : "bg-[var(--color-myb)]"}`}>{label}</span>
     </div>
   );
 
@@ -236,8 +235,8 @@ export default function SpotPage() {
 
         {data ? (
           <div ref={area} className="relative flex min-h-0 flex-1 flex-col justify-center gap-2">
-            {renderImage(data.level.a, "원본", false, true)}
-            {renderImage(data.level.b, "여기서 찾기", phase === "idle" || phase === "count", false)}
+            {renderImage(data.level.a, "원본 그림", false)}
+            {renderImage(data.level.b, "다른 그림", phase === "idle" || phase === "count")}
             {phase === "count" && (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                 <span key={count} className="spot-count flex h-[120px] w-[120px] items-center justify-center rounded-full bg-[var(--color-myb)] text-[64px] font-extrabold text-white shadow-[0_12px_40px_rgba(255,90,45,.5)]">{count}</span>

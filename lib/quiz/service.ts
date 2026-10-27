@@ -138,13 +138,14 @@ export async function getHome(userId: string): Promise<HomePayload> {
   if (justNow) await repo.addLedger({ userId, delta: SIGNUP_POINTS, reason: "signup", refType: "signup", memo: "가입 보너스" });
   const [sets, w, badges, scores, done, rush, profile, topups] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId), repo.listCompletions(userId), rushSummary(userId), repo.findProfile(userId), repo.countHoneyTopups(userId, kstDayKey())]);
   const attendedToday = await repo.hasStamp(userId, "attendance", kstDayKey());
+  const rouletteFree = !(await repo.listGamePlays(userId)).some((p) => p.game === "roulette" && p.dayKey === kstDayKey());
   const nb = await getNewbie(userId);
   const earned = new Set(badges.map((b) => b.code));
   const badgeProgress = (await repo.listBadges()).map((b) => ({
     code: b.code, name: b.name, emoji: b.emoji, description: b.description, current: Math.min(scores[b.rule.tag] ?? 0, b.rule.min), min: b.rule.min, earned: earned.has(b.code),
   }));
   return {
-    wallet: w, honey: honeyLeft(done, topups), honeyMax: HONEY_PER_DAY + topups, honeyTopups: { used: topups, max: HONEY_TOPUP_MAX }, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday,
+    wallet: w, honey: honeyLeft(done, topups), honeyMax: HONEY_PER_DAY + topups, honeyTopups: { used: topups, max: HONEY_TOPUP_MAX }, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday, rouletteFree,
     starter: starterOf(profile?.createdAt ?? new Date(0).toISOString()), badgeProgress, welcome: { justNow, points: SIGNUP_POINTS },
     me: { loggedIn: !!profile?.provider, nickname: profile?.nickname, avatarUrl: profile?.avatarUrl, provider: profile?.provider },
     newbie: { active: nb.active, dayNo: nb.dayNo, doneToday: nb.days.find((d) => d.today)?.done ?? 0, goal: NEWBIE_GOAL, claimableCount: nb.claimableCount, totalMax: nb.totalMax },

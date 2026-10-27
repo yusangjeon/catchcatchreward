@@ -19,7 +19,7 @@ import { NumberFlow } from "@/components/motion/NumberFlow";
 /** 홈 하단 롤링 배너 */
 const BANNERS: BannerSlide[] = [
   { title: "친구 초대하고 500P", sub: "친구는 300P, 나는 첫 퀴즈 완료 시 500P", icon: "people", tone: "pink", href: "/invite", bg: "linear-gradient(90deg,#ffe9f1,#fff4f8)" },
-  { title: "스탬프 10개 = 무료 룰렛", sub: "미션마다 스탬프, 최대 5,000원 편의점 상품권", icon: "wheel", tone: "amber", href: "/roulette", bg: "linear-gradient(90deg,#fff3d6,#fff9ea)" },
+  { title: "매일 무료 룰렛 1회", sub: "스탬프 10개마다 한 번 더, 최대 5,000원 편의점 상품권", icon: "wheel", tone: "amber", href: "/roulette", bg: "linear-gradient(90deg,#fff3d6,#fff9ea)" },
   { title: "월간 도전 과제 최대 3,300P", sub: "이번 달 퀴즈·출석·게임 다 채우면", icon: "trophy", tone: "violet", href: "/monthly", bg: "linear-gradient(90deg,#2b3a67,#4257a3)", dark: true },
   { title: "틀린그림찾기 하루 3판", sub: "LV1→3 점점 어려워져요 · 완주 보너스", icon: "search", tone: "blue", href: "/games/spot", bg: "linear-gradient(90deg,#e8f1ff,#f3f8ff)" },
 ];
@@ -33,7 +33,7 @@ const QUICK: { key: string; name?: DuoName; tone?: Tone; label: string; href?: s
   { key: "honey", name: "drop", tone: "amber", label: "꿀 충전" },
   { key: "invite", name: "people", tone: "pink", label: "친구초대", href: "/invite" },
   { key: "shop", name: "bag", tone: "blue", label: "내 쇼핑", href: "/shop" },
-  { key: "store", name: "pin", tone: "teal", label: "매장미션", href: "/missions" },
+  { key: "store", name: "pin", tone: "teal", label: "플레이스", href: "/missions" },
   { key: "roulette", name: "wheel", tone: "orange", label: "룰렛", href: "/roulette" },
 ];
 
@@ -240,8 +240,8 @@ export default function HomePage() {
             { name: "people", tone: "pink", title: "친구 초대", desc: "친구 초대하면 300P 적립", value: "300P", href: "/invite" },
             { name: "flame", tone: "orange", title: "캐치 러쉬", desc: data ? `이번 주 스탬프 ${data.rush.stamps}/${data.rush.total} · 미션 완료하면 룰렛 스탬프` : "주간 스탬프 미션", value: data && data.rush.claimable > 0 ? "받기" : `${data?.rush.stamps ?? 0}/${data?.rush.total ?? 8}`, href: "/rush", dot: !!data && data.rush.claimable > 0 },
             { name: "trophy", tone: "violet", title: "월간 도전 과제", desc: "이번 달 과제 달성하면 최대 3,300P", value: "3,300P", href: "/monthly" },
-            { name: "pin", tone: "teal", title: "동네 매장 미션", desc: "매장 방문·저장·리뷰하고 스탬프", value: "최대 500P", href: "/missions" },
-            { name: "wheel", tone: "amber", title: "무료 룰렛", desc: data && data.wallet.stamps >= 10 ? "스탬프 10개 모였어요! 지금 돌리기" : `스탬프 ${data?.wallet.stamps ?? 0}/10 · 10개면 룰렛 1회`, value: `${data?.wallet.stamps ?? 0}/10`, href: "/roulette", dot: !!data && data.wallet.stamps >= 10 },
+            { name: "pin", tone: "teal", title: "플레이스 방문하기", desc: "매장 방문·저장·리뷰하고 스탬프", value: "최대 500P", href: "/missions" },
+            { name: "wheel", tone: "amber", title: "무료 룰렛", desc: data?.rouletteFree ? "오늘의 무료 룰렛 1회가 남았어요" : data && data.wallet.stamps >= 10 ? "스탬프 10개 모였어요! 한 번 더 돌리기" : `스탬프 ${data?.wallet.stamps ?? 0}/10 · 10개마다 1회 추가`, value: data?.rouletteFree ? "무료 1회" : `${data?.wallet.stamps ?? 0}/10`, href: "/roulette", dot: !!data && (data.rouletteFree || data.wallet.stamps >= 10) },
           ].map((c) => (
             <li key={c.title} className="border-b border-bg-3 last:border-b-0">
               <Link href={c.href} className="flex items-center gap-3 py-[13px]">
