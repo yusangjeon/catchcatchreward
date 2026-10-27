@@ -63,7 +63,7 @@ export interface UserBadge {
   earnedAt: string;
 }
 
-export type LedgerReason = "signup" | "newbie" | "game" | "quiz_answer" | "quiz_bonus" | "mission" | "rush" | "store_mission" | "roulette" | "redeem" | "admin_adjust" | "referral";
+export type LedgerReason = "signup" | "newbie" | "monthly" | "game" | "quiz_answer" | "quiz_bonus" | "mission" | "rush" | "store_mission" | "roulette" | "redeem" | "admin_adjust" | "referral";
 
 export interface LedgerEntry {
   id: string;
@@ -266,4 +266,14 @@ export interface AdminStats {
   storeCompletions: number;
   referrals: number;
   rushClaims: number;
+}
+
+export interface PushSubscriptionRow {
+  id: string;
+  userId: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  userAgent?: string;
+  createdAt: string;
 }

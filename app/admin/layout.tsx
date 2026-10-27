@@ -15,6 +15,7 @@ const NAV = [
   { href: "/admin/redemptions", label: "교환 신청" },
   { href: "/admin/grant", label: "수동 지급" },
   { href: "/admin/users", label: "유저" },
+  { href: "/admin/push", label: "푸시" },
   { href: "/admin/db", label: "DB" },
 ];
 

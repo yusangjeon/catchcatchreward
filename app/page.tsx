@@ -210,6 +210,7 @@ export default function HomePage() {
           {[
             { emoji: "🤝", title: "친구 초대", desc: "친구 초대하면 300P 적립", href: "/invite" },
             { emoji: "🔥", title: "비포인트 러쉬", desc: data ? `이번 주 스탬프 ${data.rush.stamps}/${data.rush.total} · 미션 완료하면 룰렛 스탬프` : "주간 스탬프 미션", href: "/rush", dot: !!data && data.rush.claimable > 0 },
+            { emoji: "🏆", title: "월간 도전 과제", desc: "이번 달 과제 달성하면 최대 3,300P", href: "/monthly" },
             { emoji: "📍", title: "동네 매장 미션", desc: "매장 방문·저장·리뷰하고 스탬프", href: "/missions" },
             { emoji: "🎡", title: "무료 룰렛", desc: data && data.wallet.stamps >= 10 ? "스탬프 10개 모였어요! 지금 돌리기" : `스탬프 ${data?.wallet.stamps ?? 0}/10 · 10개면 룰렛 1회`, href: "/roulette", dot: !!data && data.wallet.stamps >= 10 },
           ].map((c) => (

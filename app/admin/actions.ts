@@ -171,3 +171,13 @@ export async function migrateDbAction() {
     redirect(`/admin/db?error=${encodeURIComponent(e instanceof Error ? e.message : String(e))}`);
   }
 }
+
+export async function broadcastPushAction(fd: FormData) {
+  await requireAdmin();
+  const title = str(fd, "title");
+  const body = str(fd, "body");
+  if (!title || !body) return;
+  const { broadcast } = await import("@/lib/push/service");
+  const r = await broadcast({ title, body, url: str(fd, "url") || "/", tag: "admin" });
+  redirect(`/admin/push?sent=${r.sent}&failed=${r.failed}&removed=${r.removed}`);
+}

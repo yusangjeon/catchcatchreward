@@ -259,6 +259,20 @@ export function createPostgresRepo(url: string): Repo {
     async addHoneyTopup(userId, dayKey) {
       await sql`insert into honey_topups (user_id, day_key) values (${userId}, ${dayKey})`;
     },
+    async addPushSubscription(input) {
+      const r = await sql<{ id: string; created_at: Date }[]>`insert into push_subscriptions (user_id, endpoint, p256dh, auth, user_agent) values (${input.userId}, ${input.endpoint}, ${input.p256dh}, ${input.auth}, ${input.userAgent ?? null})
+        on conflict (endpoint) do update set user_id = excluded.user_id, p256dh = excluded.p256dh, auth = excluded.auth, user_agent = excluded.user_agent returning id, created_at`;
+      return { ...input, id: r[0].id, createdAt: isoReq(r[0].created_at) };
+    },
+    async removePushSubscription(endpoint) {
+      await sql`delete from push_subscriptions where endpoint = ${endpoint}`;
+    },
+    async listPushSubscriptions(userId) {
+      const rows = userId
+        ? await sql<{ id: string; user_id: string; endpoint: string; p256dh: string; auth: string; user_agent: string | null; created_at: Date }[]>`select * from push_subscriptions where user_id = ${userId} order by created_at desc`
+        : await sql<{ id: string; user_id: string; endpoint: string; p256dh: string; auth: string; user_agent: string | null; created_at: Date }[]>`select * from push_subscriptions order by created_at desc`;
+      return rows.map((r) => ({ id: r.id, userId: r.user_id, endpoint: r.endpoint, p256dh: r.p256dh, auth: r.auth, userAgent: r.user_agent ?? undefined, createdAt: isoReq(r.created_at) }));
+    },
     async addGamePlay(input) {
       const r = await sql<{ id: string; created_at: Date }[]>`insert into game_plays (user_id, game, day_key, result, points) values (${input.userId}, ${input.game}, ${input.dayKey}, ${input.result}, ${input.points}) returning id, created_at`;
       return { ...input, id: r[0].id, createdAt: isoReq(r[0].created_at) };

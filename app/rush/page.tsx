@@ -117,11 +117,11 @@ export default function RushPage() {
         ))}
         <Steps tag="게임적립" icon="🕹️" title={<><span className="text-[#ff3e9a]">미니게임</span>&nbsp;3회 플레이하기</>} href="/games" points={[10, 10, 20]} labels={["플레이 1회", "플레이 2회", "플레이 3회"]} current={game?.current ?? 0} />
         <Steps tag="퀴즈 보상" icon="📝" title="퀴즈 참여하기" href="/quiz" points={[10, 10, 10]} labels={["오늘 1회", "오늘 2회", "오늘 3회"]} current={Math.min(3, quiz?.current ?? 0)} />
-        <Link href="/missions" className="mt-3 flex items-center gap-3 rounded-[20px] bg-white px-5 py-5">
+        <Link href="/monthly" className="mt-3 flex items-center gap-3 rounded-[20px] bg-white px-5 py-5">
           <span className="text-[30px]">🏆</span>
           <span className="flex-1">
-            <p className="text-[17px] font-bold">동네 매장 도전 과제</p>
-            <p className="mt-0.5 text-[13px] text-[#5c6573]">매장 방문·저장·리뷰하면 스탬프 👀</p>
+            <p className="text-[17px] font-bold">월간 도전 과제</p>
+            <p className="mt-0.5 text-[13px] text-[#5c6573]">달성할 때마다 엄청난 혜택이 👀</p>
           </span>
           <span className="text-[#b0b8c1]">›</span>
         </Link>

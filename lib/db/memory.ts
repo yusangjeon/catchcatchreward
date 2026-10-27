@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Repo } from "./repo";
-import type { Badge, GamePlay, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge } from "@/lib/types";
+import type { Badge, GamePlay, LedgerEntry, Profile, PushSubscriptionRow, Quiz, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge } from "@/lib/types";
 import { SEED_STORE_MISSIONS } from "@/lib/missions/seed";
 import { newInviteCode } from "@/lib/invite/code";
 import { SEED_BADGES, SEED_QUIZZES, SEED_SETS } from "@/lib/quiz/seed";
@@ -26,6 +26,7 @@ interface Store {
   rushClaims: RushClaim[];
   gamePlays: GamePlay[];
   honeyTopups: { userId: string; dayKey: string }[];
+  pushSubs: PushSubscriptionRow[];
 }
 
 // dev 서버 HMR 때 모듈이 재평가돼도 데이터가 유지되도록 globalThis 에 붙인다.
@@ -53,6 +54,7 @@ function store(): Store {
       rushClaims: [],
       gamePlays: [],
       honeyTopups: [],
+      pushSubs: [],
     };
   }
   return g.__ccrStore;
@@ -269,6 +271,20 @@ export const memoryRepo: Repo = {
 
   async countHoneyTopups(userId, dayKey) {
     return store().honeyTopups.filter((t) => t.userId === userId && t.dayKey === dayKey).length;
+  },
+  async addPushSubscription(input) {
+    const st = store();
+    st.pushSubs = st.pushSubs.filter((x) => x.endpoint !== input.endpoint);
+    const row: PushSubscriptionRow = { ...input, id: randomUUID(), createdAt: new Date().toISOString() };
+    st.pushSubs.push(row);
+    return row;
+  },
+  async removePushSubscription(endpoint) {
+    const st = store();
+    st.pushSubs = st.pushSubs.filter((x) => x.endpoint !== endpoint);
+  },
+  async listPushSubscriptions(userId) {
+    return store().pushSubs.filter((x) => !userId || x.userId === userId);
   },
   async addHoneyTopup(userId, dayKey) {
     store().honeyTopups.push({ userId, dayKey });

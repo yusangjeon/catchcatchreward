@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Notice } from "@/lib/notifications";
+import { PushToggle } from "@/components/PushToggle";
 
 /* eslint-disable @next/next/no-img-element */
 
@@ -27,7 +28,8 @@ export default function NotificationsPage() {
         <h1 className="flex-1 text-center text-[18px] font-semibold">알림</h1>
         <span className="w-7" />
       </header>
-      <ul className="flex flex-col gap-2 px-6 pt-[64px]">
+      <div className="px-6 pt-[64px]"><PushToggle /></div>
+      <ul className="flex flex-col gap-2 px-6 pt-3">
         {(data?.notices ?? []).map((n) => (
           <li key={n.id}>
             <Link href={n.href} className="flex items-center gap-3 rounded-[16px] bg-white px-4 py-[14px]" style={{ boxShadow: "0 2px 10px 0 rgba(0, 43, 141, 0.06)" }}>
