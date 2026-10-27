@@ -232,3 +232,6 @@ body {
 .mascot-jump { animation: mascotJump .7s cubic-bezier(.22,1,.36,1) both }
 .mascot-wiggle { animation: mascotWiggle .9s ease-in-out both; transform-origin: 50% 85% }
 .mascot-wrap:active { transform: scale(.96) }
+@keyframes mascotWave { 0% { transform: rotate(0) } 15% { transform: rotate(-22deg) } 32% { transform: rotate(10deg) } 50% { transform: rotate(-22deg) } 68% { transform: rotate(10deg) } 85% { transform: rotate(-16deg) } 100% { transform: rotate(0) } }
+.mascot-wave { animation: mascotWave 1.3s ease-in-out both }
+.mascot-arm-rest { transform: rotate(0); transition: transform .3s }
