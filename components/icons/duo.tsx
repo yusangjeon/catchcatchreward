@@ -86,9 +86,9 @@ export const FLAT: Partial<Record<DuoName, string>> = {
 };
 
 /** 플랫 아이콘 이미지 단독 */
-export function FlatIcon({ file, size = 40, className }: { file: string; size?: number; className?: string }) {
+export function FlatIcon({ file, size = 40, className, style }: { file: string; size?: number; className?: string; style?: CSSProperties }) {
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={`/brand/qm/${file}.webp`} alt="" width={size} height={size} className={`shrink-0 object-contain ${className ?? ""}`} style={{ width: size, height: size }} draggable={false} />;
+  return <img src={`/brand/qm/${file}.webp`} alt="" width={size} height={size} className={`shrink-0 object-contain ${className ?? ""}`} style={{ width: size, height: size, ...style }} draggable={false} />;
 }
 
 export function IconTile({ name, tone = "blue", size = 44, icon, radius, className, round = false, flat = true }: { name: DuoName; tone?: Tone; size?: number; icon?: number; radius?: number; className?: string; round?: boolean; flat?: boolean }) {

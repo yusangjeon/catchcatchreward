@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DuoIcon, IconTile } from "@/components/icons/duo";
+import { DuoIcon, FlatIcon, IconTile } from "@/components/icons/duo";
+
+/** 목표별 플랫 아이콘(걸음 → 번개 → 불꽃 → 코인 → 트로피) */
+const GOAL_ICON: Record<number, string> = { 1000: "walk", 3000: "bolt", 5000: "flame", 7000: "coin", 10000: "trophy" };
 import { PCoin } from "@/components/icons";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { useToast } from "@/components/motion/Toast";
@@ -153,8 +156,9 @@ export default function WalkPage() {
             const ready = steps >= g.steps && !g.claimed;
             return (
               <li key={g.steps} className={`flex items-center gap-3 rounded-[14px] px-3 py-2.5 ${g.claimed ? "bg-[#f3f4f7]" : ready ? "bg-myb-soft" : "bg-[#f8f9fc]"}`}>
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${g.claimed ? "bg-[#dfe3ea] text-white" : ready ? "bg-myb text-white" : "bg-white text-[#b0b8c1]"}`}>
-                  {g.claimed ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden><path d="m5 12 5 5L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg> : <DuoIcon name="bolt" size={16} />}
+                <span className="relative flex h-11 w-11 shrink-0 items-center justify-center">
+                  <FlatIcon file={GOAL_ICON[g.steps] ?? "walk"} size={40} className={ready ? "walk-bounce" : ""} style={g.claimed || ready ? undefined : { filter: "grayscale(1) opacity(.45)" }} />
+                  {g.claimed && <span className="absolute -bottom-0.5 -right-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#22c55e] ring-2 ring-white"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden><path d="m5 12 5 5L19 7" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span>}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className={`block text-[14px] font-bold ${g.claimed ? "text-muted line-through" : "text-ink"}`}>{fmt(g.steps)}걸음</span>
