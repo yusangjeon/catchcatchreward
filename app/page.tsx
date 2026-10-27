@@ -189,12 +189,13 @@ export default function HomePage() {
         </Link>
         {data?.newbie.active && (
           <>
-            <Link href="/newbie" className="mt-[18px] flex items-center gap-3 rounded-[16px] bg-[var(--color-myb-soft)] px-4 py-3">
-              <IconTile name="sparkle" tone="amber" size={44} />
-              <span>
-                <p className="text-[15px] font-bold text-myb">신규 유저 전용 혜택</p>
-                <p className="text-[13px] text-ink-2">3일 동안 매일 퀴즈 3개 풀면 최대 {fmt(data.newbie.totalMax)}P</p>
+            <Link href="/newbie" className="mt-[18px] flex items-center gap-3 rounded-[18px] px-4 py-3.5" style={{ background: "linear-gradient(135deg,#fff3cc 0%,#ffe4d3 100%)" }}>
+              <img src="/brand/qm/gift.webp" alt="" width={52} height={52} className="h-[52px] w-[52px] object-contain" draggable={false} />
+              <span className="min-w-0 flex-1">
+                <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink">신규 유저 전용 혜택 <span className="rounded-full bg-myb px-1.5 py-0.5 text-[10px] font-bold text-white">D-{Math.max(0, 4 - data.newbie.dayNo)}</span></p>
+                <p className="text-[12.5px] text-ink-2">3일 동안 매일 퀴즈 3개 풀면 최대 {fmt(data.newbie.totalMax)}P</p>
               </span>
+              <ChevronRight size={18} className="text-[#c9a46a]" />
             </Link>
             <div className="relative mt-[14px] grid grid-cols-2 gap-[26px]">
               {[{ brand: "네이버페이 포인트쿠폰", name: "네이버페이 1,000원", price: "1,500", img: "/products/npay_10000.webp", bg: "#f1efec" }, { brand: "트레져러", name: "한국거래소 금 1,000원", price: "무제한", img: "/brand/gold.webp", bg: "#fff4d6" }].map((p) => (
@@ -202,11 +203,9 @@ export default function HomePage() {
                   <div className="overflow-hidden rounded-[18px]">
                     <p className="flex h-[32px] items-center justify-center bg-myb text-[12px] font-bold text-white">신규 유저 전용</p>
                     <div className="relative flex h-[136px] items-center justify-center" style={{ background: p.bg }}>
-                      <img src={p.img} alt="" className="h-[86px] w-[86px] rounded-xl object-cover opacity-50 blur-[2px] saturate-50" />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-ink-2 shadow-[0_2px_8px_rgba(40,24,14,.12)]"><DuoIcon name="lock" size={24} /></span>
-                        <span className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-bold text-ink shadow-[0_2px_8px_rgba(40,24,14,.12)]">{data.newbie.dayNo}일차 미션 완료하기</span>
-                      </div>
+                      <img src={p.img} alt="" className="h-[96px] w-[96px] rounded-xl object-cover" />
+                      <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-ink-2 shadow-[0_2px_8px_rgba(40,24,14,.12)]"><DuoIcon name="lock" size={15} /></span>
+                      <span className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-ink/85 px-2.5 py-1 text-[11px] font-semibold text-white">{data.newbie.dayNo}일차 퀴즈 {data.newbie.doneToday}/{data.newbie.goal} · 다 풀면 열려요</span>
                     </div>
                   </div>
                   <p className="mt-2.5 text-[12px] text-muted">{p.brand}</p>
@@ -319,11 +318,7 @@ function QuickMenu({ items, attended, onTap }: { items: typeof QUICK; attended: 
             <button type="button" onClick={() => onTap(qk.key, qk.href)} className="myb-press flex flex-col items-center gap-[10px]">
               {qk.tip && <span className="absolute -top-0 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-myb px-2.5 py-1 text-[11px] font-bold text-white after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-myb">{qk.tip}</span>}
               {qk.key === "attend" && attended && <span className="absolute right-2 top-[22px] flex h-4 w-4 items-center justify-center rounded-full bg-myb text-[10px] text-white">✓</span>}
-              {qk.key === "newbie" ? (
-                <span className="flex h-[48px] w-[48px] items-center justify-center rounded-full text-[15px] font-extrabold" style={{ background: "#fff3d6", color: "#d98a00" }}>3일</span>
-              ) : (
-                <IconTile name={qk.name ?? "star"} tone={qk.tone ?? "gray"} size={48} round />
-              )}
+              <img src={`/brand/qm/${qk.key}.webp`} alt="" width={54} height={54} className="h-[54px] w-[54px] object-contain" draggable={false} />
               <span className="text-[13px] font-medium text-ink">{qk.label}</span>
             </button>
           </li>
