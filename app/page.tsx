@@ -133,12 +133,29 @@ export default function HomePage() {
         <p className="mt-1 pr-[120px] text-[22px] font-extrabold leading-[30px]">
           <span className="text-[#2f6fed]">{data?.newbie.active ? `${data.newbie.dayNo}일차 퀴즈 ${data.newbie.goal}개` : "오늘의 퀴즈 3개"}</span>로<br />시작해요!
         </p>
-        <Link href={data?.newbie.active ? "/newbie" : "/quiz"} className="mt-[22px] mr-[128px] flex h-[52px] items-center gap-3 rounded-[14px] bg-white px-4 shadow-[0_4px_14px_rgba(47,111,237,.10)]">
-          <span className="text-[15px] font-bold tabular-nums text-[#2f6fed]">{data ? Math.min(3, data.todayDone) : 0}/3</span>
-          <span className="flex flex-1 gap-1.5">
-            {[0, 1, 2].map((i) => <i key={i} className={`h-[8px] flex-1 rounded-full ${data && data.todayDone > i ? "bg-[#2f6fed]" : "bg-[#e3ecff]"}`} />)}
-          </span>
-        </Link>
+        {(() => {
+          const done = data ? Math.min(3, data.todayDone) : 0;
+          const nb = data?.newbie.active ? data.newbie : undefined;
+          const reward = nb ? [300, 500, 700][nb.dayNo - 1] ?? 0 : 0; // lib/quiz/newbie NEWBIE_REWARDS 와 동일(server-only 라 직접 import 불가)
+          const claimable = !!nb && nb.claimableCount > 0;
+          const left = 3 - done;
+          const label = !data ? "오늘의 퀴즈" : claimable ? `${reward.toLocaleString()}P 받기` : done >= 3 ? "오늘 미션 완료" : reward ? `${left}개 더 풀면 ${reward.toLocaleString()}P` : `${left}개 더 풀어요`;
+          return (
+            <Link href={data?.newbie.active ? "/newbie" : "/quiz"} className="mt-[18px] mr-[124px] flex items-center gap-2.5 rounded-[16px] bg-white px-3 py-3 shadow-[0_4px_14px_rgba(47,111,237,.10)]">
+              <span className="flex items-center gap-1">
+                {[0, 1, 2].map((i) => (
+                  <span key={i} className={`flex h-[27px] w-[27px] items-center justify-center rounded-full transition-colors ${done > i ? "bg-[#2f6fed] text-white" : "bg-[#eef3ff] text-[#a9bce6]"}`}>
+                    {done > i ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden><path d="m5 12 5 5L19 7" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" /></svg> : <DuoIcon name="quiz" size={15} />}
+                  </span>
+                ))}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[12px] font-bold tabular-nums text-[#2f6fed]">{done}/3 완료</span>
+                <span className={`block whitespace-nowrap text-[11.5px] font-semibold tracking-[-0.2px] ${claimable ? "text-[#d98a00]" : "text-ink-2"}`}>{label}</span>
+              </span>
+            </Link>
+          );
+        })()}
       </section>
 
       {/* 퀴즈 가로 카드 */}
