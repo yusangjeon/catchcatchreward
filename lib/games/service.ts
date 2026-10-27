@@ -17,6 +17,7 @@ export const SPOT_DIFFS = 5;
 export const SPOT_LIMIT_SEC = 60;
 export const SPOT_POINT_PER_DIFF = 3;
 export const SPOT_COMPLETE_BONUS = 10;
+export const SPOT_SPEED_BONUS = 5; // 전부 찾고 절반 시간(30초) 안에 끝내면
 const SCRATCH_PRIZES: [points: number, weight: number][] = [[0, 50], [5, 25], [10, 15], [50, 8], [500, 2]];
 const SCRATCH_SYMBOL: Record<number, string> = { 5: "🍒", 10: "🔔", 50: "⭐", 500: "💎" };
 const SCRATCH_POOL = ["🍀", "🍒", "🔔", "⭐", "💎", "🎁"];
@@ -103,7 +104,7 @@ function validFound(userId: string, day: string, levelId: string, tokens: { id: 
 
 export interface SpotPayload {
   dayKey: string; level: { id: string; name: string; a: string; b: string; index: number }; total: number; limitSec: number;
-  played: number; left: number; pointPerDiff: number; completeBonus: number; recent: { level: string; result: string; points: number }[];
+  played: number; left: number; pointPerDiff: number; completeBonus: number; speedBonus: number; recent: { level: string; result: string; points: number }[];
 }
 /** 오늘 다음 레벨(좌표는 내려주지 않음) */
 export async function getSpot(userId: string): Promise<SpotPayload> {
@@ -114,7 +115,7 @@ export async function getSpot(userId: string): Promise<SpotPayload> {
   return {
     dayKey: day, level: { id: lv.id, name: lv.name, a: `/games/spot/${lv.id}/a.webp`, b: `/games/spot/${lv.id}/b.webp`, index: idx },
     total: SPOT_DIFFS, limitSec: SPOT_LIMIT_SEC, played: plays.length, left: Math.max(0, GAME_LIMITS.spot - plays.length),
-    pointPerDiff: SPOT_POINT_PER_DIFF, completeBonus: SPOT_COMPLETE_BONUS,
+    pointPerDiff: SPOT_POINT_PER_DIFF, completeBonus: SPOT_COMPLETE_BONUS, speedBonus: SPOT_SPEED_BONUS,
     recent: plays.map((p) => ({ level: p.result.split(":")[0], result: p.result, points: p.points })),
   };
 }
@@ -151,10 +152,11 @@ export async function submitSpot(userId: string, levelId: string, tokens: { id: 
   const { day, lv } = await assertSpotLevel(userId, levelId);
   const found = validFound(userId, day, levelId, tokens);
   const all = found.size === SPOT_DIFFS;
-  const points = found.size * SPOT_POINT_PER_DIFF + (all ? SPOT_COMPLETE_BONUS : 0);
-  await record(userId, "spot", day, `${lv.id}:${found.size}/${SPOT_DIFFS}:${Math.max(0, Math.round(seconds))}s`, points, `틀린그림 ${lv.name} ${found.size}/${SPOT_DIFFS}`);
+  const speedBonus = all && seconds <= SPOT_LIMIT_SEC / 2 ? SPOT_SPEED_BONUS : 0;
+  const points = found.size * SPOT_POINT_PER_DIFF + (all ? SPOT_COMPLETE_BONUS : 0) + speedBonus;
+  await record(userId, "spot", day, `${lv.id}:${found.size}/${SPOT_DIFFS}:${Math.max(0, Math.round(seconds))}s`, points, `틀린그림 ${lv.name} ${found.size}/${SPOT_DIFFS}${speedBonus ? " · 스피드" : ""}`);
   const plays = (await getRepo().listGamePlays(userId)).filter((x) => x.game === "spot" && x.dayKey === day);
-  return { ok: true as const, found: found.size, total: SPOT_DIFFS, points, all, missed: lv.diffs.filter((d) => !found.has(d.id)).map(circle), left: Math.max(0, GAME_LIMITS.spot - plays.length), wallet: await wallet(userId) };
+  return { ok: true as const, found: found.size, total: SPOT_DIFFS, points, all, speedBonus, seconds: Math.round(seconds), missed: lv.diffs.filter((d) => !found.has(d.id)).map(circle), left: Math.max(0, GAME_LIMITS.spot - plays.length), wallet: await wallet(userId) };
 }
 
 /** 2048: 클라이언트 플레이 후 점수 제출(일 1회). 최고 타일/점수 구간별 보상 */

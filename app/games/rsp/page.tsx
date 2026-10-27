@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
 import { Avatar } from "@/components/icons";
 import { useToast } from "@/components/motion/Toast";
+import { haptic, sfx } from "@/lib/fx";
 import { fmt } from "@/hooks/useHome";
 import type { GamesPayload } from "@/lib/games/service";
 
@@ -38,6 +39,7 @@ export default function RspPage() {
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "실패");
       setRound(j); setLeft(j.left); setStreak(j.streak); setPhase("result");
+      if (j.result === "win") { haptic(j.bonus ? "jackpot" : "success"); sfx("win"); } else if (j.result === "draw") { haptic("tap"); sfx("pop"); } else { haptic("error"); sfx("lose"); }
       show(j.result === "win" ? `이겼어요! +${j.points}P${j.bonus ? ` (${j.streak}연승 보너스 포함)` : ""}` : j.result === "draw" ? `비겼어요 · +${j.points}P` : "졌어요… 한 판 더!", j.result === "lose" ? "info" : undefined);
     } catch (e) {
       setPhase("idle");

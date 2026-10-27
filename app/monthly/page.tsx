@@ -6,6 +6,7 @@ import { GameHeader } from "@/components/games/GameHeader";
 import { PCoin } from "@/components/icons";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { useToast } from "@/components/motion/Toast";
+import { haptic, sfx } from "@/lib/fx";
 import { fmt } from "@/hooks/useHome";
 import type { MonthlyPayload } from "@/lib/monthly/service";
 
@@ -24,6 +25,7 @@ export default function MonthlyPage() {
       const res = await fetch("/api/monthly", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ key }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "보상을 받을 수 없어요");
+      haptic("jackpot"); sfx("win");
       show(`${fmt(j.points)}P를 받았어요!`);
       await load();
     } catch (e) {

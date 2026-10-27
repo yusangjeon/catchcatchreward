@@ -7,12 +7,16 @@ import { PCoin } from "@/components/icons";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { fmt } from "@/hooks/useHome";
 import type { GamesPayload } from "@/lib/games/service";
+import { haptic, isMuted, setMuted, sfx } from "@/lib/fx";
 
 const TILE_IMG: Record<string, string> = { spot: "/games/spot/photo_living/a.webp", slide: "/games/art/tile_slide.webp", scratch: "/games/art/tile_scratch.webp", rsp: "/games/art/tile_rsp.webp", memory: "/games/art/tile_memory.webp" };
 
 /** 미니게임 허브 — 매일 리셋되는 5가지. 결과·보상은 서버가 결정 */
 export default function GamesPage() {
   const [data, setData] = useState<GamesPayload | null>(null);
+  const [muted, setMutedState] = useState(false);
+  useEffect(() => { setMutedState(isMuted()); }, []);
+  function toggleMute() { const v = !muted; setMuted(v); setMutedState(v); haptic("tap"); if (!v) sfx("pop"); }
   useEffect(() => {
     fetch("/api/games", { cache: "no-store" }).then((r) => r.json()).then(setData).catch(() => {});
   }, []);
@@ -20,12 +24,12 @@ export default function GamesPage() {
   const leftTotal = data?.games.reduce((a, g) => a + g.left, 0) ?? 0;
   return (
     <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
-      <GameHeader title="미니게임" right={<Link href="/wallet" className="flex items-center gap-1 text-[16px]"><PCoin size={16} />{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</Link>} />
+      <GameHeader title="미니게임" right={<span className="flex items-center gap-2"><button type="button" onClick={toggleMute} aria-label={muted ? "효과음 켜기" : "효과음 끄기"} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eef0f4] text-[14px]">{muted ? "🔇" : "🔊"}</button><Link href="/wallet" className="flex items-center gap-1 text-[16px]"><PCoin size={16} />{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</Link></span>} />
       <div className="flex flex-col gap-4 px-5 pt-[64px]">
         <section className="relative overflow-hidden rounded-[20px] bg-[#191f28] p-5 text-white">
           <p className="text-[12px] font-semibold text-[#9fb6ff]">매일 0시 리셋 · 오늘 남은 플레이 {leftTotal}회</p>
           <p className="mt-1 text-[20px] font-extrabold leading-[26px]">오늘 게임으로 <span className="text-[#fde047]">{fmt(todayPoints)}P</span> 모았어요</p>
-          <p className="mt-2 text-[12px] text-white/60">이번 주 {data?.weekPlays ?? 0}회 플레이 · 3회마다 러쉬 스탬프 미션 달성</p>
+          <p className="mt-2 text-[12px] text-white/60">이번 주 {data?.weekPlays ?? 0}회 플레이 · 3회마다 러쉬 스탬프 미션 달성 · 진동·효과음은 {muted ? "꺼짐" : "켜짐"}</p>
           <span className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-[#427cff]/30 blur-2xl" />
         </section>
         <ul className="grid grid-cols-2 gap-3">

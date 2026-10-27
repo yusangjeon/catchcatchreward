@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
 import { PCoin } from "@/components/icons";
 import { useToast } from "@/components/motion/Toast";
+import { haptic, sfx } from "@/lib/fx";
 import { fmt } from "@/hooks/useHome";
 import type { NewbiePayload } from "@/lib/quiz/newbie";
 
@@ -24,6 +25,7 @@ export default function NewbiePage() {
       const res = await fetch("/api/newbie", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ day }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "보상을 받을 수 없어요");
+      haptic("jackpot"); sfx("win");
       show(`${day}일차 보상 ${fmt(j.points)}P를 받았어요!`);
       await load();
     } catch (e) {

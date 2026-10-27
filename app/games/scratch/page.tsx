@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
 import { Lottie } from "@/components/motion/Lottie";
 import { useToast } from "@/components/motion/Toast";
+import { haptic, sfx } from "@/lib/fx";
 import { fmt } from "@/hooks/useHome";
 import type { GamesPayload } from "@/lib/games/service";
 
@@ -78,6 +79,7 @@ export default function ScratchPage() {
     if (p > 0.55) {
       setRevealed(true);
       ctx.clearRect(0, 0, c.width, c.height);
+      if (ticket.points >= 50) { haptic("jackpot"); sfx("win"); } else if (ticket.points > 0) { haptic("success"); sfx("coin"); } else { haptic("warn"); sfx("lose"); }
       show(ticket.points > 0 ? `축하해요! ${ticket.symbol} 3개 · ${fmt(ticket.points)}P 당첨` : "꽝… 내일 다시 긁어봐요", ticket.points > 0 ? undefined : "info");
     }
   }

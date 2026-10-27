@@ -148,3 +148,9 @@
   - 틀린그림 실사 8장면(거실·부엌·시장·책상·베이커리·해변 피크닉·놀이방·가을 공원) → `spotgen/levels2.json` + `gen.py`(4번째 인자로 레벨 파일) → `public/games/spot/photo_*/{a,b}.webp`. `SPOT_LEVELS` = 실사 8 → 일러스트 8(총 16, 날짜×회차 순환). 실사 편집 팁: hue 는 `from/tol` 을 좁게(책상 나무 hue≈30 이 노란 포스트잇 tol 25 에 걸림 → scale 로 대체), 흰 벽 제거는 액자 테두리 잔상 → hue/scale 로 대체, 바다 제거는 수평선 y 유지한 수평 src.
   - 퀴즈 선택지 이미지 20장(`public/quiz/options/<seed>.webp`, seed.ts 의 imageSeed 가 그대로 파일명) · 상품 사진 8장(`public/products/<kind>.webp`, `Product.img`, 교환·지갑·홈 타일 사용) · picsum 의존 제거(관리자 세트 기본 커버 `/quiz/covers/default.webp`). DB 시드는 picsum URL 인 quiz_options/quiz_sets 행만 image_url 갱신.
   - 갤러리 v7(61장) 재발행. QA: 전 화면 콘솔 에러 0, 실사 레벨 완주 e2e(책상 5/5 +25P).
+- 2026-10-27(19차): **피드백 효과 + 라이트 톤 통일.** 대표님: "틀린 화면 클릭하면 폰 진동 울리면서 틀렸다 그런 것도" / 다크 배경이 앱 톤과 안 맞음.
+  - `lib/fx.ts`: `haptic(tap|success|error|warn|jackpot)`(navigator.vibrate, iOS Safari 미지원은 무시) + `sfx(hit|miss|win|lose|tick|coin|pop)`(Web Audio 합성, 파일 없음) + 음소거 localStorage `ccr_mute`(게임 허브 🔊 토글).
+  - 틀린그림: 3·2·1 카운트다운 → 틀리면 진동 [80,50,80]+흔들림+빨간 플래시+"틀렸어요 −5초" 플로팅, 맞추면 진동+효과음+"+3P" 플로팅, 10초 남으면 경고 진동, 결과 별 3개(완주+스피드=3) · ⚡ 스피드 보너스 +5P(전부 찾고 30초 이내, 서버 `SPOT_SPEED_BONUS`).
+  - 햅틱·효과음 적용: 출석 · 퀴즈 선택/보상 · 룰렛 결과 · 복권 공개 · 가위바위보 결과 · 카드 짝 · 러쉬/월간/3일 혜택 보상.
+  - 틀린그림·월간 과제 화면을 다크 → 라이트(#f8f9fc·#427cff)로 통일(러쉬만 영상대로 다크 유지).
+  - QA: Playwright 에서 navigator.vibrate 스파이로 틀린 탭 [80,50,80]·정답 패턴 확인, 플로팅 라벨·스피드 보너스(4초 완주 +5P)·음소거 저장 확인, 콘솔 에러 0.

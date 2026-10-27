@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { CheckIcon, CXCoin, PCoin } from "./icons";
 import { Lottie } from "./motion/Lottie";
 import { ToastOnMount } from "./motion/Toast";
+import { haptic, sfx } from "@/lib/fx";
 
 /* eslint-disable @next/next/no-img-element */
 import { SetGridCard } from "./SetCard";
@@ -59,6 +60,7 @@ export function QuizPlay({ setId }: { setId: string }) {
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "제출 실패");
       setResult(j as SubmitResult);
+      haptic("jackpot"); sfx("win");
     } catch (e) {
       setError(e instanceof Error ? e.message : "제출 실패");
     } finally {
@@ -102,7 +104,7 @@ export function QuizPlay({ setId }: { setId: string }) {
           </div>
         </div>
 
-        <Options q={q} picked={picked} onPick={(oid) => setAnswers({ ...answers, [q.id]: oid })} />
+        <Options q={q} picked={picked} onPick={(oid) => { haptic("tap"); sfx("pop"); setAnswers({ ...answers, [q.id]: oid }); }} />
       </div>
 
       <div className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 bg-myb px-[40px] pb-6 pt-3" style={{ paddingBottom: "max(24px, env(safe-area-inset-bottom))" }}>

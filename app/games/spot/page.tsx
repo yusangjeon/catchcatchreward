@@ -6,13 +6,15 @@ import { GameHeader } from "@/components/games/GameHeader";
 import { Lottie } from "@/components/motion/Lottie";
 import { useToast } from "@/components/motion/Toast";
 import { fmt } from "@/hooks/useHome";
+import { haptic, sfx } from "@/lib/fx";
 import type { SpotPayload } from "@/lib/games/service";
 
 /* eslint-disable @next/next/no-img-element */
 
 interface Circle { id: string; x: number; y: number; r: number }
 interface Token { id: string; token: string }
-interface Result { found: number; total: number; points: number; all: boolean; missed: Circle[]; left: number }
+interface Result { found: number; total: number; points: number; all: boolean; missed: Circle[]; left: number; speedBonus: number; seconds: number }
+interface Float { k: number; x: number; y: number; text: string; ok: boolean }
 type Mark = Circle & { kind: "found" | "missed" | "hint" };
 
 const MISS_PENALTY = 5;
@@ -25,7 +27,12 @@ export default function SpotPage() {
   const router = useRouter();
   const { show } = useToast();
   const [data, setData] = useState<SpotPayload | null>(null);
-  const [phase, setPhase] = useState<"idle" | "play" | "done">("idle");
+  const [phase, setPhase] = useState<"idle" | "count" | "play" | "done">("idle");
+  const [count, setCount] = useState(3);
+  const [floats, setFloats] = useState<Float[]>([]);
+  const [shake, setShake] = useState(false);
+  const [flash, setFlash] = useState(false);
+  const warned = useRef(false);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [marks, setMarks] = useState<Mark[]>([]);
   const [misses, setMisses] = useState<{ x: number; y: number; k: number }[]>([]);
@@ -67,6 +74,7 @@ export default function SpotPage() {
       setResult(r);
       setMarks((m) => [...m.filter((x) => x.kind !== "hint"), ...r.missed.map((c) => ({ ...c, kind: "missed" as const }))]);
       setPhase("done");
+      if (r.all) { haptic("jackpot"); sfx("win"); } else if (r.points > 0) { haptic("success"); sfx("coin"); } else { haptic("warn"); sfx("lose"); }
       show(r.points > 0 ? `${r.found}/${r.total} 찾았어요 · +${fmt(r.points)}P` : "아쉽게도 못 찾았어요", r.points > 0 ? undefined : "info");
     } catch (e) {
       show(e instanceof Error ? e.message : "제출 실패", "info");
@@ -78,12 +86,29 @@ export default function SpotPage() {
 
   function start() {
     if (!data || data.left <= 0) return;
-    setPhase("play");
-    startedAt.current = Date.now();
-    timer.current = setInterval(() => setLeft((s) => {
-      if (s <= 1) { stopTimer(); setTimeout(() => void submit(), 0); return 0; }
-      return s - 1;
-    }), 1000);
+    setPhase("count");
+    setCount(3);
+    haptic("tap"); sfx("tick");
+    let n = 3;
+    const id = setInterval(() => {
+      n -= 1;
+      if (n > 0) { setCount(n); sfx("tick"); haptic("tap"); return; }
+      clearInterval(id);
+      setPhase("play");
+      sfx("pop");
+      startedAt.current = Date.now();
+      warned.current = false;
+      timer.current = setInterval(() => setLeft((s) => {
+        if (s <= 1) { stopTimer(); setTimeout(() => void submit(), 0); return 0; }
+        if (s - 1 === 10 && !warned.current) { warned.current = true; haptic("warn"); sfx("tick"); }
+        return s - 1;
+      }), 1000);
+    }, 700);
+  }
+  function addFloat(x: number, y: number, text: string, ok: boolean) {
+    const k = Date.now() + Math.random();
+    setFloats((f) => [...f.slice(-4), { k, x, y, text, ok }]);
+    setTimeout(() => setFloats((f) => f.filter((z) => z.k !== k)), 900);
   }
 
   async function tap(e: React.MouseEvent<HTMLDivElement>) {
@@ -101,13 +126,18 @@ export default function SpotPage() {
         tokensRef.current = next;
         setTokens(next);
         setMarks((m) => [...m.filter((k) => !(k.kind === "hint" && k.id === j.diff.id)), { ...j.diff, kind: "found" }]);
-        if (navigator.vibrate) navigator.vibrate(30);
+        haptic("success"); sfx(j.found >= j.total ? "win" : "hit");
+        addFloat(j.diff.x, j.diff.y, `+${data.pointPerDiff}P`, true);
         if (j.found >= j.total) void submit();
       } else {
         const k = Date.now();
         setMisses((m) => [...m.slice(-3), { x, y, k }]);
         setTimeout(() => setMisses((m) => m.filter((z) => z.k !== k)), 700);
         setLeft((s) => Math.max(1, s - MISS_PENALTY));
+        haptic("error"); sfx("miss");
+        addFloat(x, y, `틀렸어요 −${MISS_PENALTY}초`, false);
+        setShake(true); setFlash(true);
+        setTimeout(() => setShake(false), 450); setTimeout(() => setFlash(false), 500);
       }
     } catch (err) {
       show(err instanceof Error ? err.message : "판정 실패", "info");
@@ -125,6 +155,7 @@ export default function SpotPage() {
     if (!j.diff) return;
     setMarks((m) => [...m, { ...j.diff, kind: "hint" }]);
     setLeft((s) => Math.max(1, s - MISS_PENALTY));
+    haptic("tap"); sfx("pop");
   }
 
   function nextLevel() {
@@ -136,7 +167,7 @@ export default function SpotPage() {
   const found = tokens.length;
   const pct = data ? (left / data.limitSec) * 100 : 100;
   const renderImage = (src: string, label: string, blur: boolean, top: boolean) => (
-    <div className="relative overflow-hidden rounded-[14px] bg-[#e5e8ee]" style={{ aspectRatio: "1024 / 688", boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }} onClick={tap}>
+    <div className={`relative overflow-hidden rounded-[14px] bg-[#e5e8ee] ${shake ? "spot-shake" : ""}`} style={{ aspectRatio: "1024 / 688", boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }} onClick={tap}>
       <img src={src} alt={label} draggable={false} onLoad={() => setImgReady((n) => n + 1)} className={`block h-full w-full select-none transition-[filter] duration-300 ${blur ? "blur-[6px]" : ""}`} />
       {marks.map((m) => (
         <span key={m.kind + m.id} className={`spot-mark pointer-events-none absolute rounded-full border-[3px] ${m.kind === "found" ? "border-[#22c55e] shadow-[0_0_0_2px_rgba(255,255,255,.9)]" : m.kind === "missed" ? "border-dashed border-[#ff3b6b]" : "border-dashed border-[#ffb400] spot-hint"}`} style={{ left: `${(m.x - m.r) * 100}%`, top: `${(m.y - m.r * 1024 / 688) * 100}%`, width: `${m.r * 2 * 100}%`, aspectRatio: "1" }} />
@@ -144,6 +175,10 @@ export default function SpotPage() {
       {misses.map((m) => (
         <span key={m.k} className="spot-miss pointer-events-none absolute text-[26px] font-black leading-none text-[#ff3b6b]" style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, transform: "translate(-50%,-50%)" }}>✕</span>
       ))}
+      {floats.map((f) => (
+        <span key={f.k} className={`spot-float pointer-events-none absolute whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-extrabold text-white shadow-md ${f.ok ? "bg-[#22c55e]" : "bg-[#ff3b6b]"}`} style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%` }}>{f.text}</span>
+      ))}
+      {flash && <span className="spot-flash pointer-events-none absolute inset-0 bg-[#ff3b6b]" />}
       <span className={`absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[11px] font-bold text-white ${top ? "bg-black/45" : "bg-[#427cff]"}`}>{label}</span>
     </div>
   );
@@ -163,7 +198,12 @@ export default function SpotPage() {
         {data ? (
           <div className="relative flex flex-col gap-2">
             {renderImage(data.level.a, "원본", false, true)}
-            {renderImage(data.level.b, "여기서 찾기", phase === "idle", false)}
+            {renderImage(data.level.b, "여기서 찾기", phase === "idle" || phase === "count", false)}
+            {phase === "count" && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <span key={count} className="spot-count flex h-[120px] w-[120px] items-center justify-center rounded-full bg-[#427cff] text-[64px] font-black text-white shadow-[0_12px_40px_rgba(66,124,255,.5)]">{count}</span>
+              </div>
+            )}
             {phase === "idle" && (
               <div className="absolute inset-0 flex items-center justify-center rounded-[14px]">
                 {data.left > 0 ? (
@@ -188,8 +228,10 @@ export default function SpotPage() {
         )}
         {phase === "done" && result && (
           <div className="rounded-[20px] bg-white p-5 text-center text-[#191f28]" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
-            <p className="text-[22px] font-extrabold">{result.all ? "완벽해요! 🎉" : `${result.found}/${result.total} 찾았어요`}</p>
-            <p className="mt-1 text-[16px] font-bold text-[#427cff]">+{fmt(result.points)}P 적립</p>
+            <p className="text-[26px] tracking-[4px]">{"★".repeat(result.all ? (result.speedBonus ? 3 : 2) : result.found >= 3 ? 1 : 0)}<span className="text-[#dee2e9]">{"★".repeat(3 - (result.all ? (result.speedBonus ? 3 : 2) : result.found >= 3 ? 1 : 0))}</span></p>
+            <p className="mt-1 text-[22px] font-extrabold">{result.all ? "완벽해요! 🎉" : `${result.found}/${result.total} 찾았어요`}</p>
+            <p className="mt-1 text-[16px] font-bold text-[#427cff]">+{fmt(result.points)}P 적립{result.speedBonus ? <span className="ml-1 rounded-full bg-[#fff0b3] px-2 py-0.5 text-[11px] text-[#9a5b00]">⚡ 스피드 +{result.speedBonus}P</span> : null}</p>
+            <p className="mt-1 text-[12px] text-[#8b94a0]">{result.seconds}초 소요{result.all && !result.speedBonus ? ` · 30초 안에 끝내면 ⚡ +${data?.speedBonus ?? 5}P` : ""}</p>
             {!result.all && <p className="mt-1 text-[12px] text-[#8b94a0]">분홍 점선이 놓친 곳이에요</p>}
             <div className="mt-4 grid grid-cols-2 gap-2">
               <button type="button" onClick={() => router.push("/games")} className="myb-press h-12 rounded-xl border border-[#dee2e9] text-[14px] font-bold">다른 게임</button>
@@ -201,7 +243,7 @@ export default function SpotPage() {
             </div>
           </div>
         )}
-        <p className="px-1 text-[11px] text-[#b0b8c1]">위·아래 그림 아무 데나 탭하면 돼요. 틀리면 {MISS_PENALTY}초가 줄어요. 매일 0시에 새 그림 3장.</p>
+        <p className="px-1 text-[11px] text-[#b0b8c1]">위·아래 그림 아무 데나 탭하면 돼요. 틀리면 진동과 함께 {MISS_PENALTY}초가 줄어요. 30초 안에 전부 찾으면 ⚡ 스피드 보너스. 매일 0시에 새 그림 3장.</p>
       </div>
     </div>
   );

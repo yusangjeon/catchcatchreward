@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PCoin } from "@/components/icons";
 import { Lottie } from "@/components/motion/Lottie";
+import { haptic, sfx } from "@/lib/fx";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { useToast } from "@/components/motion/Toast";
 import { fmt } from "@/hooks/useHome";
@@ -59,6 +60,7 @@ export default function RoulettePage() {
       setTimeout(() => {
         setResult(r);
         setSpinning(false);
+        if (r.prize.kind === "none") { haptic("warn"); sfx("lose"); } else { haptic("jackpot"); sfx("win"); }
         if (r.prize.kind !== "none") show(r.prize.kind === "points" ? `${fmt(r.prize.value)}P를 받았어요!` : `${r.prize.name} 당첨!`);
         setData((d) => (d ? { ...d, stamps: r.wallet.stamps, canSpin: r.wallet.stamps >= d.needed, wallet: r.wallet } : d));
         void load();

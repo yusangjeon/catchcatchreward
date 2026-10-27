@@ -7,6 +7,7 @@ import { PCoin } from "@/components/icons";
 import { Countdown } from "@/components/motion/Countdown";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { useToast } from "@/components/motion/Toast";
+import { haptic, sfx } from "@/lib/fx";
 import { fmt } from "@/hooks/useHome";
 import type { RushMissionView, RushPayload } from "@/lib/rush/types";
 
@@ -34,6 +35,7 @@ export default function RushPage() {
       const res = await fetch("/api/rush/claim", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ missionKey: key }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "보상을 받을 수 없어요");
+      haptic("success"); sfx("coin");
       show(j.stampAdded ? `${fmt(j.points)}P와 스탬프 1개를 받았어요` : `${fmt(j.points)}P를 받았어요!`);
       await load();
     } catch (e) {

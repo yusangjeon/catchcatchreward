@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
 import { Lottie } from "@/components/motion/Lottie";
 import { useToast } from "@/components/motion/Toast";
+import { haptic, sfx } from "@/lib/fx";
 import { fmt } from "@/hooks/useHome";
 import type { GamesPayload } from "@/lib/games/service";
 
@@ -74,8 +75,10 @@ export default function MemoryPage() {
       if (cards[a] === cards[b]) {
         const nm = new Set(matched); nm.add(a); nm.add(b);
         setMatched(nm); setOpen([]); lock.current = false;
+        haptic("success"); sfx(nm.size === cards.length ? "win" : "hit");
         if (nm.size === cards.length) void finish(m, sec);
       } else {
+        haptic("tap"); sfx("miss");
         setTimeout(() => { setOpen([]); lock.current = false; }, 650);
       }
     }

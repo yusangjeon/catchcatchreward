@@ -155,3 +155,11 @@ body {
 .spot-mark { animation: spotPop .35s cubic-bezier(.22,1,.36,1) both }
 .spot-hint { animation: spotHint .9s ease-in-out infinite }
 .spot-miss { animation: spotMiss .7s ease-out both }
+@keyframes spotShake { 0%, 100% { transform: translateX(0) } 20% { transform: translateX(-7px) } 40% { transform: translateX(6px) } 60% { transform: translateX(-4px) } 80% { transform: translateX(3px) } }
+@keyframes spotFloat { 0% { opacity: 0; transform: translate(-50%, 0) scale(.8) } 15% { opacity: 1; transform: translate(-50%, -14px) scale(1.05) } 100% { opacity: 0; transform: translate(-50%, -44px) scale(1) } }
+@keyframes spotFlash { 0% { opacity: .35 } 100% { opacity: 0 } }
+@keyframes spotCount { 0% { transform: scale(.4); opacity: 0 } 40% { transform: scale(1.1); opacity: 1 } 100% { transform: scale(1); opacity: 1 } }
+.spot-shake { animation: spotShake .45s cubic-bezier(.36,.07,.19,.97) both }
+.spot-float { animation: spotFloat .9s ease-out both }
+.spot-flash { animation: spotFlash .5s ease-out both }
+.spot-count { animation: spotCount .5s cubic-bezier(.22,1,.36,1) both }
