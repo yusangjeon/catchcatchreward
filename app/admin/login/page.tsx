@@ -15,7 +15,14 @@ export default async function AdminLogin({ searchParams }: { searchParams: Promi
       ) : (
         <form action={loginAction} className="mt-4 flex flex-col gap-3">
           <input name="key" type="password" placeholder="ADMIN_KEY" autoComplete="current-password" className="h-11 rounded-xl border border-[#dee2e9] px-3 text-[14px]" />
-          {error && <p className="text-[13px] text-[#ff3939]">키가 올바르지 않아요.</p>}
+          {error && (
+            <p className="text-[13px] text-[#ff3939]">
+              키가 올바르지 않아요.
+              <span className="mt-1 block text-[11px] text-[#8b94a0]">
+                서버에 설정된 키 길이 {(process.env.ADMIN_KEY ?? "").trim().length}자 · 배포 {(process.env.VERCEL_GIT_COMMIT_SHA ?? "local").slice(0, 7)}
+              </span>
+            </p>
+          )}
           <button type="submit" className="h-11 rounded-xl bg-[#427cff] text-[15px] font-bold text-white">로그인</button>
         </form>
       )}
