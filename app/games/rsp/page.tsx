@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useEffect, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
 import { Avatar } from "@/components/icons";
@@ -9,6 +11,7 @@ import type { GamesPayload } from "@/lib/games/service";
 
 type C = "rock" | "paper" | "scissors";
 const EMOJI: Record<C, string> = { rock: "✊", paper: "✋", scissors: "✌️" };
+const HAND: Record<C, string> = { rock: "/games/art/rock.png", paper: "/games/art/paper.png", scissors: "/games/art/scissors.png" };
 const LABEL: Record<C, string> = { rock: "바위", paper: "보", scissors: "가위" };
 const OPP = ["민지", "준호", "서연", "도윤", "하은"];
 
@@ -54,9 +57,9 @@ export default function RspPage() {
           {phase === "count" && <p key={count} className="myb-pop-in text-[44px] font-extrabold tracking-wider text-[#fde047]">{count}</p>}
           {phase === "result" && round && (
             <div className="flex items-center gap-6">
-              <div className="text-center"><p className="text-[12px] text-white/60">나</p><p className="myb-pop-in text-[64px] leading-none">{EMOJI[round.choice]}</p></div>
+              <div className="text-center"><p className="text-[12px] text-white/60">나</p><img src={HAND[round.choice]} alt={EMOJI[round.choice]} className="myb-pop-in h-[96px] w-[96px] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,.45)]" /></div>
               <p className={`text-[22px] font-extrabold ${round.result === "win" ? "text-[#4ade80]" : round.result === "draw" ? "text-[#fbbf24]" : "text-white/50"}`}>{title}</p>
-              <div className="text-center"><p className="text-[12px] text-white/60">{OPP[opp]}</p><p className="myb-pop-in text-[64px] leading-none" style={{ transform: "scaleX(-1)" }}>{EMOJI[round.cpu]}</p></div>
+              <div className="text-center"><p className="text-[12px] text-white/60">{OPP[opp]}</p><img src={HAND[round.cpu]} alt={EMOJI[round.cpu]} className="myb-pop-in h-[96px] w-[96px] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,.45)]" style={{ transform: "scaleX(-1)" }} /></div>
             </div>
           )}
           {phase === "idle" && <p className="text-[15px] text-white/60">{left === 0 ? "오늘 3판 다 했어요. 내일 또 해요!" : "아래에서 하나를 고르면 바로 시작!"}</p>}
@@ -64,8 +67,8 @@ export default function RspPage() {
         {round && round.points > 0 && <p className="text-[18px] font-extrabold text-[#4ade80]">+{fmt(round.points)}P {round.bonus ? <span className="text-[13px] text-[#fde047]">연승 보너스 +{round.bonus}</span> : null}</p>}
         <div className="grid w-full grid-cols-3 gap-3">
           {(["scissors", "rock", "paper"] as C[]).map((c) => (
-            <button key={c} type="button" disabled={phase === "count" || left === 0} onClick={() => void play(c)} className="myb-press flex h-[100px] flex-col items-center justify-center rounded-2xl bg-white/10 text-[44px] transition hover:bg-white/15 disabled:opacity-40">
-              {EMOJI[c]}<span className="mt-1 text-[13px] font-semibold text-white/80">{LABEL[c]}</span>
+            <button key={c} type="button" disabled={phase === "count" || left === 0} onClick={() => void play(c)} className="myb-press flex h-[112px] flex-col items-center justify-center rounded-2xl bg-white/10 transition hover:bg-white/15 disabled:opacity-40">
+              <img src={HAND[c]} alt={EMOJI[c]} className="h-[64px] w-[64px] object-contain" /><span className="mt-1 text-[13px] font-semibold text-white/80">{LABEL[c]}</span>
             </button>
           ))}
         </div>

@@ -8,13 +8,7 @@ import { NumberFlow } from "@/components/motion/NumberFlow";
 import { fmt } from "@/hooks/useHome";
 import type { GamesPayload } from "@/lib/games/service";
 
-const TILE: Record<string, { bg: string; art: React.ReactNode }> = {
-  spot: { bg: "linear-gradient(135deg,#bfe3ff,#8fd37a)", art: <svg viewBox="0 0 48 48" className="h-10 w-10"><circle cx="19" cy="19" r="12" fill="none" stroke="#191f28" strokeWidth="4" /><line x1="28" y1="28" x2="40" y2="40" stroke="#191f28" strokeWidth="5" strokeLinecap="round" /><circle cx="19" cy="19" r="5" fill="#ff5c8a" /></svg> },
-  slide: { bg: "linear-gradient(135deg,#ffe08a,#ff8a3d)", art: <svg viewBox="0 0 48 48" className="h-10 w-10"><rect x="4" y="4" width="18" height="18" rx="4" fill="#fff" /><rect x="26" y="4" width="18" height="18" rx="4" fill="#fff" opacity=".7" /><rect x="4" y="26" width="18" height="18" rx="4" fill="#fff" opacity=".7" /><rect x="26" y="26" width="18" height="18" rx="4" fill="#427cff" /><text x="35" y="40" fontSize="11" fontWeight="800" fill="#fff" textAnchor="middle">2048</text></svg> },
-  scratch: { bg: "linear-gradient(135deg,#ffb86b,#ff6b6b)", art: <svg viewBox="0 0 48 48" className="h-10 w-10"><rect x="6" y="12" width="36" height="24" rx="4" fill="#fff" /><circle cx="16" cy="24" r="4" fill="#ff8a3d" /><circle cx="24" cy="24" r="4" fill="#ff8a3d" /><circle cx="32" cy="24" r="4" fill="#ff8a3d" /></svg> },
-  rsp: { bg: "linear-gradient(135deg,#1e293b,#427cff)", art: <span className="text-[34px] leading-none">✌️</span> },
-  memory: { bg: "linear-gradient(135deg,#c084fc,#427cff)", art: <svg viewBox="0 0 48 48" className="h-10 w-10"><rect x="6" y="8" width="16" height="22" rx="3" fill="#fff" /><rect x="26" y="8" width="16" height="22" rx="3" fill="#fff" opacity=".8" /><rect x="6" y="34" width="36" height="6" rx="3" fill="#fff" opacity=".5" /></svg> },
-};
+const TILE_IMG: Record<string, string> = { spot: "/games/spot/park/a.webp", slide: "/games/art/tile_slide.webp", scratch: "/games/art/tile_scratch.webp", rsp: "/games/art/tile_rsp.webp", memory: "/games/art/tile_memory.webp" };
 
 /** 미니게임 허브 — 매일 리셋되는 5가지. 결과·보상은 서버가 결정 */
 export default function GamesPage() {
@@ -38,11 +32,9 @@ export default function GamesPage() {
           {(data?.games ?? []).map((g) => (
             <li key={g.key}>
               <Link href={g.href} className="block overflow-hidden rounded-[20px] bg-white" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
-                {g.key === "spot" ? (
-                  <div className="relative h-[96px] bg-cover bg-center" style={{ backgroundImage: "url(/games/spot/park/a.webp)" }}><span className="absolute right-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold text-white">NEW 일러스트</span></div>
-                ) : (
-                  <div className="flex h-[96px] items-center justify-center" style={{ background: TILE[g.key]?.bg }}>{TILE[g.key]?.art}</div>
-                )}
+                <div className="relative h-[104px] bg-cover bg-center" style={{ backgroundImage: `url(${TILE_IMG[g.key] ?? "/games/spot/park/a.webp"})` }}>
+                  {g.key === "spot" && <span className="absolute right-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold text-white">NEW</span>}
+                </div>
                 <div className="p-3">
                   <p className="text-[15px] font-bold">{g.title}</p>
                   <p className="mt-0.5 line-clamp-2 min-h-[32px] text-[11px] leading-[16px] text-[#8b94a0]">{g.desc}</p>

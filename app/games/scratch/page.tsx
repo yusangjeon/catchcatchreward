@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
@@ -7,6 +9,9 @@ import { Lottie } from "@/components/motion/Lottie";
 import { useToast } from "@/components/motion/Toast";
 import { fmt } from "@/hooks/useHome";
 import type { GamesPayload } from "@/lib/games/service";
+
+const ART: Record<string, string> = { "🍀": "clover", "🍒": "cherry", "🔔": "bell", "⭐": "star", "💎": "diamond", "🎁": "gift" };
+const Sym = ({ s, size = 56 }: { s: string; size?: number }) => (ART[s] ? <img src={`/games/art/${ART[s]}.png`} alt={s} width={size} height={size} className="object-contain" style={{ width: size, height: size }} /> : <span>{s}</span>);
 
 /** 복권 긁기 — 3×3 칸. 같은 그림 3개면 당첨. 당첨은 복권을 받는 순간 서버가 정하고 그리드도 서버가 만든다 */
 export default function ScratchPage() {
@@ -91,14 +96,14 @@ export default function ScratchPage() {
           <div className="relative mt-3 rounded-2xl bg-white p-3">
             <div className="grid grid-cols-3 gap-2">
               {(ticket?.grid ?? Array(9).fill("?")).map((g, i) => (
-                <div key={i} className={`flex aspect-square items-center justify-center rounded-xl text-[34px] ${revealed && winIdx.has(i) ? "bg-[#fff0b3] ring-2 ring-[#ff8a3d]" : "bg-[#f8f9fc]"}`}>{g}</div>
+                <div key={i} className={`flex aspect-square items-center justify-center rounded-xl text-[34px] ${revealed && winIdx.has(i) ? "bg-[#fff0b3] ring-2 ring-[#ff8a3d]" : "bg-[#f8f9fc]"}`}>{g === "?" ? <span className="text-[#c5cbd3]">?</span> : <Sym s={g} size={64} />}</div>
               ))}
             </div>
             {ticket && !revealed && <canvas ref={canvas} width={330} height={330} onPointerDown={(e) => { drawing.current = true; scratchAt(e); }} onPointerMove={(e) => { if (drawing.current || e.pointerType === "touch") scratchAt(e); }} onPointerUp={() => (drawing.current = false)} onPointerLeave={() => (drawing.current = false)} className="absolute inset-3 h-[calc(100%-24px)] w-[calc(100%-24px)] touch-none rounded-2xl" />}
             {revealed && ticket && ticket.points > 0 && <div className="pointer-events-none absolute inset-0 flex items-center justify-center"><Lottie src="/myb/lottie_confetti_pop.json" className="h-[300px] w-[300px]" /></div>}
           </div>
           <div className="mt-3 flex items-center justify-between px-1 text-[12px] font-bold text-[#7a3f00]">
-            <span>🍒 5P · 🔔 10P · ⭐ 50P · 💎 500P</span>
+            <span className="flex items-center gap-1"><Sym s="🍒" size={18} />5P <Sym s="🔔" size={18} />10P <Sym s="⭐" size={18} />50P <Sym s="💎" size={18} />500P</span>
             {ticket && !revealed && <span>{Math.round(pct * 100)}% 긁음</span>}
           </div>
         </div>
