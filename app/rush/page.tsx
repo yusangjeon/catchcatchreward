@@ -8,6 +8,7 @@ import { Countdown } from "@/components/motion/Countdown";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { useToast } from "@/components/motion/Toast";
 import { haptic, sfx } from "@/lib/fx";
+import { burstAtPointer, confetti, flyToBalance } from "@/lib/fxEngine";
 import { fmt } from "@/hooks/useHome";
 import type { RushMissionView, RushPayload } from "@/lib/rush/types";
 
@@ -35,7 +36,7 @@ export default function RushPage() {
       const res = await fetch("/api/rush/claim", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ missionKey: key }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "보상을 받을 수 없어요");
-      haptic("success"); sfx("coin");
+      haptic("success"); sfx("coin"); burstAtPointer("coins"); flyToBalance(6); if (key.startsWith("stamp")) setTimeout(() => confetti(140), 250);
       show(j.stampAdded ? `${fmt(j.points)}P와 스탬프 1개를 받았어요` : `${fmt(j.points)}P를 받았어요!`);
       await load();
     } catch (e) {
@@ -87,7 +88,7 @@ export default function RushPage() {
         <h1 className="text-[18px] font-semibold text-white">비포인트 러쉬</h1>
         <Link href="/wallet" className="flex items-center gap-[6px]">
           <PCoin size={18} />
-          <span className="text-[18px] font-semibold leading-[18px] text-white">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span>
+          <span id="hdr-balance" className="text-[18px] font-semibold leading-[18px] text-white">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span>
         </Link>
       </header>
 

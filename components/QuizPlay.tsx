@@ -7,6 +7,7 @@ import { CheckIcon, CXCoin, PCoin } from "./icons";
 import { Lottie } from "./motion/Lottie";
 import { ToastOnMount } from "./motion/Toast";
 import { haptic, sfx } from "@/lib/fx";
+import { burst, confetti } from "@/lib/fxEngine";
 
 /* eslint-disable @next/next/no-img-element */
 import { SetGridCard } from "./SetCard";
@@ -60,7 +61,7 @@ export function QuizPlay({ setId }: { setId: string }) {
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "제출 실패");
       setResult(j as SubmitResult);
-      haptic("jackpot"); sfx("win");
+      haptic("jackpot"); sfx("win"); setTimeout(() => { confetti(150); burst("coins", window.innerWidth / 2, 260); }, 250);
     } catch (e) {
       setError(e instanceof Error ? e.message : "제출 실패");
     } finally {

@@ -8,6 +8,7 @@ import { useToast } from "@/components/motion/Toast";
 import { fmt } from "@/hooks/useHome";
 import { PCoin } from "@/components/icons";
 import { haptic, sfx } from "@/lib/fx";
+import { burst, confetti, flyCoins } from "@/lib/fxEngine";
 import type { SpotPayload } from "@/lib/games/service";
 
 /* eslint-disable @next/next/no-img-element */
@@ -35,6 +36,7 @@ export default function SpotPage() {
   const [flash, setFlash] = useState(false);
   const warned = useRef(false);
   const area = useRef<HTMLDivElement | null>(null);
+  const dots = useRef<(HTMLSpanElement | null)[]>([]);
   const [dim, setDim] = useState<{ w: number; h: number } | null>(null);
   // 두 그림이 남는 세로 공간에 딱 맞도록(스크롤 없이 한 화면) 크기 계산
   useEffect(() => {
@@ -90,7 +92,7 @@ export default function SpotPage() {
       setResult(r);
       setMarks((m) => [...m.filter((x) => x.kind !== "hint"), ...r.missed.map((c) => ({ ...c, kind: "missed" as const }))]);
       setPhase("done");
-      if (r.all) { haptic("jackpot"); sfx("win"); } else if (r.points > 0) { haptic("success"); sfx("coin"); } else { haptic("warn"); sfx("lose"); }
+      if (r.all) { haptic("jackpot"); sfx("win"); } else if (r.points > 0) { haptic("success"); sfx("coin"); burst("coins", window.innerWidth / 2, window.innerHeight / 2); } else { haptic("warn"); sfx("lose"); }
       show(r.points > 0 ? `${r.found}/${r.total} 찾았어요 · +${fmt(r.points)}P` : "아쉽게도 못 찾았어요", r.points > 0 ? undefined : "info");
     } catch (e) {
       show(e instanceof Error ? e.message : "제출 실패", "info");
@@ -132,6 +134,7 @@ export default function SpotPage() {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
+    const cx = e.clientX, cy = e.clientY;
     tapLock.current = true;
     try {
       const res = await fetch("/api/games/spot", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "tap", level: data.level.id, x, y, tokens: tokensRef.current }) });
@@ -144,7 +147,10 @@ export default function SpotPage() {
         setMarks((m) => [...m.filter((k) => !(k.kind === "hint" && k.id === j.diff.id)), { ...j.diff, kind: "found" }]);
         haptic("success"); sfx(j.found >= j.total ? "win" : "hit");
         addFloat(j.diff.x, j.diff.y, `+${data.pointPerDiff}P`, true);
-        if (j.found >= j.total) void submit();
+        burst("sparkle", cx, cy);
+        const dot = dots.current[j.found - 1];
+        setTimeout(() => flyCoins({ x: cx, y: cy }, dot, 3, (i) => { if (i === 0 && dot) { dot.classList.add("spot-dot-pop"); burst("ring", dot.getBoundingClientRect().left + 9, dot.getBoundingClientRect().top + 9); } }), 120);
+        if (j.found >= j.total) { setTimeout(() => confetti(160), 500); void submit(); }
       } else {
         const k = Date.now();
         setMisses((m) => [...m.slice(-3), { x, y, k }]);
@@ -152,6 +158,7 @@ export default function SpotPage() {
         setLeft((s) => Math.max(1, s - MISS_PENALTY));
         haptic("error"); sfx("miss");
         addFloat(x, y, `틀렸어요 −${MISS_PENALTY}초`, false);
+        burst("miss", cx, cy);
         setShake(true); setFlash(true);
         setTimeout(() => setShake(false), 450); setTimeout(() => setFlash(false), 500);
       }
@@ -187,10 +194,23 @@ export default function SpotPage() {
     <div className={`relative mx-auto overflow-hidden rounded-[14px] bg-[#e5e8ee] ${shake ? "spot-shake" : ""}`} style={dim ? { width: dim.w, height: dim.h, boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" } : { aspectRatio: "1024 / 688", boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }} onClick={tap}>
       <img src={src} alt={label} draggable={false} onLoad={() => setImgReady((n) => n + 1)} className={`block h-full w-full select-none transition-[filter] duration-300 ${blur ? "blur-[6px]" : ""}`} />
       {marks.map((m) => (
-        <span key={m.kind + m.id} className={`spot-mark pointer-events-none absolute rounded-full border-[3px] ${m.kind === "found" ? "border-[#22c55e] shadow-[0_0_0_2px_rgba(255,255,255,.9)]" : m.kind === "missed" ? "border-dashed border-[#ff3b6b]" : "border-dashed border-[#ffb400] spot-hint"}`} style={{ left: `${(m.x - m.r) * 100}%`, top: `${(m.y - m.r * 1024 / 688) * 100}%`, width: `${m.r * 2 * 100}%`, aspectRatio: "1" }} />
+        <svg key={m.kind + m.id} viewBox="0 0 100 100" className="pointer-events-none absolute overflow-visible" style={{ left: `${(m.x - m.r) * 100}%`, top: `${(m.y - m.r * 1024 / 688) * 100}%`, width: `${m.r * 2 * 100}%`, aspectRatio: "1" }}>
+          {m.kind === "found" ? (
+            <>
+              <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,.95)" strokeWidth="10" pathLength={1} className="spot-ring spot-ring-halo" />
+              <circle cx="50" cy="50" r="46" fill="none" stroke="#22c55e" strokeWidth="5.5" strokeLinecap="round" pathLength={1} className="spot-ring" />
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" pathLength={1} className="spot-ring spot-ring-2" opacity=".8" />
+              <circle cx="50" cy="50" r="46" fill="none" stroke="#22c55e" strokeWidth="3" className="spot-ring-pulse" />
+            </>
+          ) : m.kind === "missed" ? (
+            <circle cx="50" cy="50" r="45" fill="rgba(255,59,107,.12)" stroke="#ff3b6b" strokeWidth="4" strokeDasharray="7 6" pathLength={1} className="spot-ring" />
+          ) : (
+            <circle cx="50" cy="50" r="45" fill="rgba(255,180,0,.15)" stroke="#ffb400" strokeWidth="4" strokeDasharray="6 5" className="spot-hint-ring" />
+          )}
+        </svg>
       ))}
       {misses.map((m) => (
-        <span key={m.k} className="spot-miss pointer-events-none absolute text-[26px] font-black leading-none text-[#ff3b6b]" style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, transform: "translate(-50%,-50%)" }}>✕</span>
+        <span key={m.k} className="spot-miss pointer-events-none absolute text-[34px] font-black leading-none text-[#ff3b6b] drop-shadow-[0_2px_0_rgba(255,255,255,.9)]" style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, transform: "translate(-50%,-50%)" }}>✕</span>
       ))}
       {floats.map((f) => (
         <span key={f.k} className={`spot-float pointer-events-none absolute whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-extrabold text-white shadow-md ${f.ok ? "bg-[#22c55e]" : "bg-[#ff3b6b]"}`} style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%` }}>{f.text}</span>
@@ -207,7 +227,7 @@ export default function SpotPage() {
         {/* 상태 줄: 레벨 칩 · 찾은 개수 5개 · 타이머 바 */}
         <div className="flex shrink-0 items-center justify-between px-0.5">
           <span className="rounded-full bg-[#e8f1ff] px-2.5 py-1 text-[12px] font-bold text-[#427cff]">LV {data ? data.level.index + 1 : "-"}<span className="font-medium text-[#9fb6ff]">/3</span></span>
-          <div className="flex items-center gap-2">{Array.from({ length: total }).map((_, i) => <span key={i} className={`h-[18px] w-[18px] rounded-full border-2 transition-all ${i < found ? "border-[#22c55e] bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,.5)]" : "border-[#dee2e9] bg-white"}`} />)}</div>
+          <div className="flex items-center gap-2">{Array.from({ length: total }).map((_, i) => <span key={i} ref={(el) => { dots.current[i] = el; }} className={`flex h-[20px] w-[20px] items-center justify-center rounded-full border-2 text-[11px] font-black text-white transition-all duration-300 ${i < found ? "border-[#22c55e] bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,.6)]" : "border-[#dee2e9] bg-white"}`}>{i < found ? "✓" : ""}</span>)}</div>
           <span className="w-[52px] text-right text-[12px] font-semibold text-[#8b94a0]">{data ? data.level.name : ""}</span>
         </div>
         <div className="h-1 w-full shrink-0 overflow-hidden rounded-full bg-[#e5e8ee]"><div className="h-full rounded-full transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%`, background: left <= 10 ? "#ff3939" : "linear-gradient(90deg,#427cff,#22d3ee)" }} /></div>
@@ -269,7 +289,7 @@ export default function SpotPage() {
         <>
           <div className="myb-fade-in fixed inset-0 z-[999] bg-black/55" />
           <div className="myb-modal-in fixed left-1/2 top-1/2 z-[1000] w-[calc(100%-56px)] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-[24px] bg-white px-6 pb-6 pt-7 text-center">
-            <p className="text-[34px] tracking-[6px] text-[#ffb400]">{"★".repeat(stars)}<span className="text-[#e5e8ee]">{"★".repeat(3 - stars)}</span></p>
+            <p className="flex items-center justify-center gap-2 text-[38px] leading-none">{[0, 1, 2].map((i) => <span key={i} className={i < stars ? "spot-star text-[#ffb400] drop-shadow-[0_2px_6px_rgba(255,180,0,.5)]" : "text-[#e5e8ee]"} style={{ animationDelay: `${0.25 + i * 0.18}s` }}>★</span>)}</p>
             <p className="mt-2 text-[24px] font-extrabold">{result.all ? "완벽해요!" : `${result.found}/${result.total} 찾았어요`}</p>
             <p className="mt-2 flex items-center justify-center gap-1 text-[20px] font-extrabold text-[#427cff]"><PCoin size={20} />+{fmt(result.points)}</p>
             <p className="mt-1 text-[12px] text-[#8b94a0]">{result.seconds}초{result.speedBonus ? ` · ⚡ 스피드 +${result.speedBonus}P` : ""}{!result.all ? " · 놓친 곳은 분홍 점선" : ""}</p>

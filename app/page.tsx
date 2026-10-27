@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useHome, fmt } from "@/hooks/useHome";
 import { useToast } from "@/components/motion/Toast";
 import { haptic, sfx } from "@/lib/fx";
+import { burstAtPointer, confetti, flyToBalance } from "@/lib/fxEngine";
 import { ChevronRight, PCoin } from "@/components/icons";
 import { SetCard } from "@/components/SetCard";
 import { Banners } from "@/components/motion/Banners";
@@ -89,7 +90,7 @@ export default function HomePage() {
     const j = await res.json();
     if (!res.ok) return show("출석체크에 실패했어요", "info");
     if (j.already) show(`오늘은 이미 출석했어요 (${j.streak}일 연속)`, "info");
-    else { haptic("success"); sfx("coin"); }
+    else { haptic("success"); sfx("coin"); burstAtPointer("coins"); flyToBalance(6); if (j.bonus) setTimeout(() => confetti(100), 300); }
     if (!j.already) show(`출석 완료! ${fmt(j.points)}P와 스탬프 1개를 받았어요${j.streak > 1 ? ` · ${j.streak}일 연속` : ""}${j.bonus ? ` · 보너스 +${j.bonus}P` : ""}`);
     await reload();
   }
@@ -100,7 +101,7 @@ export default function HomePage() {
       <header className="flex h-[55px] items-center justify-between px-5">
         <Link href="/wallet" className="flex items-center gap-2">
           <PCoin size={24} />
-          <span className="text-[16px] font-bold tabular-nums">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span>
+          <span id="hdr-balance" className="text-[16px] font-bold tabular-nums">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span>
         </Link>
         <div className="flex items-center gap-3">
           <Link href="/me" className="flex h-[26px] items-center gap-1.5 rounded-lg border border-line bg-bg-2 px-2 text-[12px] font-semibold">

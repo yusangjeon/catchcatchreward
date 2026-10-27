@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Shell } from "@/components/Shell";
 import { ToastProvider } from "@/components/motion/Toast";
+import { FxLayer } from "@/components/motion/FxLayer";
 
 export const metadata: Metadata = {
   title: "캐치캐치리워드",
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased">
         <ToastProvider>
           <Shell>{children}</Shell>
+          <FxLayer />
         </ToastProvider>
       </body>
     </html>

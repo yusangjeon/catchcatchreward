@@ -7,6 +7,7 @@ import { PCoin } from "@/components/icons";
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { useToast } from "@/components/motion/Toast";
 import { haptic, sfx } from "@/lib/fx";
+import { burstAtPointer, confetti, flyToBalance } from "@/lib/fxEngine";
 import { fmt } from "@/hooks/useHome";
 import type { MonthlyPayload } from "@/lib/monthly/service";
 
@@ -25,7 +26,7 @@ export default function MonthlyPage() {
       const res = await fetch("/api/monthly", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ key }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "보상을 받을 수 없어요");
-      haptic("jackpot"); sfx("win");
+      haptic("jackpot"); sfx("win"); burstAtPointer("stars"); flyToBalance(8); setTimeout(() => confetti(140), 200);
       show(`${fmt(j.points)}P를 받았어요!`);
       await load();
     } catch (e) {
@@ -38,7 +39,7 @@ export default function MonthlyPage() {
 
   return (
     <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
-      <GameHeader title="월간 도전 과제" right={<Link href="/wallet" className="flex items-center gap-1 text-[16px]"><PCoin size={16} />{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</Link>} />
+      <GameHeader title="월간 도전 과제" right={<Link href="/wallet" className="flex items-center gap-1 text-[16px]"><PCoin size={16} /><span id="hdr-balance">{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</span></Link>} />
       <div className="px-4 pt-[60px]">
         <section className="relative overflow-hidden rounded-[24px] px-6 pb-6 pt-6 text-white" style={{ background: "linear-gradient(135deg,#ff8a3d 0%,#ff3e9a 50%,#8e3cff 100%)" }}>
           <span className="inline-flex h-6 items-center rounded-full bg-white/20 px-2.5 text-[12px] font-bold">{data ? `${data.monthLabel} · D-${daysLeft}` : "—"}</span>
