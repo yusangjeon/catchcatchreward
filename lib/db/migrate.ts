@@ -45,7 +45,7 @@ export async function migrateAndSeed(sql: Sql): Promise<{ seeded: Record<string,
     seeded.badges = (seeded.badges ?? 0) + r.count;
   }
   for (const s of SEED_SETS) {
-    const r = await sql`insert into quiz_sets (id, title, image_url, reward_points, capacity, base_participants, today_only, active, sort, target_badges) values (${s.id}, ${s.title}, ${s.imageUrl}, ${s.rewardPoints}, ${s.capacity}, ${s.baseParticipants}, ${s.todayOnly}, ${s.active}, ${s.sort}, ${sql.array(s.targetBadges ?? [])}::text[]) on conflict (id) do update set image_url = excluded.image_url where quiz_sets.image_url like 'https://picsum.photos/%'`;
+    const r = await sql`insert into quiz_sets (id, title, image_url, reward_points, capacity, base_participants, today_only, active, sort, target_badges) values (${s.id}, ${s.title}, ${s.imageUrl}, ${s.rewardPoints}, ${s.capacity}, ${s.baseParticipants}, ${s.todayOnly}, ${s.active}, ${s.sort}, ${sql.array(s.targetBadges ?? [])}::text[]) on conflict (id) do update set image_url = case when quiz_sets.image_url like 'https://picsum.photos/%' then excluded.image_url else quiz_sets.image_url end, title = excluded.title where quiz_sets.image_url like 'https://picsum.photos/%' or quiz_sets.title <> excluded.title`;
     seeded.quiz_sets = (seeded.quiz_sets ?? 0) + r.count;
   }
   for (const q of SEED_QUIZZES) {

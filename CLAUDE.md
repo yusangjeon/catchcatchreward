@@ -185,3 +185,4 @@
   - 토큰(`app/globals.css`): `--color-blue/-soft`, `green`, `violet`, `teal`, `amber`, `navy`. 히어로 재배색: 홈 블루 틴트 · 혜택 블루 · 월간 네이비 · 초대 핑크 · 매장 틸 · 러쉬 다크(영상 기준 유지).
   - 틀린그림 난이도(`lib/games/service.ts SPOT_STAGES`): LV1 60초/오답 −5/차이당 3P/완주 +10/스피드 +5 → LV2 50/−7/4/+15/+8 → LV3 40/−10/5/+20/+12. 오늘 3레벨은 `spotLevelFor` 가 차이 반경 평균 큰 순(쉬움→어려움) 정렬. 서버 `missPenalty` 를 payload 로 내려 클라이언트가 사용, LV 칩에 제한 초 표시.
   - QA: tsc·lint 0 경고·build, Playwright `qa/spotqa.js`(3레벨 5/5, 보상 30P/35P/45P 단계 확인) · `qa/v8.js` 전 화면 콘솔 에러 0·실패 요청 0, 갤러리 v9(60장) 아티팩트 갱신.
+  - 추가(같은 날): 퀴즈 채널 배지 칩·지갑 뱃지·보상 획득 칩·퀴즈 풀기 페르소나 칩의 **이모지 제거** → `components/icons/badge.tsx`(배지 코드/태그 → 듀오톤 14종 pepper/coffee/moon/home/cart/dumbbell/plane/paw/lipstick/dress/trend/fork/car/leaf + 톤). `Persona.tag` 추가. 시드 퀴즈 제목 끝 이모지 5건 삭제, `migrate.ts` 가 제목 변경도 upsert(`/admin/db` 1회로 라이브 반영). `badges.emoji` 컬럼은 관리자 표에서만 사용.

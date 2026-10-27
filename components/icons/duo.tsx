@@ -3,7 +3,8 @@ import type { CSSProperties } from "react";
 
 export type DuoName =
   | "calendar" | "gamepad" | "gift" | "flame" | "trophy" | "pin" | "ticket" | "people" | "coin" | "bell" | "lock" | "search"
-  | "quiz" | "store" | "drop" | "bag" | "star" | "megaphone" | "doc" | "chat" | "clock" | "badge" | "wheel" | "bolt" | "stamp" | "sparkle" | "chart";
+  | "quiz" | "store" | "drop" | "bag" | "star" | "megaphone" | "doc" | "chat" | "clock" | "badge" | "wheel" | "bolt" | "stamp" | "sparkle" | "chart"
+  | "home" | "cart" | "dumbbell" | "plane" | "paw" | "lipstick" | "dress" | "trend" | "fork" | "car" | "leaf" | "pepper" | "coffee" | "moon";
 
 export type Tone = "blue" | "green" | "violet" | "pink" | "teal" | "amber" | "orange" | "gray" | "navy";
 
@@ -48,6 +49,20 @@ const P: Record<DuoName, { back?: string; front: string; fill?: string }> = {
   stamp: { back: "M12 2l1.8 2.4 2.9-.6.6 2.9L19.7 8.5l-1.7 2.4 1.7 2.4-2.4 1.8-.6 2.9-2.9-.6L12 20l-1.8-2.6-2.9.6-.6-2.9L4.3 13.3 6 10.9 4.3 8.5l2.4-1.8.6-2.9 2.9.6z", front: "M9 11l2 2 4-4" },
   sparkle: { back: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z", front: "M19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8zM5 3l.6 1.6L7.2 5l-1.6.6L5 7.2l-.6-1.6L2.8 5l1.6-.4z" },
   chart: { back: "M4 20h16v1H4z", front: "M5 19V11M10 19V6M15 19v-8M20 19V4" },
+  home: { back: "M4 11l8-7 8 7v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z", front: "M10 21v-6h4v6M3 11.5 12 4l9 7.5" },
+  cart: { back: "M6 7h15l-1.6 7H8z", front: "M3 4h2.4l2.6 10h10M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM17 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" },
+  dumbbell: { back: "M7 8h10v8H7z", front: "M3 10v4M21 10v4M5 8v8M19 8v8M7 12h10M7 7h2v10H7zM15 7h2v10h-2z" },
+  plane: { back: "M21 12l-7-2V4.5a2 2 0 0 0-4 0V10l-7 2v2l7-1v4l-2 1.5V20l4-1 4 1v-1.5L14 17v-4l7 1z", front: "M21 12l-7-2V4.5a2 2 0 0 0-4 0V10l-7 2v2l7-1v4l-2 1.5V20l4-1 4 1v-1.5L14 17v-4l7 1z" },
+  paw: { back: "M12 20c-3 0-5-1.6-5-3.6 0-1.8 2.2-4.4 5-4.4s5 2.6 5 4.4c0 2-2 3.6-5 3.6z", front: "M7.5 9.5a1.6 2 0 1 0 0-4 1.6 2 0 0 0 0 4zM16.5 9.5a1.6 2 0 1 0 0-4 1.6 2 0 0 0 0 4zM4.5 13.5a1.5 2 0 1 0 0-4 1.5 2 0 0 0 0 4zM19.5 13.5a1.5 2 0 1 0 0-4 1.5 2 0 0 0 0 4z" },
+  lipstick: { back: "M9 10h6v10a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z", front: "M10 10V5l4-2v7M8 13h8M12 13v8" },
+  dress: { back: "M7 21l1.5-9L7 8h10l-1.5 4L17 21z", front: "M9 3c0 3 1.5 5 3 5s3-2 3-5M7 8h10M8.5 12h7" },
+  trend: { back: "M4 20h16v1H4z", front: "M4 17l5-5 4 3 7-7M15 8h5v5" },
+  fork: { back: "M15 3c-2 0-3 2-3 5s1 5 3 5z", front: "M6 3v5a2.5 2.5 0 0 0 5 0V3M8.5 3v18M15 13v8M15 3c2 0 3 2 3 5s-1 5-3 5" },
+  car: { back: "M4 12h16v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z", front: "M5 12l2-5.5A1.5 1.5 0 0 1 8.4 5.5h7.2a1.5 1.5 0 0 1 1.4 1L19 12M7 19v2M17 19v2M7.5 15.5h.01M16.5 15.5h.01" },
+  leaf: { back: "M19 4c-9 0-14 4-14 11a5 5 0 0 0 5 5c7 0 9-7 9-16z", front: "M5 20c3-6 7-9 12-12M19 4c-9 0-14 4-14 11a5 5 0 0 0 5 5c7 0 9-7 9-16z" },
+  pepper: { back: "M16 7c-5 0-10 4-10 9a4 4 0 0 0 4 4c6 0 9-6 9-11z", front: "M16 7c0-2 1.5-3.5 3.5-3.5M16 7c-5 0-10 4-10 9a4 4 0 0 0 4 4c6 0 9-6 9-11zM9 17c1.5-3 4-5.5 7-7" },
+  coffee: { back: "M4 9h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z", front: "M16 10h2a2.5 2.5 0 0 1 0 5h-2M7 4.5c0 1 1 1 1 2M11 4.5c0 1 1 1 1 2" },
+  moon: { back: "M14 3a9 9 0 1 0 7 14.5A8 8 0 0 1 14 3z", front: "M14 3a9 9 0 1 0 7 14.5A8 8 0 0 1 14 3zM18 4l.5 1.5L20 6l-1.5.5L18 8l-.5-1.5L16 6l1.5-.5z" },
 };
 
 export function DuoIcon({ name, size = 22, className, style }: { name: DuoName; size?: number; className?: string; style?: CSSProperties }) {

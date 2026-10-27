@@ -190,7 +190,8 @@ export interface SetCard {
 export interface Persona {
   title: string; // 예: 미학적인 스타일리스트
   code: string; // 예: INTJ
-  emojis: string; // 예: 🤔🖼️👇
+  emojis: string; // 예: 🤔🖼️👇 (레거시, 화면 미사용)
+  tag: string; // 최상위 취향 태그(아이콘 매핑용). 응답 없으면 ""
 }
 
 export interface Wallet {

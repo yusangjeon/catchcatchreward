@@ -59,9 +59,9 @@ function persona(scores: Record<string, number>): Persona {
     .sort((a, b) => b.s - a.s)[0];
   const g = (a: string, b: string, A: string, B: string) => ((scores[a] ?? 0) >= (scores[b] ?? 0) ? A : B);
   const total = Object.values(scores).reduce((x, y) => x + y, 0);
-  if (total === 0) return { title: "탐험을 시작한 뉴비", code: "????", emojis: "🔍✨👋" };
+  if (total === 0) return { title: "탐험을 시작한 뉴비", code: "????", emojis: "", tag: "" };
   const code = g("outdoor", "home", "E", "I") + g("challenge", "value", "N", "S") + g("tech", "cafe", "T", "F") + g("saving", "rest", "J", "P");
-  return { title: top.title, code, emojis: top.emojis };
+  return { title: top.title, code, emojis: top.emojis, tag: top.tag };
 }
 
 // ───────── 공용 조립 ─────────

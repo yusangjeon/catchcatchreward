@@ -1,5 +1,7 @@
 "use client";
 
+import { BadgeTile } from "@/components/icons/badge";
+
 /* eslint-disable @next/next/no-img-element */
 
 import { DuoIcon, IconTile, type DuoName, type Tone } from "@/components/icons/duo";
@@ -129,8 +131,8 @@ export default function WalletPage() {
           {data && data.badges.length > 0 ? (
             <ul className="mt-5 grid grid-cols-3 gap-4">
               {data.badges.map((b) => (
-                <li key={b.code} className="flex flex-col items-center rounded-2xl border border-line p-4 text-center">
-                  <span className="text-[40px]" aria-hidden>{b.emoji}</span>
+                <li key={b.code} className="flex flex-col items-center rounded-2xl bg-bg-2 p-4 text-center">
+                  <BadgeTile code={b.code} size={56} />
                   <span className="mt-2 text-[14px] font-bold">{b.name}</span>
                 </li>
               ))}
@@ -143,8 +145,8 @@ export default function WalletPage() {
               <h3 className="mt-8 text-[16px] font-bold">다음 뱃지까지</h3>
               <ul className="mt-3 flex flex-col gap-3">
                 {data.badgeProgress.filter((b) => !b.earned).sort((a, b) => b.current / b.min - a.current / a.min).map((b) => (
-                  <li key={b.code} className="flex items-center gap-3 rounded-2xl border border-line px-4 py-3">
-                    <span className="text-[28px] grayscale" aria-hidden>{b.emoji}</span>
+                  <li key={b.code} className="flex items-center gap-3 rounded-2xl bg-bg-2 px-4 py-3">
+                    <BadgeTile code={b.code} size={44} muted />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between text-[14px]">
                         <span className="font-semibold">{b.name}</span>

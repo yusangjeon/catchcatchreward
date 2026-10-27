@@ -1,5 +1,7 @@
 "use client";
 
+import { BadgeIcon, BadgeTile } from "@/components/icons/badge";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useHome, fmt } from "@/hooks/useHome";
@@ -58,7 +60,7 @@ export default function QuizTabPage() {
           {(groups ?? []).map((x) => (
             <li key={x.code}>
               <button type="button" onClick={() => { setTab(x.code); setMore(false); }} className={`flex h-[42px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-4 text-[15px] font-semibold ${tab === x.code ? "bg-myb text-white" : "bg-white text-ink"}`}>
-                {x.emoji} {x.name}{x.earned && <span className="text-[11px]">✓</span>}
+                <BadgeIcon code={x.code} size={18} className={tab === x.code ? "text-white" : "text-ink-2"} />{x.name}{x.earned && <span className="text-[11px]">✓</span>}
               </button>
             </li>
           ))}
@@ -66,7 +68,7 @@ export default function QuizTabPage() {
         </ul>
         <div className="mx-5 mt-4 rounded-[20px] bg-white p-5">
           <div className="flex items-center justify-between">
-            <p className="text-[18px] font-bold">{g ? `${g.emoji} ${g.name}` : "…"}</p>
+            <p className="flex items-center gap-2 text-[18px] font-bold">{g ? <><BadgeTile code={g.code} size={30} /> {g.name}</> : "…"}</p>
             <Link href="/wallet" className="flex h-8 items-center gap-0.5 rounded-full border border-[#dfe3ea] px-3 text-[12px] font-medium text-ink-2">{g?.earned ? "획득한 뱃지" : "뱃지 미획득"} ›</Link>
           </div>
           <ul className="mt-4 flex flex-col gap-4">

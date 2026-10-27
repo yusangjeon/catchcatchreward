@@ -1,5 +1,7 @@
 "use client";
 
+import { BadgeIcon } from "@/components/icons/badge";
+
 import { DuoIcon } from "@/components/icons/duo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -102,7 +104,7 @@ export function QuizPlay({ setId }: { setId: string }) {
             </p>
             <div className="mt-1.5 flex gap-2">
               <span className="flex h-[26px] items-center rounded-full bg-white px-3.5 text-[12px] tracking-widest text-ink-2">•••</span>
-              <span className="flex h-[26px] items-center rounded-full bg-white px-2.5 text-[13px]">{data.persona.emojis}</span>
+              <span className="flex h-[26px] items-center gap-1 rounded-full bg-white px-2.5 text-[12px] font-semibold text-ink-2"><BadgeIcon code={data.persona.tag} size={14} />{data.persona.tag ? "취향 분석" : "분석 중"}</span>
               <span className="h-[26px] w-10 rounded-full bg-white/35" />
             </div>
           </div>
@@ -223,8 +225,8 @@ function RewardScreen({ result }: { result: SubmitResult }) {
         {result.newBadges.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {result.newBadges.map((b) => (
-              <span key={b.code} className="rounded-full bg-myb-soft px-3 py-1.5 text-[13px] font-semibold text-myb-dark">
-                {b.emoji} {b.name} 뱃지 획득
+              <span key={b.code} className="flex items-center gap-1.5 rounded-full bg-myb-soft px-3 py-1.5 text-[13px] font-semibold text-myb-dark">
+                <BadgeIcon code={b.code} size={16} /> {b.name} 뱃지 획득
               </span>
             ))}
           </div>
