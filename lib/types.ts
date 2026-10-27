@@ -194,6 +194,7 @@ export interface HomePayload {
   sets: SetCard[];
   rushEndsAt: string; // 비포인트 러쉬 주차 종료(ISO)
   attendedToday: boolean; // 오늘 출석체크 완료 여부(KST)
+  starter: { active: boolean; endsAt: string; multiplier: number }; // 뉴비 스타터팩(가입 후 3일 퀴즈 보상 2배)
 }
 
 export interface PublicQuestion {
@@ -213,6 +214,7 @@ export interface SubmitResult {
   ok: true;
   points: number;
   bonus: number;
+  starterBonus: number; // 스타터팩 추가분
   wallet: Wallet;
   newBadges: Badge[];
   recommended: SetCard[];

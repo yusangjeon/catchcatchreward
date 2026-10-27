@@ -96,7 +96,10 @@ export default function HomePage() {
       {/* 내게 딱 맞는 퀴즈 */}
       <section className="mt-[12px] bg-[#f4f6fa] pb-5 pt-[24px]">
         <Link href="/quiz" className="flex items-center justify-between px-5">
-          <h2 className="text-[20px] font-bold">내게 딱 맞는 퀴즈</h2>
+          <h2 className="flex items-center gap-2 text-[20px] font-bold">
+            내게 딱 맞는 퀴즈
+            {data?.starter.active && <span className="rounded-full bg-[#ff8a3d] px-2 py-0.5 text-[11px] font-bold text-white">뉴비 2배 D-{Math.max(0, Math.ceil((new Date(data.starter.endsAt).getTime() - Date.now()) / 86400_000))}</span>}
+          </h2>
           <ChevronRight size={20} className="text-ink-2" />
         </Link>
         <div className="mt-[14px] flex gap-3 px-5">

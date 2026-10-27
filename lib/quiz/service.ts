@@ -12,6 +12,16 @@ const RANDOM_BONUS = [0, 0, 0, 10, 10, 20, 30];
 /** 꿀 = 하루 퀴즈 세트 참여 횟수(마이비 "보유 꿀 8"). KST 0시에 충전. 광고 시청 충전은 오퍼월 연동 후. */
 export const HONEY_PER_DAY = 8;
 
+/** 스타터팩(마이비 isEnableStarterPack · beginnerEndAt = 가입일+3일 23:59 KST): 기간 내 퀴즈 세트 보상 2배 */
+export const STARTER_DAYS = 3;
+export const STARTER_MULTIPLIER = 2;
+export function starterOf(createdAt: string): { active: boolean; endsAt: string; multiplier: number } {
+  const KST = 9 * 3600_000;
+  const k = new Date(new Date(createdAt).getTime() + KST);
+  const end = Date.UTC(k.getUTCFullYear(), k.getUTCMonth(), k.getUTCDate() + STARTER_DAYS - 1, 23, 59, 59) - KST;
+  return { active: Date.now() <= end, endsAt: new Date(end).toISOString(), multiplier: STARTER_MULTIPLIER };
+}
+
 export class QuizError extends Error {
   constructor(
     public code: "NOT_FOUND" | "ALREADY_DONE" | "INCOMPLETE" | "BAD_OPTION" | "NO_HONEY",
@@ -100,9 +110,9 @@ function toPublic(q: Quiz): PublicQuestion {
 // ───────── 조회 ─────────
 export async function getHome(userId: string): Promise<HomePayload> {
   const repo = getRepo();
-  const [sets, w, badges, scores, done, rush] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId), repo.listCompletions(userId), rushSummary(userId)]);
+  const [sets, w, badges, scores, done, rush, profile] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId), repo.listCompletions(userId), rushSummary(userId), repo.findProfile(userId)]);
   const attendedToday = await repo.hasStamp(userId, "attendance", kstDayKey());
-  return { wallet: w, honey: honeyLeft(done), honeyMax: HONEY_PER_DAY, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday };
+  return { wallet: w, honey: honeyLeft(done), honeyMax: HONEY_PER_DAY, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday, starter: starterOf(profile?.createdAt ?? new Date(0).toISOString()) };
 }
 
 export async function getSetPayload(userId: string, setId: string): Promise<SetPayload> {
@@ -149,9 +159,13 @@ export async function submitSet(userId: string, setId: string, answers: { quizId
     await repo.saveResponse({ userId, quizId: q.id, optionId: byQuiz.get(q.id)!, dayKey });
   }
 
-  // 2) 세트 완료 기록 + 보상 원장
+  // 2) 세트 완료 기록 + 보상 원장 (+ 스타터팩 2배)
   const completion = await repo.saveCompletion({ userId, setId, dayKey });
   await repo.addLedger({ userId, delta: set.rewardPoints, reason: "quiz_answer", refType: "set_completion", refId: completion.id });
+  const profile = await repo.findProfile(userId);
+  const starter = starterOf(profile?.createdAt ?? new Date(0).toISOString());
+  const starterBonus = starter.active ? set.rewardPoints * (STARTER_MULTIPLIER - 1) : 0;
+  if (starterBonus > 0) await repo.addLedger({ userId, delta: starterBonus, reason: "quiz_bonus", refType: "set_completion", refId: completion.id, memo: "starter_pack" });
   const bonus = RANDOM_BONUS[Math.floor(Math.random() * RANDOM_BONUS.length)];
   if (bonus > 0) {
     await repo.addLedger({ userId, delta: bonus, reason: "quiz_bonus", refType: "set_completion", refId: completion.id, memo: "random_bonus" });
@@ -188,6 +202,7 @@ export async function submitSet(userId: string, setId: string, answers: { quizId
     ok: true,
     points: set.rewardPoints,
     bonus,
+    starterBonus,
     wallet: await wallet(userId),
     newBadges,
     recommended: cards.filter((c) => !c.done).slice(0, 4),

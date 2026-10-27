@@ -205,6 +205,11 @@ function RewardScreen({ result }: { result: SubmitResult }) {
           <span className="h-7 w-px bg-line" />
           <span className="flex items-center gap-3">CONX <span className="flex items-center gap-1.5 text-[20px] font-extrabold text-ink"><CXCoin size={22} />{conx}</span></span>
         </div>
+        {result.starterBonus > 0 && (
+          <p className="mt-4 flex h-[42px] items-center justify-center gap-1.5 rounded-xl bg-[#fff6e5] text-[13px] text-[#9a5b00]">
+            🎁 뉴비 스타터팩 2배로 <PCoin size={18} /> <b className="text-[16px] font-extrabold text-[#ff8a3d]">+{fmt(result.starterBonus)}</b> 더 받았어요
+          </p>
+        )}
         {result.bonus > 0 && (
           <p className="mt-4 flex h-[42px] items-center justify-center gap-1.5 rounded-xl bg-[#eef3ff] text-[13px] text-ink-2">
             랜덤 보상으로 <PCoin size={18} /> <b className="text-[16px] font-extrabold text-myb-dark">+{result.bonus}</b> 더 받았어요
