@@ -33,8 +33,8 @@ export default function HomePage() {
     const res = await fetch("/api/attendance", { method: "POST" });
     const j = await res.json();
     if (!res.ok) return show("출석체크에 실패했어요", "info");
-    if (j.already) show("오늘은 이미 출석했어요", "info");
-    else show(`출석 완료! ${fmt(j.points)}P와 스탬프 1개를 받았어요`);
+    if (j.already) show(`오늘은 이미 출석했어요 (${j.streak}일 연속)`, "info");
+    else show(`출석 완료! ${fmt(j.points)}P와 스탬프 1개를 받았어요${j.streak > 1 ? ` · ${j.streak}일 연속` : ""}${j.bonus ? ` · 보너스 +${j.bonus}P` : ""}`);
     await reload();
   }
 

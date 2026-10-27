@@ -80,6 +80,15 @@ export const memoryRepo: Repo = {
   async listResponses(userId) {
     return store().responses.filter((r) => r.userId === userId);
   },
+  async countResponsesByOption(quizIds) {
+    const want = new Set(quizIds);
+    const out: Record<string, Record<string, number>> = {};
+    for (const r of store().responses) {
+      if (!want.has(r.quizId)) continue;
+      (out[r.quizId] ??= {})[r.optionId] = (out[r.quizId]?.[r.optionId] ?? 0) + 1;
+    }
+    return out;
+  },
   async saveResponse(input) {
     const r: QuizResponse = { ...input, id: randomUUID(), answeredAt: now() };
     store().responses.push(r);

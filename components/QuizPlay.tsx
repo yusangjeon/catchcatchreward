@@ -221,6 +221,32 @@ function RewardScreen({ result }: { result: SubmitResult }) {
         )}
       </div>
 
+      {result.stats.length > 0 && (
+        <section className="px-5 pt-[36px]">
+          <h2 className="text-[19px] font-bold">다른 사람들은 어떻게 골랐을까요?</h2>
+          <ul className="mt-4 flex flex-col gap-4">
+            {result.stats.map((st, i) => (
+              <li key={i} className="rounded-2xl bg-[#f4f6fa] p-4">
+                <p className="text-[14px] font-semibold leading-[1.4]">{st.question}</p>
+                <ul className="mt-3 flex flex-col gap-2">
+                  {st.options.map((o) => (
+                    <li key={o.label}>
+                      <div className="flex items-center justify-between text-[13px]">
+                        <span className={o.mine ? "font-bold text-myb-dark" : "text-ink-2"}>{o.mine ? "✓ " : ""}{o.label}</span>
+                        <b className="tabular-nums">{o.pct}%</b>
+                      </div>
+                      <div className="mt-1 h-2 overflow-hidden rounded-full bg-white">
+                        <div className={`myb-progress h-full rounded-full ${o.mine ? "bg-myb" : "bg-[#c9d4ea]"}`} style={{ width: `${o.pct}%` }} />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {result.recommended.length > 0 && (
         <section className="px-5 pt-[36px]">
           <h2 className="text-[19px] font-bold">이런 퀴즈는 어때요?</h2>

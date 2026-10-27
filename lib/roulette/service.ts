@@ -12,6 +12,19 @@ export class RouletteError extends Error {
 }
 
 const ATTENDANCE_POINTS = 10; // 마이비 러쉬 스탬프 미션 "출석체크 완료하기" 보상 10P 와 동일
+const STREAK_DAYS = 7; // 연속 7일마다 보너스(마이비 dailyAttendanceClaimCreditIndex 구조 참고)
+const STREAK_BONUS = 50;
+
+/** 오늘 포함 연속 출석 일수(KST). stamps 의 attendance sourceId = 날짜 키 */
+function streakOf(days: Set<string>, today: string): number {
+  let n = 0;
+  const d = new Date(`${today}T00:00:00Z`);
+  while (days.has(d.toISOString().slice(0, 10))) {
+    n++;
+    d.setUTCDate(d.getUTCDate() - 1);
+  }
+  return n;
+}
 
 async function wallet(userId: string): Promise<Wallet> {
   const repo = getRepo();
@@ -79,8 +92,16 @@ export async function spin(userId: string): Promise<SpinResult> {
 export async function checkIn(userId: string): Promise<AttendanceResult> {
   const repo = getRepo();
   const day = kstDayKey();
-  if (await repo.hasStamp(userId, "attendance", day)) return { ok: true, already: true, points: 0, wallet: await wallet(userId) };
+  const days = new Set((await repo.listStamps(userId)).filter((s) => s.sourceType === "attendance" && s.sourceId).map((s) => s.sourceId!));
+  if (days.has(day)) return { ok: true, already: true, points: 0, streak: streakOf(days, day), bonus: 0, wallet: await wallet(userId) };
   await repo.addStamp({ userId, sourceType: "attendance", sourceId: day });
   await repo.addLedger({ userId, delta: ATTENDANCE_POINTS, reason: "mission", refType: "attendance", refId: day, memo: "출석체크" });
-  return { ok: true, already: false, points: ATTENDANCE_POINTS, wallet: await wallet(userId) };
+  days.add(day);
+  const streak = streakOf(days, day);
+  let bonus = 0;
+  if (streak % STREAK_DAYS === 0) {
+    bonus = STREAK_BONUS;
+    await repo.addLedger({ userId, delta: bonus, reason: "mission", refType: "attendance_streak", refId: `${day}:${streak}`, memo: `${streak}일 연속 출석 보너스` });
+  }
+  return { ok: true, already: false, points: ATTENDANCE_POINTS, streak, bonus, wallet: await wallet(userId) };
 }

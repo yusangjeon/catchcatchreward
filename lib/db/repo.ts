@@ -30,6 +30,8 @@ export interface Repo {
   listQuizzesBySet(setId: string): Promise<Quiz[]>;
 
   listResponses(userId: string): Promise<QuizResponse[]>;
+  /** quizId → optionId → 응답 수 (선택 분포) */
+  countResponsesByOption(quizIds: string[]): Promise<Record<string, Record<string, number>>>;
   saveResponse(input: Omit<QuizResponse, "id" | "answeredAt">): Promise<QuizResponse>;
 
   listCompletions(userId: string): Promise<SetCompletion[]>;

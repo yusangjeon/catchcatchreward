@@ -89,6 +89,13 @@ export function createSupabaseRepo(url: string, serviceRoleKey: string): Repo {
       );
       return rows.map((r) => ({ id: r.id, userId: r.user_id, quizId: r.quiz_id, optionId: r.option_id, dayKey: r.day_key, answeredAt: r.answered_at }));
     },
+    async countResponsesByOption(quizIds) {
+      if (quizIds.length === 0) return {};
+      const rows = ok<{ quiz_id: string; option_id: string }[]>(await sb.from("quiz_responses").select("quiz_id, option_id").in("quiz_id", quizIds), "quiz_responses.count");
+      const out: Record<string, Record<string, number>> = {};
+      for (const r of rows) (out[r.quiz_id] ??= {})[r.option_id] = (out[r.quiz_id]?.[r.option_id] ?? 0) + 1;
+      return out;
+    },
     async saveResponse(input): Promise<QuizResponse> {
       const data = ok<{ id: string; answered_at: string }>(
         await sb.from("quiz_responses").insert({ user_id: input.userId, quiz_id: input.quizId, option_id: input.optionId, day_key: input.dayKey }).select("id, answered_at").single(),

@@ -32,5 +32,7 @@ export interface AttendanceResult {
   ok: true;
   already: boolean;
   points: number;
+  streak: number; // 오늘 포함 연속 출석 일수
+  bonus: number; // 연속 7일 보너스(해당일만)
   wallet: Wallet;
 }

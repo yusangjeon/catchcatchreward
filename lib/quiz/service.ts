@@ -60,6 +60,7 @@ function toCard(s: QuizSet, counts: Record<string, number>, doneIds: Set<string>
     participants: s.baseParticipants + (counts[s.id] ?? 0),
     todayOnly: s.todayOnly,
     done: doneIds.has(s.id),
+    targeted: !!s.targetBadges?.length,
   };
 }
 
@@ -174,6 +175,14 @@ export async function submitSet(userId: string, setId: string, answers: { quizId
   // 5) 첫 세트 완료 → 초대한 친구에게 보상
   if (done.length === 0) await onFirstQuizCompletion(userId);
 
+  // 6) 선택 분포(이번 응답 포함)
+  const dist = await repo.countResponsesByOption(quizzes.map((q) => q.id));
+  const stats = quizzes.map((q) => {
+    const counts = dist[q.id] ?? {};
+    const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
+    return { question: q.question, options: q.options.map((o) => ({ label: o.label, pct: Math.round(((counts[o.id] ?? 0) / total) * 100), mine: byQuiz.get(q.id) === o.id })) };
+  });
+
   const cards = await setCards(userId);
   return {
     ok: true,
@@ -182,5 +191,6 @@ export async function submitSet(userId: string, setId: string, answers: { quizId
     wallet: await wallet(userId),
     newBadges,
     recommended: cards.filter((c) => !c.done).slice(0, 4),
+    stats,
   };
 }

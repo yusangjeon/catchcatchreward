@@ -170,6 +170,7 @@ export interface SetCard {
   participants: number;
   todayOnly: boolean;
   done: boolean;
+  targeted: boolean; // 내 배지 세그먼트 타깃 세트
 }
 
 export interface Persona {
@@ -215,6 +216,8 @@ export interface SubmitResult {
   wallet: Wallet;
   newBadges: Badge[];
   recommended: SetCard[];
+  /** 문항별 선택 분포(이번 응답 포함) — "다른 사람들은?" */
+  stats: { question: string; options: { label: string; pct: number; mine: boolean }[] }[];
 }
 
 export type RedemptionStatus = "requested" | "processing" | "done" | "rejected";
