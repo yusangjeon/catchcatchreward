@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BenefitIcon, HomeIcon, QuizIcon, WalkIcon, WalletIcon } from "@/components/icons";
-
-const TAB_ICON: Record<string, (p: { className?: string; size?: number }) => React.ReactNode> = { "/": HomeIcon, "/quiz": QuizIcon, "/benefits": BenefitIcon, "/wallet": WalletIcon, "/walk": WalkIcon };
+/* eslint-disable @next/next/no-img-element */
+const TAB_ICON: Record<string, string> = { "/": "home", "/quiz": "quiz", "/benefits": "benefit", "/wallet": "wallet", "/walk": "walk" };
 
 const TABS = [
   { href: "/", label: "홈" },
@@ -31,11 +30,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <ul className="grid h-[68px] grid-cols-5">
             {TABS.map((t) => {
               const active = t.href === "/" ? pathname === "/" : pathname.startsWith(t.href);
-              const color = "highlight" in t && t.highlight ? "text-myb" : active ? "text-ink" : "text-[#9aa3af]";
+              const hl = "highlight" in t && t.highlight;
+              const color = hl ? "text-myb" : active ? "text-ink" : "text-[#9aa3af]";
+              const on = active || hl;
               return (
                 <li key={t.href}>
                   <Link href={t.href} aria-current={active ? "page" : undefined} className={`flex h-full flex-col items-center justify-center gap-1 ${color}`}>
-                    {TAB_ICON[t.href]({ size: 26 })}
+                    <img src={`/brand/qm/${TAB_ICON[t.href]}.webp`} alt="" width={28} height={28} className="h-7 w-7 object-contain transition-[filter,transform] duration-200" style={on ? undefined : { filter: "grayscale(1) opacity(.5)" }} draggable={false} />
                     <span className={`text-[11px] ${active || ("highlight" in t && t.highlight) ? "font-bold" : "font-medium"}`}>{t.label}</span>
                   </Link>
                 </li>

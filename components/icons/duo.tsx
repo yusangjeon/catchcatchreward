@@ -79,8 +79,28 @@ export function DuoIcon({ name, size = 22, className, style }: { name: DuoName; 
 }
 
 /** 연한 배경 둥근 타일 안의 듀오톤 아이콘 — 리스트·퀵메뉴·카드 공통 */
-export function IconTile({ name, tone = "blue", size = 44, icon, radius, className, round = false }: { name: DuoName; tone?: Tone; size?: number; icon?: number; radius?: number; className?: string; round?: boolean }) {
+/** 플랫 컬러 아이콘(`/brand/qm/*.webp`, 자체 제작)이 있는 이름 → 파일명. 없는 이름은 듀오톤 타일로 폴백 */
+export const FLAT: Partial<Record<DuoName, string>> = {
+  calendar: "attend", gamepad: "games", gift: "gift", drop: "honey", people: "invite", wheel: "roulette", bag: "shop", pin: "store", store: "store", bolt: "walk",
+  quiz: "quiz", search: "search", trophy: "trophy", flame: "flame", doc: "doc", coin: "coin", ticket: "ticket", stamp: "stamp", bell: "bell", megaphone: "megaphone", chat: "chat", clock: "clock", home: "home",
+};
+
+/** 플랫 아이콘 이미지 단독 */
+export function FlatIcon({ file, size = 40, className }: { file: string; size?: number; className?: string }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={`/brand/qm/${file}.webp`} alt="" width={size} height={size} className={`shrink-0 object-contain ${className ?? ""}`} style={{ width: size, height: size }} draggable={false} />;
+}
+
+export function IconTile({ name, tone = "blue", size = 44, icon, radius, className, round = false, flat = true }: { name: DuoName; tone?: Tone; size?: number; icon?: number; radius?: number; className?: string; round?: boolean; flat?: boolean }) {
   const t = TONE[tone];
+  const file = flat ? FLAT[name] : undefined;
+  if (file) {
+    return (
+      <span className={`inline-flex shrink-0 items-center justify-center ${className ?? ""}`} style={{ width: size, height: size }}>
+        <FlatIcon file={file} size={Math.round(size * 0.92)} />
+      </span>
+    );
+  }
   return (
     <span className={`inline-flex shrink-0 items-center justify-center ${className ?? ""}`} style={{ width: size, height: size, borderRadius: round ? 9999 : (radius ?? Math.round(size * 0.32)), background: t.soft, color: t.deep }}>
       <DuoIcon name={name} size={icon ?? Math.round(size * 0.52)} />
