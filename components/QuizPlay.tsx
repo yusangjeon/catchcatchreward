@@ -197,7 +197,7 @@ function RewardScreen({ result }: { result: SubmitResult }) {
       </div>
       <ToastOnMount text="포인트를 받았어요!" />
 
-      <h1 className="mt-[10px] text-center text-[22px] font-bold">축하해요! 보상을 받았어요 🎉</h1>
+      <h1 className="mt-[10px] text-center text-[22px] font-bold">축하해요! 보상을 받았어요</h1>
       <p className="mt-[14px] text-center text-[13px] leading-[1.7] text-muted">
         매일 이벤트에 참여하고 푸짐한 보상을 받아보세요.<br />
         <span className="text-myb-dark">뱃지를 누르면</span> 자세한 내용을 볼 수 있어요.
@@ -211,7 +211,7 @@ function RewardScreen({ result }: { result: SubmitResult }) {
         </div>
         {result.starterBonus > 0 && (
           <p className="mt-4 flex h-[42px] items-center justify-center gap-1.5 rounded-xl bg-[#fff6e5] text-[13px] text-[#9a5b00]">
-            🎁 뉴비 스타터팩 2배로 <PCoin size={18} /> <b className="text-[16px] font-extrabold text-[#ff8a3d]">+{fmt(result.starterBonus)}</b> 더 받았어요
+            <img src="/brand/gift.webp" alt="" className="h-5 w-5 object-contain" /> 뉴비 스타터팩 2배로 <PCoin size={18} /> <b className="text-[16px] font-extrabold text-[#ff8a3d]">+{fmt(result.starterBonus)}</b> 더 받았어요
           </p>
         )}
         {result.bonus > 0 && (

@@ -18,15 +18,15 @@ export default function MePage() {
 }
 
 const MENU = [
-  { href: "/history", label: "포인트 내역", icon: "📒" },
-  { href: "/exchange", label: "포인트 교환", icon: "🎁" },
-  { href: "/gifts", label: "선물함", icon: "🎀" },
-  { href: "/attendance", label: "출석 달력", icon: "📅" },
-  { href: "/invite", label: "친구초대", icon: "💌" },
-  { href: "/notifications", label: "알림", icon: "🔔" },
-  { href: "/notice", label: "공지사항", icon: "📢" },
-  { href: "/support", label: "고객센터", icon: "💬" },
-  { href: "/terms", label: "이용약관 · 개인정보", icon: "📄" },
+  { href: "/history", label: "포인트 내역", icon: "/brand/coins.webp" },
+  { href: "/exchange", label: "포인트 교환", icon: "/brand/ticket.webp" },
+  { href: "/gifts", label: "선물함", icon: "/brand/gift.webp" },
+  { href: "/attendance", label: "출석 달력", icon: "/brand/qm_attend.webp" },
+  { href: "/invite", label: "친구초대", icon: "/brand/qm_invite.webp" },
+  { href: "/notifications", label: "알림", icon: "/brand/bell.webp" },
+  { href: "/notice", label: "공지사항", icon: "/brand/party.webp" },
+  { href: "/support", label: "고객센터", icon: "/brand/quiz.webp" },
+  { href: "/terms", label: "이용약관 · 개인정보", icon: "/brand/badge.webp" },
 ];
 
 /** MY — 계정 연결 상태, 잔액, 메뉴. 로그인은 카카오 */
@@ -67,7 +67,7 @@ function MeView() {
         <ul className="overflow-hidden rounded-[20px] bg-white" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
           {MENU.map((m) => (
             <li key={m.href} className="border-b border-[var(--color-bg-2)] last:border-0">
-              <Link href={m.href} className="flex h-[52px] items-center gap-3 px-5 text-[15px]"><span className="text-[18px]">{m.icon}</span><span className="flex-1">{m.label}</span><span className="text-[#b0b8c1]">›</span></Link>
+              <Link href={m.href} className="flex h-[52px] items-center gap-3 px-5 text-[15px]"><img src={m.icon} alt="" className="h-7 w-7 object-contain" /><span className="flex-1">{m.label}</span><span className="text-[#b0b8c1]">›</span></Link>
             </li>
           ))}
         </ul>

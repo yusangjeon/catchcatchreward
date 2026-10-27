@@ -59,10 +59,11 @@ export default function MissionsPage() {
       </header>
 
       <div className="flex flex-col gap-4 px-6 pt-[64px]">
-        <section className="rounded-[20px] bg-[#191f28] p-5 text-white">
-          <p className="text-[12px] font-semibold text-[var(--color-myb-line)]">캐치랭크 제휴 매장</p>
+        <section className="relative overflow-hidden rounded-[20px] bg-[var(--color-myb-soft)] p-5 pr-[110px]">
+          <img src="/brand/qm_store.webp" alt="" className="pointer-events-none absolute -bottom-2 right-3 h-[92px] w-[92px] object-contain" />
+          <p className="text-[12px] font-semibold text-myb-dark">캐치랭크 제휴 매장</p>
           <p className="mt-1 text-[18px] font-extrabold leading-[24px]">동네 매장 방문·저장·리뷰하고<br />포인트와 스탬프 받기</p>
-          <p className="mt-2 text-[12px] text-white/70">완료한 미션 <b className="text-white">{data?.doneCount ?? 0}</b>개 · 매장에서 받은 인증코드를 입력하면 바로 적립돼요</p>
+          <p className="mt-2 text-[12px] text-ink-2">완료한 미션 <b className="text-ink">{data?.doneCount ?? 0}</b>개 · 매장에서 받은 인증코드를 입력하면 바로 적립돼요</p>
         </section>
 
         <ul className="flex flex-col gap-3">
@@ -72,9 +73,14 @@ export default function MissionsPage() {
                 <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${KIND_COLOR[m.kind]}`}>{m.kindLabel}</span>
                 <span className="text-[12px] text-[#8b94a0]">{m.capacity > 0 ? `${Math.max(0, m.capacity - m.completedCount)}명 남음` : `${m.completedCount}명 참여`}</span>
               </div>
-              <p className="mt-2 text-[13px] font-medium text-[#5c6573]">{m.storeName}</p>
-              <p className="mt-0.5 text-[16px] font-bold">{m.title}</p>
-              {m.description && <p className="mt-1 text-[12px] leading-[17px] text-[#8b94a0]">{m.description}</p>}
+              <div className="mt-3 flex items-start gap-3">
+                <span className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[14px] bg-[var(--color-myb-soft)]"><img src="/brand/store_pin.webp" alt="" className="h-[32px] w-[32px] object-contain" /></span>
+                <div className="min-w-0">
+                  <p className="text-[12px] font-medium text-[#5c6573]">{m.storeName}</p>
+                  <p className="mt-0.5 text-[16px] font-bold">{m.title}</p>
+                  {m.description && <p className="mt-1 text-[12px] leading-[17px] text-[#8b94a0]">{m.description}</p>}
+                </div>
+              </div>
               <div className="mt-3 flex items-center justify-between">
                 <span className="flex items-center gap-1 text-[16px] font-bold text-[var(--color-myb)]"><PCoin size={18} />{fmt(m.rewardPoints)}</span>
                 {m.done ? (

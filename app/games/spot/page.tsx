@@ -89,7 +89,7 @@ export default function SpotPage() {
       const j = await res.json();
       if (!res.ok) throw new Error(j.message ?? "제출 실패");
       const r = j as Result;
-      if (r.points > 0) await showReward({ variant: "big", points: r.points, to: r.wallet?.balance ?? r.points, title: r.all ? "완주 보상 지급!" : "보상 지급!", subtitle: r.all ? `차이 ${r.total}개를 모두 찾았어요 🎉` : `${r.found}/${r.total} 찾았어요`, holdMs: 2200 });
+      if (r.points > 0) await showReward({ variant: "big", points: r.points, to: r.wallet?.balance ?? r.points, title: r.all ? "완주 보상 지급!" : "보상 지급!", subtitle: r.all ? `차이 ${r.total}개를 모두 찾았어요` : `${r.found}/${r.total} 찾았어요`, holdMs: 2200 });
       setResult(r);
       setMarks((m) => [...m.filter((x) => x.kind !== "hint"), ...r.missed.map((c) => ({ ...c, kind: "missed" as const }))]);
       setPhase("done");
@@ -246,7 +246,7 @@ export default function SpotPage() {
               <div className="absolute inset-0 flex items-center justify-center">
                 {data.left > 0 ? (
                   <button type="button" onClick={start} disabled={imgReady < 2} className="myb-press flex h-14 items-center gap-2 rounded-full bg-[var(--color-myb)] px-8 text-[17px] font-extrabold text-white shadow-[0_8px_30px_rgba(255,90,45,.45)] disabled:opacity-60">
-                    {imgReady < 2 ? "준비 중…" : "▶ 시작"}
+                    {imgReady < 2 ? "준비 중…" : <><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5.5v13l10-6.5z" /></svg>시작</>}
                   </button>
                 ) : (
                   <div className="rounded-2xl bg-white/95 px-5 py-4 text-center text-[14px] font-semibold shadow-lg">오늘 3레벨을 모두 풀었어요<br /><span className="text-[12px] font-normal text-[#8b94a0]">내일 0시에 새 그림 3장</span></div>
@@ -264,11 +264,11 @@ export default function SpotPage() {
           {phase === "play" && (
             <>
               <button type="button" disabled={hintUsed} onClick={() => void hint()} className="myb-press flex flex-col items-center gap-0.5 disabled:opacity-40">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-[22px] shadow-[0_4px_14px_rgba(0,43,141,.12)]">💡</span>
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_4px_14px_rgba(40,24,14,.12)]"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5.9 1.2.9 1.9V16h5.4v-.3c0-.7.3-1.4.9-1.9A6 6 0 0 0 12 3Z" stroke="#ffb13d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="#fff4d6" /></svg></span>
                 <span className="text-[11px] font-semibold text-[#5c6573]">힌트 {hintUsed ? "0" : "1"}</span>
               </button>
               <button type="button" disabled={busy} onClick={() => void submit()} className="myb-press flex flex-col items-center gap-0.5 disabled:opacity-40">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#191f28] text-[18px] text-white shadow-[0_4px_14px_rgba(0,43,141,.2)]">■</span>
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-ink shadow-[0_4px_14px_rgba(40,24,14,.2)]"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" aria-hidden><rect x="6" y="6" width="12" height="12" rx="2.5" /></svg></span>
                 <span className="text-[11px] font-semibold text-[#5c6573]">그만</span>
               </button>
             </>
@@ -276,8 +276,8 @@ export default function SpotPage() {
           {phase === "idle" && data && (
             <div className="flex items-center gap-2">
               {data.today.map((t) => (
-                <span key={t.index} className={`flex h-8 items-center gap-1 rounded-full px-3 text-[12px] font-bold ${t.status === "done" ? "bg-[#e9f7ef] text-[#1aa260]" : t.status === "current" ? "bg-[var(--color-myb)] text-white" : "bg-[#eef0f4] text-[#b0b8c1]"}`}>
-                  {t.status === "done" ? (t.found === data.total ? "🏆" : "✓") : t.status === "current" ? "▶" : "🔒"} {t.index + 1}
+                <span key={t.index} className={`flex h-8 items-center gap-1.5 rounded-full pl-2 pr-3 text-[12px] font-bold ${t.status === "done" ? "bg-[#e9f7ef] text-[#1aa260]" : t.status === "current" ? "bg-[var(--color-myb)] text-white" : "bg-[#f1efec] text-[#b9b4ad]"}`}>
+                  {t.status === "done" ? (t.found === data.total ? <img src="/brand/trophy.webp" alt="" className="h-5 w-5 object-contain" /> : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden><path d="m5 12 5 5L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>) : t.status === "current" ? <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5.5v13l10-6.5z" /></svg> : <img src="/brand/lock.webp" alt="" className="h-4 w-4 object-contain opacity-70 grayscale" />} {t.index + 1}
                 </span>
               ))}
             </div>
@@ -290,10 +290,10 @@ export default function SpotPage() {
         <>
           <div className="myb-fade-in fixed inset-0 z-[999] bg-black/55" />
           <div className="myb-modal-in fixed left-1/2 top-1/2 z-[1000] w-[calc(100%-56px)] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-[24px] bg-white px-6 pb-6 pt-7 text-center">
-            <p className="flex items-center justify-center gap-2 text-[38px] leading-none">{[0, 1, 2].map((i) => <span key={i} className={i < stars ? "spot-star text-[#ffb400] drop-shadow-[0_2px_6px_rgba(255,180,0,.5)]" : "text-[#e5e8ee]"} style={{ animationDelay: `${0.25 + i * 0.18}s` }}>★</span>)}</p>
+            <p className="flex items-center justify-center gap-2 text-[38px] leading-none">{[0, 1, 2].map((i) => <span key={i} className={i < stars ? "spot-star text-[#ffb400] drop-shadow-[0_2px_6px_rgba(255,180,0,.5)]" : "text-[#e5e8ee]"} style={{ animationDelay: `${0.25 + i * 0.18}s` }}><svg width="38" height="38" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" /></svg></span>)}</p>
             <p className="mt-2 text-[24px] font-extrabold">{result.all ? "완벽해요!" : `${result.found}/${result.total} 찾았어요`}</p>
             <p className="mt-2 flex items-center justify-center gap-1 text-[20px] font-extrabold text-[var(--color-myb)]"><PCoin size={20} />+{fmt(result.points)}</p>
-            <p className="mt-1 text-[12px] text-[#8b94a0]">{result.seconds}초{result.speedBonus ? ` · ⚡ 스피드 +${result.speedBonus}P` : ""}{!result.all ? " · 놓친 곳은 분홍 점선" : ""}</p>
+            <p className="mt-1 text-[12px] text-[#8b94a0]">{result.seconds}초{result.speedBonus ? ` · 스피드 보너스 +${result.speedBonus}P` : ""}{!result.all ? " · 놓친 곳은 분홍 점선" : ""}</p>
             <div className="mt-5 grid grid-cols-2 gap-2">
               <button type="button" onClick={() => router.push("/games")} className="myb-press h-12 rounded-xl border border-[#dee2e9] text-[14px] font-bold">나가기</button>
               {result.left > 0 ? (

@@ -16,8 +16,8 @@ const TABS = ["자산", "상품 구매", "뱃지"] as const;
 /** 상품 카테고리 원형 */
 const BRANDS: { name: string; img?: string; label?: string; bg?: string; pad?: boolean }[] = [
   { name: "전체", img: "/brand/gift.webp", pad: true },
-  { name: "카페", label: "☕", bg: "bg-[#fff4d6]" },
-  { name: "편의점", label: "🏪", bg: "bg-[#eef7ff]" },
+  { name: "카페", img: "/products/americano_tall.webp" },
+  { name: "편의점", img: "/products/cu_5000.webp" },
   { name: "상품권", img: "/brand/ticket.webp", pad: true },
   { name: "포인트", img: "/brand/coins.webp", pad: true },
   { name: "금", img: "/brand/gold.webp", pad: true },

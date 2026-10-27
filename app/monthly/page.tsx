@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { GameHeader } from "@/components/games/GameHeader";
 import { PCoin } from "@/components/icons";
+
+/* eslint-disable @next/next/no-img-element */
+const ICON: Record<string, string> = { quiz30: "/brand/quiz.webp", attend15: "/brand/qm_attend.webp", game30: "/brand/qm_games.webp", spot10: "/brand/magnifier.webp", roulette3: "/brand/qm_roulette.webp", store3: "/brand/store_pin.webp", invite3: "/brand/qm_invite.webp" };
+const ICON_BG: Record<string, string> = { quiz30: "bg-myb-soft", attend15: "bg-gold-soft", game30: "bg-myb-soft", spot10: "bg-gold-soft", roulette3: "bg-myb-soft", store3: "bg-gold-soft", invite3: "bg-myb-soft" };
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { useToast } from "@/components/motion/Toast";
 import { burstAtPointer, confetti, flyToBalance } from "@/lib/fxEngine";
@@ -43,7 +47,8 @@ export default function MonthlyPage() {
       <div className="px-4 pt-[60px]">
         <section className="relative overflow-hidden rounded-[24px] px-6 pb-6 pt-6 text-white" style={{ background: "linear-gradient(135deg,#ff8a3d 0%,var(--color-myb) 50%,#ff8a5c 100%)" }}>
           <span className="inline-flex h-6 items-center rounded-full bg-white/20 px-2.5 text-[12px] font-bold">{data ? `${data.monthLabel} · D-${daysLeft}` : "—"}</span>
-          <h2 className="mt-2 text-[22px] font-extrabold leading-[30px]">🏆 달성할 때마다<br />엄청난 혜택이 👀</h2>
+          <h2 className="mt-2 text-[22px] font-extrabold leading-[30px]">달성할 때마다<br />엄청난 혜택이</h2>
+          <img src="/brand/trophy.webp" alt="" className="pointer-events-none absolute -bottom-1 right-3 h-[96px] w-[96px] object-contain" />
           <p className="mt-2 text-[13px] text-white/85">이번 달 받은 보상 <b className="text-[var(--color-gold)]">{fmt(data?.earned ?? 0)}P</b> / 최대 {fmt(data?.totalMax ?? 3300)}P</p>
           {data && data.claimable > 0 && <span className="absolute right-5 top-5 rounded-full bg-white px-3 py-1 text-[12px] font-bold text-[var(--color-myb)]">받을 보상 {data.claimable}</span>}
         </section>
@@ -54,7 +59,7 @@ export default function MonthlyPage() {
             return (
               <li key={m.key} className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 2px 10px 0 rgba(40, 24, 14, 0.06)" }}>
                 <div className="flex items-center gap-3">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-gold-soft)] text-[26px]">{m.emoji}</span>
+                  <span className={`flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl ${ICON_BG[m.key] ?? "bg-myb-soft"}`}><img src={ICON[m.key] ?? "/brand/coins.webp"} alt="" className="h-[38px] w-[38px] object-contain" /></span>
                   <div className="min-w-0 flex-1">
                     <p className="text-[16px] font-bold">{m.title}</p>
                     <p className="mt-0.5 truncate text-[12px] text-[#8b94a0]">{m.desc}</p>
@@ -62,8 +67,8 @@ export default function MonthlyPage() {
                   <p className="flex shrink-0 items-center gap-1 text-[17px] font-extrabold text-[var(--color-myb)]"><PCoin size={16} />{fmt(m.reward)}</p>
                 </div>
                 <div className="mt-4 flex items-center gap-3">
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#eef0f4]"><div className="myb-progress h-full rounded-full" style={{ width: `${m.claimed ? 100 : pct}%`, background: m.completed ? "linear-gradient(90deg,var(--color-myb),#ff8a5c)" : "var(--color-myb)" }} /></div>
-                  <span className="w-14 text-right text-[13px] font-bold tabular-nums text-[#ffc53d]">{m.current}/{m.value}</span>
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#f1efec]"><div className="myb-progress h-full rounded-full" style={{ width: `${m.claimed ? 100 : pct}%`, background: "linear-gradient(90deg,var(--color-myb),var(--color-gold))" }} /></div>
+                  <span className="w-14 text-right text-[13px] font-bold tabular-nums text-muted">{m.current}/{m.value}</span>
                 </div>
                 <div className="mt-3">
                   {m.claimed ? (

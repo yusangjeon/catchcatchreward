@@ -66,7 +66,7 @@ export default function RushPage() {
   const Steps = ({ tag, icon, title, href, points, labels, current }: { tag: string; icon: string; title: React.ReactNode; href: string; points: number[]; labels: string[]; current: number }) => (
     <Link href={href} className="relative mt-3 block rounded-[20px] bg-white px-5 pb-5 pt-6">
       <span className="absolute -top-0 left-0 rounded-br-[14px] rounded-tl-[20px] bg-[var(--color-gold-soft)] px-3 py-1 text-[12px] font-bold text-[#ff8a5c]">{tag}</span>
-      <p className="mt-2 flex items-center gap-2 text-[17px] font-bold"><span className="text-[22px]">{icon}</span>{title}<span className="ml-auto text-[#b0b8c1]">›</span></p>
+      <p className="mt-2 flex items-center gap-2 text-[17px] font-bold"><img src={icon} alt="" className="h-7 w-7 object-contain" />{title}<span className="ml-auto text-[#b0b8c1]">›</span></p>
       <div className="relative mt-4 flex items-center justify-between">
         <i className="absolute left-6 right-6 top-[18px] h-[3px] bg-[var(--color-myb-soft)]" />
         {points.map((pt, k) => (
@@ -106,11 +106,11 @@ export default function RushPage() {
       </section>
 
       <div className="px-4">
-        <Pill>✨ 스페셜 미션 ✨</Pill>
+        <Pill>스페셜 미션</Pill>
         {/* 프리패스 배너 2종 */}
-        {[{ title: "프리패스", sub: "게임", desc: "안 해본 미니게임 첫 보상 받기", href: "/games", icon: "🎮" }, { title: "프리패스", sub: "퀴즈", desc: quiz ? `퀴즈 ${quiz.current}/${quiz.value} 완료` : "퀴즈 풀고 포인트", href: "/quiz", icon: "📝", beta: true }].map((b) => (
+        {[{ title: "프리패스", sub: "게임", desc: "안 해본 미니게임 첫 보상 받기", href: "/games", icon: "/brand/qm_games.webp" }, { title: "프리패스", sub: "퀴즈", desc: quiz ? `퀴즈 ${quiz.current}/${quiz.value} 완료` : "퀴즈 풀고 포인트", href: "/quiz", icon: "/brand/quiz.webp", beta: true }].map((b) => (
           <Link key={b.sub} href={b.href} className="mt-3 flex items-center gap-3 rounded-[18px] px-4 py-4 text-white" style={{ background: "linear-gradient(90deg,#ff7a3d 0%,var(--color-myb) 45%,#ff8a5c 100%)" }}>
-            <span className="text-[34px] leading-none">{b.icon}</span>
+            <img src={b.icon} alt="" className="h-[44px] w-[44px] object-contain" />
             <span className="min-w-0 flex-1">
               <p className="text-[20px] font-black leading-[24px]">{b.title} <span className="text-[15px] font-semibold">{b.sub}</span>{b.beta && <span className="ml-1 rounded-full bg-[#ffe9b0] px-2 py-0.5 text-[11px] font-bold italic text-[#b06a00]">Beta</span>}</p>
               <p className="mt-1 truncate text-[13px] text-white/90">{b.desc}</p>
@@ -118,18 +118,18 @@ export default function RushPage() {
             <span className="rounded-[12px] bg-gradient-to-r from-[var(--color-myb)] to-[#ffb13d] px-5 py-3 text-[15px] font-bold shadow-md">이동</span>
           </Link>
         ))}
-        <Steps tag="게임적립" icon="🕹️" title={<><span className="text-[var(--color-myb)]">미니게임</span>&nbsp;3회 플레이하기</>} href="/games" points={[10, 10, 20]} labels={["플레이 1회", "플레이 2회", "플레이 3회"]} current={game?.current ?? 0} />
-        <Steps tag="퀴즈 보상" icon="📝" title="퀴즈 참여하기" href="/quiz" points={[10, 10, 10]} labels={["오늘 1회", "오늘 2회", "오늘 3회"]} current={Math.min(3, quiz?.current ?? 0)} />
+        <Steps tag="게임적립" icon="/brand/qm_games.webp" title={<><span className="text-[var(--color-myb)]">미니게임</span>&nbsp;3회 플레이하기</>} href="/games" points={[10, 10, 20]} labels={["플레이 1회", "플레이 2회", "플레이 3회"]} current={game?.current ?? 0} />
+        <Steps tag="퀴즈 보상" icon="/brand/quiz.webp" title="퀴즈 참여하기" href="/quiz" points={[10, 10, 10]} labels={["오늘 1회", "오늘 2회", "오늘 3회"]} current={Math.min(3, quiz?.current ?? 0)} />
         <Link href="/monthly" className="mt-3 flex items-center gap-3 rounded-[20px] bg-white px-5 py-5">
-          <span className="text-[30px]">🏆</span>
+          <img src="/brand/trophy.webp" alt="" className="h-[40px] w-[40px] object-contain" />
           <span className="flex-1">
             <p className="text-[17px] font-bold">월간 도전 과제</p>
-            <p className="mt-0.5 text-[13px] text-[#5c6573]">달성할 때마다 엄청난 혜택이 👀</p>
+            <p className="mt-0.5 text-[13px] text-[#5c6573]">달성할 때마다 엄청난 혜택이</p>
           </span>
           <span className="text-[#b0b8c1]">›</span>
         </Link>
 
-        <Pill>🔥 스탬프 미션 🔥</Pill>
+        <Pill>스탬프 미션</Pill>
         {/* 스탬프 보드 */}
         <section className="mt-3 rounded-[20px] bg-white p-5">
           <p className="text-center text-[18px] font-bold">스탬프 7개를 채우면 <span className="inline-flex items-center gap-1 text-[var(--color-myb)]"><PCoin size={18} />300</span></p>
@@ -150,7 +150,7 @@ export default function RushPage() {
                     ) : reward.reached ? (
                       <button type="button" onClick={() => void claim(reward.key)} disabled={busy !== null} className="myb-press rounded-full bg-[var(--color-myb)] px-2 py-0.5 text-[11px] font-bold text-white">{fmt(reward.points)}P 받기</button>
                     ) : (
-                      <span className="rounded-full bg-[var(--color-myb-soft)] px-2 py-0.5 text-[11px] font-bold text-[var(--color-myb)]">🎁 {fmt(reward.points)}P</span>
+                      <span className="rounded-full bg-[var(--color-myb-soft)] px-2 py-0.5 text-[11px] font-bold text-[var(--color-myb)]">{fmt(reward.points)}P</span>
                     )
                   )}
                 </div>

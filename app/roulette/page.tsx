@@ -61,7 +61,7 @@ export default function RoulettePage() {
       setTimeout(() => {
         setSpinning(false);
         if (r.prize.kind === "none") { haptic("warn"); sfx("lose"); setResult(r); }
-        else if (r.prize.kind === "points") { void showReward({ variant: "big", points: r.prize.value, to: r.wallet.balance, title: "룰렛 당첨!", subtitle: "축하해요! 포인트가 적립됐어요 🎉" }).then(() => { setResult(r); burst("stars", window.innerWidth / 2, window.innerHeight / 2 - 40); show(`${fmt(r.prize.value)}P를 받았어요!`); }); }
+        else if (r.prize.kind === "points") { void showReward({ variant: "big", points: r.prize.value, to: r.wallet.balance, title: "룰렛 당첨!", subtitle: "축하해요! 포인트가 적립됐어요" }).then(() => { setResult(r); burst("stars", window.innerWidth / 2, window.innerHeight / 2 - 40); show(`${fmt(r.prize.value)}P를 받았어요!`); }); }
         else { haptic("jackpot"); sfx("win"); confetti(200); burst("coins", window.innerWidth / 2, window.innerHeight / 2); burst("stars", window.innerWidth / 2, window.innerHeight / 2 - 40); setResult(r); }
         if (r.prize.kind === "gifticon") show(`${r.prize.name} 당첨!`);
         setData((d) => (d ? { ...d, stamps: r.wallet.stamps, canSpin: r.wallet.stamps >= d.needed, wallet: r.wallet } : d));
@@ -211,7 +211,7 @@ export default function RoulettePage() {
                 </div>
               )}
               <img src={result.prize.kind === "none" ? "/brand/mascot_5.webp" : "/brand/coins.webp"} alt="" width={120} height={120} className="myb-pop-in myb-float relative mx-auto h-[120px] w-[120px] object-contain" />
-              <p className="relative mt-4 text-[20px] font-bold">{result.prize.kind === "none" ? "아쉬워요, 다음 기회에!" : "축하해요! 당첨됐어요 🎉"}</p>
+              <p className="relative mt-4 text-[20px] font-bold">{result.prize.kind === "none" ? "아쉬워요, 다음 기회에!" : "축하해요! 당첨됐어요"}</p>
               <p className="relative mt-2 flex items-center justify-center gap-1.5 text-[26px] font-extrabold text-[var(--color-myb)]">
                 {result.prize.kind === "points" && <PCoin size={26} />}
                 {result.prize.kind === "points" ? `+${fmt(result.prize.value)}` : result.prize.name}

@@ -66,7 +66,7 @@ export function RewardLayer() {
           <h2 className="rw-title mt-[52px] text-[36px] font-black leading-none" style={{ animationDelay: ".3s", background: "linear-gradient(90deg,#ffd86a 0%,#ffb13d 50%,#ff8a5c 100%)", WebkitBackgroundClip: "text", color: "transparent", filter: "drop-shadow(0 4px 14px rgba(255,138,92,.45))" }}>
             {item.title ?? "보상 지급!"}
           </h2>
-          <p className="rw-rise mt-3 text-[15px] font-medium text-white/80" style={{ animationDelay: ".36s" }}>{item.subtitle ?? "축하해요! 보상을 받았어요 🎉"}</p>
+          <p className="rw-rise mt-3 text-[15px] font-medium text-white/80" style={{ animationDelay: ".36s" }}>{item.subtitle ?? "축하해요! 보상을 받았어요"}</p>
           <div className="relative mt-[34px] flex h-[240px] w-[240px] items-center justify-center">
             <div className="rw-rays absolute inset-[-40px] rounded-full" style={{ background: "conic-gradient(from 0deg, rgba(255,197,61,0) 0deg, rgba(255,197,61,.55) 18deg, rgba(255,197,61,0) 36deg, rgba(255,197,61,0) 60deg, rgba(255,197,61,.45) 78deg, rgba(255,197,61,0) 96deg, rgba(255,197,61,0) 120deg, rgba(255,197,61,.55) 138deg, rgba(255,197,61,0) 156deg, rgba(255,197,61,0) 180deg, rgba(255,197,61,.45) 198deg, rgba(255,197,61,0) 216deg, rgba(255,197,61,0) 240deg, rgba(255,197,61,.55) 258deg, rgba(255,197,61,0) 276deg, rgba(255,197,61,0) 300deg, rgba(255,197,61,.45) 318deg, rgba(255,197,61,0) 336deg)", mask: "radial-gradient(circle, #000 30%, transparent 70%)", WebkitMask: "radial-gradient(circle, #000 30%, transparent 70%)" }} />
             <div className="rw-glow absolute h-[200px] w-[200px] rounded-full" style={{ background: "radial-gradient(circle, rgba(255,214,106,.75) 0%, rgba(255,138,92,.35) 45%, rgba(255,90,45,0) 72%)" }} />

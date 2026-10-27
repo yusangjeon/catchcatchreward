@@ -109,7 +109,7 @@ export default function MemoryPage() {
         {!started && <button type="button" disabled={left === 0} onClick={start} className="myb-press h-[52px] rounded-xl bg-[var(--color-myb)] text-[16px] font-bold text-white disabled:opacity-40">{left === 0 ? "오늘은 다 했어요. 내일 다시!" : "시작하기"}</button>}
         {done && (
           <div className="rounded-[20px] bg-white p-5 text-center" style={{ boxShadow: "0 5px 16px 0 rgba(40, 24, 14, 0.09)" }}>
-            <p className="text-[20px] font-extrabold">{moves}회 · {sec}초 만에 완료 🎉</p>
+            <p className="text-[20px] font-extrabold">{moves}회 · {sec}초 만에 완료</p>
             <p className="mt-1 text-[14px] font-bold text-[var(--color-myb)]">+{fmt(done.points)}P</p>
             <p className="mt-1 text-[12px] text-[#8b94a0]">16회 이내 15P · 24회 이내 10P · 완주 5P</p>
             <button type="button" onClick={() => router.push("/games")} className="myb-press mt-4 h-11 w-full rounded-xl bg-[var(--color-myb)] text-[14px] font-bold text-white">다른 게임 하러 가기</button>

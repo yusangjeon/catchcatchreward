@@ -39,7 +39,7 @@ export default function QuizTabPage() {
 
       <section className="px-5 pt-[30px]">
         <Link href="#all" className="flex items-center justify-between">
-          <h2 className="text-[20px] font-bold">✨ 시작하기 좋은 퀴즈</h2>
+          <h2 className="text-[20px] font-bold">시작하기 좋은 퀴즈</h2>
           <span className="text-[20px] text-[#8b94a0]">›</span>
         </Link>
         <p className="mt-1 text-[14px] text-ink-2">지금 바로 도전해보세요!</p>

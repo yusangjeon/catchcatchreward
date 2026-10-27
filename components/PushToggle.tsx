@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/components/motion/Toast";
 
@@ -76,7 +78,7 @@ export function PushToggle({ compact = false }: { compact?: boolean }) {
   const label = state === "on" ? "켜짐" : state === "off" ? "꺼짐" : state === "denied" ? "권한 거부됨" : state === "disabled" ? "서버 미설정" : state === "unsupported" ? "이 브라우저 미지원" : "…";
   return (
     <div className={`flex items-center gap-3 rounded-[16px] bg-white ${compact ? "px-4 py-3" : "px-4 py-[14px]"}`} style={{ boxShadow: "0 2px 10px 0 rgba(40, 24, 14, 0.06)" }}>
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-myb-soft)] text-[22px]">🔔</span>
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-myb-soft)]"><img src="/brand/bell.webp" alt="" className="h-8 w-8 object-contain" /></span>
       <div className="min-w-0 flex-1">
         <p className="text-[14px] font-semibold">푸시 알림 <span className={`ml-1 text-[12px] font-medium ${state === "on" ? "text-[#1aa260]" : "text-[#8b94a0]"}`}>{label}</span></p>
         <p className="mt-0.5 text-[12px] leading-[17px] text-[#8b94a0]">{state === "unsupported" ? "iPhone 은 홈 화면에 추가한 뒤 열면 받을 수 있어요" : "출석·퀴즈·받을 보상을 매일 아침 알려드려요"}</p>

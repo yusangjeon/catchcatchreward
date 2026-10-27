@@ -30,7 +30,7 @@ const QUICK: { key: string; icon?: string; label: string; href?: string; tip?: s
   { key: "honey", icon: "/brand/qm_honey.webp", label: "꿀 충전" },
   { key: "invite", icon: "/brand/qm_invite.webp", label: "친구초대", href: "/invite" },
   { key: "shop", icon: "/brand/qm_shop.webp", label: "내 쇼핑", href: "/shop" },
-  { key: "store", label: "매장미션", href: "/missions" },
+  { key: "store", icon: "/brand/store_pin.webp", label: "매장미션", href: "/missions" },
   { key: "roulette", icon: "/brand/qm_roulette.webp", label: "룰렛", href: "/roulette" },
 ];
 
@@ -162,28 +162,28 @@ export default function HomePage() {
       {/* 포인트 모아서 살 수 있어요 */}
       <section className="mt-[30px] px-5">
         <Link href="/exchange" className="flex items-center justify-between">
-          <h2 className="text-[20px] font-bold">💰 포인트 모아서 살 수 있어요</h2>
-          <ChevronRight size={20} className="text-ink-2" />
+          <h2 className="text-[20px] font-bold">포인트 모아서 살 수 있어요</h2>
+          <span className="flex items-center text-[13px] text-muted">전체보기 <ChevronRight size={16} /></span>
         </Link>
         {data?.newbie.active && (
           <>
-            <Link href="/newbie" className="mt-[18px] flex items-center gap-3 rounded-[14px] border border-[var(--color-myb-line)] bg-[var(--color-myb-soft)] px-4 py-3">
-              <span className="text-[26px]">🎉</span>
+            <Link href="/newbie" className="mt-[18px] flex items-center gap-3 rounded-[16px] bg-[var(--color-myb-soft)] px-4 py-3">
+              <img src="/brand/party.webp" alt="" className="h-11 w-11 object-contain" />
               <span>
                 <p className="text-[15px] font-bold text-myb">신규 유저 전용 혜택</p>
                 <p className="text-[13px] text-ink-2">3일 동안 매일 퀴즈 3개 풀면 최대 {fmt(data.newbie.totalMax)}P</p>
               </span>
             </Link>
             <div className="relative mt-[14px] grid grid-cols-2 gap-[26px]">
-              {[{ brand: "네이버페이 포인트쿠폰", name: "네이버페이 1,000원", price: "1,500", img: "/products/npay_10000.webp", bg: "#6e6e6e" }, { brand: "트레져러", name: "한국거래소 금 1,000원", price: "무제한", img: "/brand/gold.webp", bg: "#8b6f3a" }].map((p) => (
+              {[{ brand: "네이버페이 포인트쿠폰", name: "네이버페이 1,000원", price: "1,500", img: "/products/npay_10000.webp", bg: "#f1efec" }, { brand: "트레져러", name: "한국거래소 금 1,000원", price: "무제한", img: "/brand/gold.webp", bg: "#fff4d6" }].map((p) => (
                 <Link key={p.name} href="/newbie" className="block">
                   <div className="overflow-hidden rounded-[18px]">
-                    <p className="flex h-[36px] items-center justify-center bg-myb text-[13px] font-bold text-white">🎉 신규 유저 전용 🎉</p>
+                    <p className="flex h-[32px] items-center justify-center bg-myb text-[12px] font-bold text-white">신규 유저 전용</p>
                     <div className="relative flex h-[136px] items-center justify-center" style={{ background: p.bg }}>
-                      <img src={p.img} alt="" className="h-[90px] w-[90px] object-contain opacity-60" />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-white">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-[18px] text-ink">🔒</span>
-                        <span className="text-[14px] font-bold">{data.newbie.dayNo}일차 미션 완료하기</span>
+                      <img src={p.img} alt="" className="h-[86px] w-[86px] rounded-xl object-cover opacity-50 blur-[2px] saturate-50" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
+                        <img src="/brand/lock.webp" alt="" className="h-12 w-12 object-contain" />
+                        <span className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-bold text-ink shadow-[0_2px_8px_rgba(40,24,14,.12)]">{data.newbie.dayNo}일차 미션 완료하기</span>
                       </div>
                     </div>
                   </div>
@@ -192,7 +192,7 @@ export default function HomePage() {
                   <p className="mt-1 flex items-center gap-1 text-[16px] font-extrabold"><PCoin size={16} />{p.price}</p>
                 </Link>
               ))}
-              <span className="pointer-events-none absolute left-1/2 top-[90px] flex h-[42px] w-[42px] -translate-x-1/2 items-center justify-center rounded-full text-[13px] font-black italic text-white shadow-md" style={{ background: "linear-gradient(135deg,#7c5cff,#c84cff)" }}>VS</span>
+              <span className="pointer-events-none absolute left-1/2 top-[90px] flex h-[38px] w-[38px] -translate-x-1/2 items-center justify-center rounded-full bg-gold text-[12px] font-black text-ink shadow-[0_3px_8px_rgba(40,24,14,.18)]">VS</span>
             </div>
           </>
         )}
@@ -214,23 +214,23 @@ export default function HomePage() {
       <section className="mt-[36px] px-5">
         <h2 className="text-[20px] font-bold">나를 위한 맞춤 서비스</h2>
         <p className="mt-1 text-[14px] text-ink-2">참여 패턴을 분석해 딱 맞는 서비스를 추천해요</p>
-        <ul className="mt-[18px] flex flex-col gap-3">
+        <ul className="mt-[18px] rounded-[20px] bg-white px-4 py-1" style={{ boxShadow: "0 5px 16px rgba(40,24,14,.07)" }}>
           {[
-            { emoji: "🤝", title: "친구 초대", desc: "친구 초대하면 300P 적립", href: "/invite" },
-            { emoji: "🔥", title: "캐치 러쉬", desc: data ? `이번 주 스탬프 ${data.rush.stamps}/${data.rush.total} · 미션 완료하면 룰렛 스탬프` : "주간 스탬프 미션", href: "/rush", dot: !!data && data.rush.claimable > 0 },
-            { emoji: "🏆", title: "월간 도전 과제", desc: "이번 달 과제 달성하면 최대 3,300P", href: "/monthly" },
-            { emoji: "📍", title: "동네 매장 미션", desc: "매장 방문·저장·리뷰하고 스탬프", href: "/missions" },
-            { emoji: "🎡", title: "무료 룰렛", desc: data && data.wallet.stamps >= 10 ? "스탬프 10개 모였어요! 지금 돌리기" : `스탬프 ${data?.wallet.stamps ?? 0}/10 · 10개면 룰렛 1회`, href: "/roulette", dot: !!data && data.wallet.stamps >= 10 },
+            { icon: "/brand/qm_invite.webp", bg: "bg-myb-soft", title: "친구 초대", desc: "친구 초대하면 300P 적립", value: "300P", href: "/invite" },
+            { icon: "/brand/flame.webp", bg: "bg-myb-soft", title: "캐치 러쉬", desc: data ? `이번 주 스탬프 ${data.rush.stamps}/${data.rush.total} · 미션 완료하면 룰렛 스탬프` : "주간 스탬프 미션", value: data && data.rush.claimable > 0 ? "받기" : `${data?.rush.stamps ?? 0}/${data?.rush.total ?? 8}`, href: "/rush", dot: !!data && data.rush.claimable > 0 },
+            { icon: "/brand/trophy.webp", bg: "bg-gold-soft", title: "월간 도전 과제", desc: "이번 달 과제 달성하면 최대 3,300P", value: "3,300P", href: "/monthly" },
+            { icon: "/brand/store_pin.webp", bg: "bg-myb-soft", title: "동네 매장 미션", desc: "매장 방문·저장·리뷰하고 스탬프", value: "최대 500P", href: "/missions" },
+            { icon: "/brand/qm_roulette.webp", bg: "bg-gold-soft", title: "무료 룰렛", desc: data && data.wallet.stamps >= 10 ? "스탬프 10개 모였어요! 지금 돌리기" : `스탬프 ${data?.wallet.stamps ?? 0}/10 · 10개면 룰렛 1회`, value: `${data?.wallet.stamps ?? 0}/10`, href: "/roulette", dot: !!data && data.wallet.stamps >= 10 },
           ].map((c) => (
-            <li key={c.title}>
-              <Link href={c.href} className="flex items-center gap-4 rounded-[18px] bg-white px-5 py-4" style={{ boxShadow: "0 4px 16px rgba(40,24,14,.08)" }}>
-                <span className="text-[34px] leading-none">{c.emoji}</span>
+            <li key={c.title} className="border-b border-bg-3 last:border-b-0">
+              <Link href={c.href} className="flex items-center gap-3 py-[13px]">
+                <span className={`flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[14px] ${c.bg}`}><img src={c.icon} alt="" className="h-[34px] w-[34px] object-contain" /></span>
                 <span className="min-w-0 flex-1">
-                  <p className="text-[17px] font-bold">{c.title}</p>
-                  <p className="mt-0.5 truncate text-[13px] text-ink-2">{c.desc}</p>
+                  <p className="text-[15px] font-bold">{c.title}</p>
+                  <p className="mt-0.5 truncate text-[12px] text-ink-2">{c.desc}</p>
                 </span>
-                <span className="relative flex h-[38px] items-center rounded-[10px] bg-myb px-4 text-[14px] font-bold text-white">
-                  이동{c.dot && <i className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white" />}
+                <span className="relative flex shrink-0 items-center gap-0.5 text-[13px] font-bold text-myb-dark">
+                  {c.value}<ChevronRight size={18} className="text-muted" />{c.dot && <i className="absolute -left-2 -top-1 h-2 w-2 rounded-full bg-red" />}
                 </span>
               </Link>
             </li>
@@ -299,8 +299,6 @@ function QuickMenu({ items, attended, onTap }: { items: typeof QUICK; attended: 
               {qk.key === "attend" && attended && <span className="absolute right-2 top-[22px] flex h-4 w-4 items-center justify-center rounded-full bg-myb text-[10px] text-white">✓</span>}
               {qk.key === "newbie" ? (
                 <span className="flex h-[40px] w-[40px] items-center justify-center text-[24px] font-black italic leading-none" style={{ background: "linear-gradient(180deg,#ffe27a,#f5a524)", WebkitBackgroundClip: "text", color: "transparent", filter: "drop-shadow(0 1px 0 #b06a00)" }}>3일</span>
-              ) : qk.key === "store" ? (
-                <span className="flex h-[40px] w-[40px] items-center justify-center text-[30px] leading-none">📍</span>
               ) : (
                 <img src={qk.icon} alt="" className={`h-[40px] w-[40px] object-contain ${qk.key === "shop" ? "rounded-full" : ""}`} />
               )}

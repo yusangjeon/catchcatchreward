@@ -66,7 +66,7 @@ export default function BenefitsPage() {
 
         {/* 진행 중 이벤트 */}
         <section>
-          <h2 className="text-[18px] font-bold">🔥 지금 진행 중</h2>
+          <h2 className="flex items-center gap-1.5 text-[18px] font-bold"><img src="/brand/flame.webp" alt="" className="h-6 w-6 object-contain" />지금 진행 중</h2>
           <div className="no-scrollbar -mx-5 mt-3 flex gap-3 overflow-x-auto px-5">
             {data?.newbie.active && (
               <Link href="/newbie" className="flex w-[220px] shrink-0 flex-col justify-between rounded-[18px] bg-white p-4" style={{ boxShadow: CARD_SHADOW }}>
@@ -78,7 +78,7 @@ export default function BenefitsPage() {
             <Link href="/rush" className="flex w-[220px] shrink-0 flex-col justify-between rounded-[18px] bg-white p-4" style={{ boxShadow: CARD_SHADOW }}>
               <span className="flex items-center justify-between"><span className="w-fit rounded-full bg-myb-soft px-2 py-0.5 text-[11px] font-bold text-myb-dark">주간 러쉬</span>{data && <Countdown endsAt={data.rushEndsAt} compact />}</span>
               <p className="mt-2 text-[16px] font-extrabold">스탬프 {data?.rush.stamps ?? 0}/{data?.rush.total ?? 7}</p>
-              <p className="mt-1 text-[12px] text-ink-2">{data && data.rush.claimable > 0 ? `받을 보상 ${data.rush.claimable}개 🎁` : "7개 모으면 300P"}</p>
+              <p className="mt-1 text-[12px] text-ink-2">{data && data.rush.claimable > 0 ? `받을 보상 ${data.rush.claimable}개` : "7개 모으면 300P"}</p>
             </Link>
             <Link href="/monthly" className="flex w-[220px] shrink-0 flex-col justify-between rounded-[18px] bg-white p-4" style={{ boxShadow: CARD_SHADOW }}>
               <span className="w-fit rounded-full bg-[#eef7ff] px-2 py-0.5 text-[11px] font-bold text-[#1d6fd6]">월간</span>
