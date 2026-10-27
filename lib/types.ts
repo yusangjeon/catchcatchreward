@@ -156,7 +156,7 @@ export interface StoreMissionCompletion {
 export interface GamePlay {
   id: string;
   userId: string;
-  game: "spot" | "rsp" | "scratch" | "memory" | "slide";
+  game: "spot" | "rsp" | "scratch" | "memory" | "slide" | "walk";
   dayKey: string;
   result: string; // win/draw/lose, found:5, prize:50 …
   points: number;
@@ -277,4 +277,12 @@ export interface PushSubscriptionRow {
   auth: string;
   userAgent?: string;
   createdAt: string;
+}
+
+/** 만보기 — 유저·날짜별 걸음 수(클라이언트 보고값, 상한 적용) */
+export interface WalkDay {
+  userId: string;
+  dayKey: string;
+  steps: number;
+  updatedAt: string;
 }

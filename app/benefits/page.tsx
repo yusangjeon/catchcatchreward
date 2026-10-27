@@ -19,6 +19,7 @@ const CARD_SHADOW = "0 5px 16px rgba(40,24,14,.08)";
 
 const EARN: { name: DuoName; tone: Tone; title: string; sub: string; href: string; chip?: string }[] = [
   { name: "calendar", tone: "green", title: "출석체크", sub: "매일 10P + 스탬프 1 · 7일 연속 +50P", href: "/attendance" },
+  { name: "bolt", tone: "blue", title: "만보기", sub: "걷기만 해도 하루 최대 210P · 1,000걸음마다 보상", href: "/walk", chip: "NEW" },
   { name: "quiz", tone: "blue", title: "취향 퀴즈", sub: "세트 완료마다 포인트 + 랜덤 보너스 + 스탬프", href: "/quiz", chip: "HOT" },
   { name: "search", tone: "violet", title: "틀린그림찾기", sub: "하루 3판 · LV1→3 점점 어려워져요 · 완주 보너스", href: "/games/spot", chip: "NEW" },
   { name: "gamepad", tone: "violet", title: "미니게임", sub: "2048 · 복권 · 가위바위보 · 카드 뒤집기", href: "/games" },

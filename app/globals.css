@@ -266,3 +266,15 @@ body {
 @keyframes rlShake { 0%, 100% { transform: translateX(0) } 20% { transform: translateX(-8px) rotate(-1deg) } 40% { transform: translateX(7px) rotate(1deg) } 60% { transform: translateX(-5px) } 80% { transform: translateX(4px) } }
 .rl-shake { animation: rlShake .55s ease-in-out both }
 .rl-rays { background: conic-gradient(from 0deg, rgba(255,197,61,.22) 0 12deg, transparent 12deg 30deg, rgba(255,197,61,.22) 30deg 42deg, transparent 42deg 60deg, rgba(255,197,61,.22) 60deg 72deg, transparent 72deg 90deg, rgba(255,197,61,.22) 90deg 102deg, transparent 102deg 120deg, rgba(255,197,61,.22) 120deg 132deg, transparent 132deg 150deg, rgba(255,197,61,.22) 150deg 162deg, transparent 162deg 180deg, rgba(255,197,61,.22) 180deg 192deg, transparent 192deg 210deg, rgba(255,197,61,.22) 210deg 222deg, transparent 222deg 240deg, rgba(255,197,61,.22) 240deg 252deg, transparent 252deg 270deg, rgba(255,197,61,.22) 270deg 282deg, transparent 282deg 300deg, rgba(255,197,61,.22) 300deg 312deg, transparent 312deg 330deg, rgba(255,197,61,.22) 330deg 342deg, transparent 342deg 360deg); border-radius: 9999px; mask: radial-gradient(circle, #000 0%, transparent 70%); animation: rwRays 14s linear infinite }
+
+/* 만보기 */
+@keyframes walkLive { 0%, 100% { opacity: 1; transform: scale(1) } 50% { opacity: .4; transform: scale(.7) } }
+.walk-live { animation: walkLive 1.2s ease-in-out infinite }
+@keyframes walkCat { 0%, 100% { transform: translateY(0) rotate(-4deg) } 25% { transform: translateY(-5px) rotate(0) } 50% { transform: translateY(0) rotate(4deg) } 75% { transform: translateY(-5px) rotate(0) } }
+.walk-cat { animation: walkCat .7s ease-in-out infinite }
+@keyframes walkCount { 0% { transform: scale(1.08) } 100% { transform: scale(1) } }
+.walk-count { animation: walkCount .18s ease-out }
+@keyframes walkBounce { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
+.walk-bounce { animation: walkBounce 1s ease-in-out infinite }
+@keyframes walkBar { from { height: 0 } }
+.walk-bar { animation: walkBar .8s cubic-bezier(.22,1,.36,1) both }

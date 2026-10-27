@@ -45,7 +45,7 @@ async function metrics(userId: string, startsAt: string, endsAt: string): Promis
     attendance: stamps.filter((s) => s.sourceType === "attendance" && s.sourceId?.startsWith(prefix)).length,
     quiz: completions.filter((c) => inRange(c.completedAt)).length,
     roulette: spins.filter((s) => inRange(s.spunAt)).length,
-    game: games.filter((g) => inRange(g.createdAt)).length,
+    game: games.filter((g) => g.game !== "walk" && inRange(g.createdAt)).length,
     spot: games.filter((g) => g.game === "spot" && inRange(g.createdAt) && /:5\/5:/.test(g.result)).length,
     store: store.filter((c) => inRange(c.completedAt)).length,
     invite: invites.filter((r) => inRange(r.createdAt)).length,

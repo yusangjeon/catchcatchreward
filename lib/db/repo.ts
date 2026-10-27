@@ -16,7 +16,7 @@ import type {
   Stamp,
   StoreMission,
   StoreMissionCompletion,
-  UserBadge, PushSubscriptionRow } from "@/lib/types";
+  UserBadge, PushSubscriptionRow, WalkDay } from "@/lib/types";
 
 /**
  * 저장소 인터페이스. 구현체: memory(기본, env 없음) / supabase(SUPABASE_URL 설정 시).
@@ -88,6 +88,11 @@ export interface Repo {
   // ── 꿀 충전(광고 시청) ──
   countHoneyTopups(userId: string, dayKey: string): Promise<number>;
   addHoneyTopup(userId: string, dayKey: string): Promise<void>;
+
+  // 만보기
+  getWalkDay(userId: string, dayKey: string): Promise<WalkDay | null>;
+  setWalkSteps(userId: string, dayKey: string, steps: number): Promise<WalkDay>;
+  listWalkDays(userId: string, limit: number): Promise<WalkDay[]>;
 
   // ── 웹푸시 구독 ──
   addPushSubscription(input: Omit<PushSubscriptionRow, "id" | "createdAt">): Promise<PushSubscriptionRow>;

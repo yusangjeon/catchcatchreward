@@ -12,7 +12,8 @@ import { SPOT_LEVELS, type SpotDiff } from "./spotLevels";
  *  - scratch(복권 긁기): 하루 1장. 0P 50% · 5P 25% · 10P 15% · 50P 8% · 500P 2% (기대값 ≈16.8P)
  *  - memory(카드 뒤집기): 4×4 8쌍. 클라이언트 플레이, 완료 시 시도 수로 보상(≤16회 15P · ≤24회 10P · 그 외 5P). 하루 1회, 서버는 타당성(시도≥8·시간≥5s)만 검사
  */
-export const GAME_LIMITS: Record<GamePlay["game"], number> = { spot: 3, rsp: 3, scratch: 1, memory: 1, slide: 1 };
+export type MiniGame = Exclude<GamePlay["game"], "walk">;
+export const GAME_LIMITS: Record<MiniGame, number> = { spot: 3, rsp: 3, scratch: 1, memory: 1, slide: 1 };
 export const SPOT_DIFFS = 5;
 /** 레벨(오늘 n번째 판)별 난이도: 시간은 줄고 감점·보상은 커진다. 장면도 차이 크기(r) 기준으로 쉬운 것부터 배치 */
 export const SPOT_STAGES = [
@@ -44,13 +45,13 @@ async function wallet(userId: string): Promise<Wallet> {
 
 export interface GamesPayload {
   dayKey: string;
-  games: { key: GamePlay["game"]; title: string; desc: string; icon: string; href: string; limit: number; played: number; left: number; todayPoints: number }[];
+  games: { key: MiniGame; title: string; desc: string; icon: string; href: string; limit: number; played: number; left: number; todayPoints: number }[];
   weekPlays: number;
   recent: { game: string; result: string; points: number; createdAt: string }[];
   wallet: Wallet;
 }
 
-const META: Record<GamePlay["game"], { title: string; desc: string; icon: string }> = {
+const META: Record<MiniGame, { title: string; desc: string; icon: string }> = {
   spot: { title: "틀린그림 찾기", desc: "실사·일러스트 16장면, 하루 3레벨 · 최대 75P", icon: "spot" },
   slide: { title: "2048 퍼즐", desc: "타일을 합쳐 2048에 도전, 최대 50P", icon: "slide" },
   scratch: { title: "복권 긁기", desc: "같은 그림 3개면 당첨, 최대 500P", icon: "scratch" },
@@ -68,17 +69,17 @@ export async function getGames(userId: string): Promise<GamesPayload> {
     const mine = today.filter((p) => p.game === key);
     return { key, ...META[key], href: `/games/${key}`, limit: GAME_LIMITS[key], played: mine.length, left: Math.max(0, GAME_LIMITS[key] - mine.length), todayPoints: mine.reduce((a, p) => a + p.points, 0) };
   });
-  return { dayKey: day, games, weekPlays: plays.filter((p) => p.createdAt >= weekStart).length, recent: plays.slice(0, 10).map((p) => ({ game: META[p.game]?.title ?? p.game, result: p.result, points: p.points, createdAt: p.createdAt })), wallet: w };
+  return { dayKey: day, games, weekPlays: plays.filter((p) => p.createdAt >= weekStart).length, recent: plays.slice(0, 10).map((p) => ({ game: p.game === "walk" ? "만보기" : META[p.game].title, result: p.result, points: p.points, createdAt: p.createdAt })), wallet: w };
 }
 
-async function assertLimit(userId: string, game: GamePlay["game"], day: string) {
+async function assertLimit(userId: string, game: MiniGame, day: string) {
   const plays = await getRepo().listGamePlays(userId);
   const n = plays.filter((p) => p.game === game && p.dayKey === day).length;
   if (n >= GAME_LIMITS[game]) throw new GameError("LIMIT", "오늘은 다 했어요. 내일 또 만나요!");
   return n;
 }
 
-async function record(userId: string, game: GamePlay["game"], day: string, result: string, points: number, memo: string) {
+async function record(userId: string, game: MiniGame, day: string, result: string, points: number, memo: string) {
   const repo = getRepo();
   const play = await repo.addGamePlay({ userId, game, dayKey: day, result, points });
   if (points > 0) await repo.addLedger({ userId, delta: points, reason: "game", refType: "game_play", refId: play.id, memo });

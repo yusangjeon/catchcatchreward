@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Repo } from "./repo";
-import type { Badge, GamePlay, LedgerEntry, Profile, PushSubscriptionRow, Quiz, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge } from "@/lib/types";
+import type { Badge, GamePlay, LedgerEntry, Profile, PushSubscriptionRow, Quiz, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge, WalkDay } from "@/lib/types";
 import { SEED_STORE_MISSIONS } from "@/lib/missions/seed";
 import { newInviteCode } from "@/lib/invite/code";
 import { SEED_BADGES, SEED_QUIZZES, SEED_SETS } from "@/lib/quiz/seed";
@@ -25,6 +25,7 @@ interface Store {
   storeCompletions: StoreMissionCompletion[];
   rushClaims: RushClaim[];
   gamePlays: GamePlay[];
+  walkDays: WalkDay[];
   honeyTopups: { userId: string; dayKey: string }[];
   pushSubs: PushSubscriptionRow[];
 }
@@ -53,6 +54,7 @@ function store(): Store {
       storeCompletions: [],
       rushClaims: [],
       gamePlays: [],
+      walkDays: [],
       honeyTopups: [],
       pushSubs: [],
     };
@@ -285,6 +287,19 @@ export const memoryRepo: Repo = {
   },
   async listPushSubscriptions(userId) {
     return store().pushSubs.filter((x) => !userId || x.userId === userId);
+  },
+  async getWalkDay(userId, dayKey) {
+    return store().walkDays.find((w) => w.userId === userId && w.dayKey === dayKey) ?? null;
+  },
+  async setWalkSteps(userId, dayKey, steps) {
+    const cur = store().walkDays.find((w) => w.userId === userId && w.dayKey === dayKey);
+    if (cur) { cur.steps = steps; cur.updatedAt = now(); return { ...cur }; }
+    const w: WalkDay = { userId, dayKey, steps, updatedAt: now() };
+    store().walkDays.push(w);
+    return { ...w };
+  },
+  async listWalkDays(userId, limit) {
+    return store().walkDays.filter((w) => w.userId === userId).sort((a, b) => b.dayKey.localeCompare(a.dayKey)).slice(0, limit).map((w) => ({ ...w }));
   },
   async addHoneyTopup(userId, dayKey) {
     store().honeyTopups.push({ userId, dayKey });

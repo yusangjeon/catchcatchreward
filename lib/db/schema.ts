@@ -209,6 +209,15 @@ create table if not exists game_plays (
 create index if not exists game_plays_user_idx on game_plays(user_id, day_key);
 alter table game_plays drop constraint if exists game_plays_game_check;
 
+create table if not exists walk_days (
+  user_id    uuid not null references profiles(id) on delete cascade,
+  day_key    text not null,
+  steps      integer not null default 0,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, day_key)
+);
+alter table walk_days enable row level security;
+
 create table if not exists honey_topups (
   id         uuid primary key default gen_random_uuid(),
   user_id    uuid not null references profiles(id) on delete cascade,

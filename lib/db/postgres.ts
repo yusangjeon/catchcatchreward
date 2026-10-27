@@ -1,6 +1,6 @@
 import postgres, { type Sql } from "postgres";
 import type { Repo } from "./repo";
-import type { Badge, GamePlay, LedgerEntry, Profile, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge } from "@/lib/types";
+import type { Badge, GamePlay, LedgerEntry, Profile, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge, WalkDay } from "@/lib/types";
 import { newInviteCode } from "@/lib/invite/code";
 
 /**
@@ -255,6 +255,18 @@ export function createPostgresRepo(url: string): Repo {
 
     async countHoneyTopups(userId, dayKey) {
       return count(sql`select count(*)::int as n from honey_topups where user_id = ${userId} and day_key = ${dayKey}`);
+    },
+    async getWalkDay(userId, dayKey) {
+      const rows = await sql<{ user_id: string; day_key: string; steps: number; updated_at: Date }[]>`select * from walk_days where user_id = ${userId} and day_key = ${dayKey}`;
+      return rows[0] ? { userId: rows[0].user_id, dayKey: rows[0].day_key, steps: rows[0].steps, updatedAt: isoReq(rows[0].updated_at) } : null;
+    },
+    async setWalkSteps(userId, dayKey, steps) {
+      const r = await sql<{ updated_at: Date }[]>`insert into walk_days (user_id, day_key, steps, updated_at) values (${userId}, ${dayKey}, ${steps}, now()) on conflict (user_id, day_key) do update set steps = excluded.steps, updated_at = now() returning updated_at`;
+      return { userId, dayKey, steps, updatedAt: isoReq(r[0].updated_at) };
+    },
+    async listWalkDays(userId, limit) {
+      const rows = await sql<{ user_id: string; day_key: string; steps: number; updated_at: Date }[]>`select * from walk_days where user_id = ${userId} order by day_key desc limit ${limit}`;
+      return rows.map((r) => ({ userId: r.user_id, dayKey: r.day_key, steps: r.steps, updatedAt: isoReq(r.updated_at) }));
     },
     async addHoneyTopup(userId, dayKey) {
       await sql`insert into honey_topups (user_id, day_key) values (${userId}, ${dayKey})`;

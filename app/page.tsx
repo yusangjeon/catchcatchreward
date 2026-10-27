@@ -27,6 +27,7 @@ const BANNERS: BannerSlide[] = [
 /** 퀵메뉴(마이비 영상 기준: 출석체크·만보기·3일 혜택·게임적립·내 쇼핑 … 가로 스크롤 + 점 인디케이터) */
 const QUICK: { key: string; name?: DuoName; tone?: Tone; label: string; href?: string; tip?: string }[] = [
   { key: "attend", name: "calendar", tone: "green", label: "출석체크" },
+  { key: "walk", name: "bolt", tone: "blue", label: "만보기", href: "/walk" },
   { key: "games", name: "gamepad", tone: "violet", label: "미니게임", href: "/games" },
   { key: "newbie", label: "3일 혜택", href: "/newbie", tip: "최대 1,500P" },
   { key: "honey", name: "drop", tone: "amber", label: "꿀 충전" },
