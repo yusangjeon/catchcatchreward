@@ -33,6 +33,16 @@ export default function WalkPage() {
   const [pedo, setPedo] = useState<PedometerState>("idle");
   const [claiming, setClaiming] = useState<number | null>(null);
   const [stepPop, setStepPop] = useState(0);
+  const [mounted, setMounted] = useState(false); // 마운트 후 링·숫자가 0 → 현재값으로 차오르는 연출
+  const [plus, setPlus] = useState<{ id: number; x: number }[]>([]); // 걸음마다 떠오르는 "+1"
+  useEffect(() => { const id = requestAnimationFrame(() => setMounted(true)); return () => cancelAnimationFrame(id); }, []);
+  useEffect(() => {
+    if (!stepPop) return;
+    const id = stepPop;
+    setPlus((l) => [...l.slice(-5), { id, x: (id % 5) * 14 - 28 }]);
+    const t = setTimeout(() => setPlus((l) => l.filter((q) => q.id !== id)), 900);
+    return () => clearTimeout(t);
+  }, [stepPop]);
   const ped = useRef<Pedometer | null>(null);
   const pending = useRef(0);
   const dayKey = useRef("");
@@ -93,10 +103,12 @@ export default function WalkPage() {
     } finally { setClaiming(null); }
   };
 
-  const pct = Math.min(1, steps / DAY_GOAL);
+  const shown = mounted ? steps : 0;
+  const pct = Math.min(1, shown / DAY_GOAL);
   const next = data?.goals.find((g) => steps < g.steps) ?? null;
   const km = (steps * 0.00072).toFixed(2);
   const kcal = Math.round(steps * 0.04);
+  const running = pedo === "running";
   const maxHist = Math.max(DAY_GOAL, ...(data?.history.map((h) => h.steps) ?? [0]));
 
   return (
@@ -111,7 +123,11 @@ export default function WalkPage() {
       {/* 링 게이지 */}
       <section className="relative mx-5 mt-2 overflow-hidden rounded-[26px] px-5 pb-6 pt-6 text-white" style={{ background: "linear-gradient(160deg,#2f6fed 0%,#1f4fc8 60%,#173c9c 100%)", boxShadow: "0 14px 34px rgba(47,111,237,.3)" }}>
         <DuoIcon name="bolt" size={140} className="pointer-events-none absolute -right-6 -top-6 text-white/10" />
-        <div className="flex items-center justify-between">
+        {/* 떠다니는 입자 */}
+        {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+          <i key={i} className="walk-float pointer-events-none absolute rounded-full bg-white" style={{ left: `${6 + i * 12}%`, bottom: -20, width: 6 + (i % 3) * 4, height: 6 + (i % 3) * 4, opacity: 0, animationDelay: `${i * 1.1}s`, animationDuration: `${7 + (i % 4) * 1.5}s` }} />
+        ))}
+        <div className="relative flex items-center justify-between">
           <div>
             <p className="text-[13px] font-semibold text-white/75">오늘 걸음</p>
             <p className="mt-0.5 text-[12px] text-white/60">{next ? `${fmt(next.steps - steps)}걸음 더 걸으면 +${next.points}P` : "오늘 목표를 모두 달성했어요"}</p>
@@ -122,26 +138,44 @@ export default function WalkPage() {
         </div>
 
         <div className="relative mx-auto mt-4" style={{ width: 280, height: 280 }}>
+          {/* 천천히 도는 점선 트랙 */}
+          <svg width={280} height={280} viewBox="0 0 280 280" className={`walk-spin absolute inset-0 ${running ? "walk-spin-fast" : ""}`}><circle cx="140" cy="140" r={R + 16} stroke="rgba(255,255,255,.22)" strokeWidth="2" strokeDasharray="2 9" strokeLinecap="round" fill="none" /></svg>
           <svg width={280} height={280} viewBox="0 0 280 280" className="absolute inset-0 -rotate-90">
             <circle cx="140" cy="140" r={R} stroke="rgba(255,255,255,.15)" strokeWidth="18" fill="none" />
-            <circle cx="140" cy="140" r={R} stroke="url(#walk-g)" strokeWidth="18" strokeLinecap="round" fill="none" strokeDasharray={CIRC} strokeDashoffset={CIRC * (1 - pct)} style={{ transition: "stroke-dashoffset .8s cubic-bezier(.22,1,.36,1)" }} />
+            <circle cx="140" cy="140" r={R} stroke="url(#walk-g)" strokeWidth="18" strokeLinecap="round" fill="none" strokeDasharray={CIRC} strokeDashoffset={CIRC * (1 - pct)} style={{ transition: "stroke-dashoffset 1.4s cubic-bezier(.22,1,.36,1)" }} />
             <defs><linearGradient id="walk-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ffd45c" /><stop offset="1" stopColor="#ff8a5c" /></linearGradient></defs>
           </svg>
+          {/* 링 끝의 빛나는 점 — 진행도 따라 이동 */}
+          <div className="pointer-events-none absolute inset-0" style={{ transform: `rotate(${pct * 360}deg)`, transition: "transform 1.4s cubic-bezier(.22,1,.36,1)" }}>
+            <i className={`walk-dot absolute left-1/2 rounded-full bg-white ${shown > 0 ? "opacity-100" : "opacity-0"}`} style={{ top: 140 - R - 7, width: 14, height: 14, marginLeft: -7, boxShadow: "0 0 0 4px rgba(255,255,255,.25), 0 0 18px 6px rgba(255,212,92,.75)" }} />
+          </div>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <img src="/brand/mascot_body.webp" alt="" width={74} height={74} className={`h-[74px] w-[74px] object-contain ${pedo === "running" ? "walk-cat" : "mascot-idle"}`} draggable={false} />
-            <p key={stepPop} className="walk-count mt-1 text-[44px] font-bold leading-none tabular-nums">{fmt(steps)}</p>
+            <div className="relative h-[84px] w-[110px]">
+              {/* 걷는 중: 흐르는 바닥선 + 발자국 */}
+              {running && (
+                <>
+                  <i className="walk-ground absolute bottom-[2px] left-1/2 h-[3px] w-[96px] -translate-x-1/2 rounded-full opacity-70" />
+                  {[0, 1, 2, 3].map((i) => <i key={i} className="walk-paw absolute bottom-[6px] h-[7px] w-[5px] rounded-full bg-white/80" style={{ left: 18 + i * 22, animationDelay: `${i * 0.35}s` }} />)}
+                </>
+              )}
+              <img src="/brand/mascot_body.webp" alt="" width={74} height={74} className={`absolute left-1/2 top-0 h-[74px] w-[74px] -translate-x-1/2 object-contain ${running ? "walk-cat" : "walk-idle"}`} draggable={false} />
+            </div>
+            <div className="relative mt-1">
+              <p key={stepPop} className="walk-count text-[44px] font-bold leading-none tabular-nums"><NumberFlow value={shown} duration={1200} /></p>
+              {plus.map((q) => <span key={q.id} className="walk-plus pointer-events-none absolute -top-2 left-1/2 text-[16px] font-bold text-[#ffd45c]" style={{ marginLeft: q.x }}>+1</span>)}
+            </div>
             <p className="mt-1 text-[12px] font-semibold text-white/70">/ {fmt(DAY_GOAL)} 걸음</p>
           </div>
         </div>
 
         <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-[14px] bg-white/12 py-2.5"><p className="text-[16px] font-bold">{km}<span className="ml-0.5 text-[11px] font-semibold text-white/70">km</span></p><p className="text-[11px] text-white/60">거리</p></div>
-          <div className="rounded-[14px] bg-white/12 py-2.5"><p className="text-[16px] font-bold">{kcal}<span className="ml-0.5 text-[11px] font-semibold text-white/70">kcal</span></p><p className="text-[11px] text-white/60">소모</p></div>
-          <div className="rounded-[14px] bg-white/12 py-2.5"><p className="text-[16px] font-bold">{data?.todayPoints ?? 0}<span className="ml-0.5 text-[11px] font-semibold text-white/70">P</span></p><p className="text-[11px] text-white/60">오늘 적립</p></div>
+          <div className="walk-in rounded-[14px] bg-white/12 py-2.5" style={{ animationDelay: ".15s" }}><p className="text-[16px] font-bold tabular-nums">{mounted ? km : "0.00"}<span className="ml-0.5 text-[11px] font-semibold text-white/70">km</span></p><p className="text-[11px] text-white/60">거리</p></div>
+          <div className="walk-in rounded-[14px] bg-white/12 py-2.5" style={{ animationDelay: ".3s" }}><p className="text-[16px] font-bold tabular-nums"><NumberFlow value={mounted ? kcal : 0} duration={1200} /><span className="ml-0.5 text-[11px] font-semibold text-white/70">kcal</span></p><p className="text-[11px] text-white/60">소모</p></div>
+          <div className="walk-in rounded-[14px] bg-white/12 py-2.5" style={{ animationDelay: ".45s" }}><p className="text-[16px] font-bold tabular-nums"><NumberFlow value={mounted ? (data?.todayPoints ?? 0) : 0} duration={1200} /><span className="ml-0.5 text-[11px] font-semibold text-white/70">P</span></p><p className="text-[11px] text-white/60">오늘 적립</p></div>
         </div>
 
-        <button type="button" onClick={pedo === "running" ? stop : start} className={`myb-press mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-[14px] text-[15px] font-bold ${pedo === "running" ? "bg-white/15 text-white" : "bg-white text-[#1f4fc8]"}`}>
-          <DuoIcon name={pedo === "running" ? "clock" : "bolt"} size={18} />{pedo === "running" ? "측정 멈추기" : steps > 0 ? "이어서 걷기" : "걸음 세기 시작"}
+        <button type="button" onClick={running ? stop : start} className={`myb-press mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-[14px] text-[15px] font-bold ${running ? "bg-white/15 text-white" : "walk-cta bg-white text-[#1f4fc8]"}`}>
+          {running ? <DuoIcon name="clock" size={18} /> : <FlatIcon file="walk" size={26} className="walk-shoe" />}{running ? "측정 멈추기" : steps > 0 ? "이어서 걷기" : "걸음 세기 시작"}
         </button>
       </section>
 
@@ -152,10 +186,14 @@ export default function WalkPage() {
           {data && data.claimable > 0 && <span className="rounded-full bg-myb-soft px-2.5 py-1 text-[11px] font-bold text-myb-dark">받을 보상 {data.claimable}P</span>}
         </div>
         <ul className="mt-3 flex flex-col gap-2">
-          {(data?.goals ?? []).map((g) => {
+          {(data?.goals ?? []).map((g, gi) => {
             const ready = steps >= g.steps && !g.claimed;
+            const isNext = next?.steps === g.steps;
+            const prevGoal = gi > 0 ? data!.goals[gi - 1].steps : 0;
+            const prog = isNext ? Math.min(1, Math.max(0, (steps - prevGoal) / (g.steps - prevGoal))) : 0;
             return (
-              <li key={g.steps} className={`flex items-center gap-3 rounded-[14px] px-3 py-2.5 ${g.claimed ? "bg-[#f3f4f7]" : ready ? "bg-myb-soft" : "bg-[#f8f9fc]"}`}>
+              <li key={g.steps} className={`walk-in relative flex items-center gap-3 overflow-hidden rounded-[14px] px-3 py-2.5 ${g.claimed ? "bg-[#f3f4f7]" : ready ? "bg-myb-soft" : "bg-[#f8f9fc]"}`} style={{ animationDelay: `${0.1 + gi * 0.07}s` }}>
+                {isNext && <i className="absolute bottom-0 left-0 h-[3px] rounded-r-full bg-gradient-to-r from-[#ffd45c] to-myb" style={{ width: `${(mounted ? prog : 0) * 100}%`, transition: "width 1.4s cubic-bezier(.22,1,.36,1)" }} />}
                 <span className="relative flex h-11 w-11 shrink-0 items-center justify-center">
                   <FlatIcon file={GOAL_ICON[g.steps] ?? "walk"} size={40} className={ready ? "walk-bounce" : ""} style={g.claimed || ready ? undefined : { filter: "grayscale(1) opacity(.45)" }} />
                   {g.claimed && <span className="absolute -bottom-0.5 -right-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#22c55e] ring-2 ring-white"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden><path d="m5 12 5 5L19 7" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span>}
@@ -187,7 +225,7 @@ export default function WalkPage() {
               <div key={h.dayKey} className="flex flex-1 flex-col items-center gap-1">
                 <span className="text-[10px] font-semibold tabular-nums text-muted">{h.steps >= 1000 ? `${(h.steps / 1000).toFixed(1)}k` : h.steps || ""}</span>
                 <div className="flex h-[84px] w-full items-end rounded-full bg-[#f1f2f5]">
-                  <div className={`walk-bar w-full rounded-full ${today ? "bg-myb" : h.steps >= DAY_GOAL ? "bg-[#2f6fed]" : "bg-[#b9c8f5]"}`} style={{ height: `${hgt}%` }} />
+                  <div className={`walk-bar w-full rounded-full ${today ? "bg-myb walk-bar-today" : h.steps >= DAY_GOAL ? "bg-[#2f6fed]" : "bg-[#b9c8f5]"}`} style={{ height: `${hgt}%`, animationDelay: `${i * 0.08}s` }} />
                 </div>
                 <span className={`text-[11px] ${today ? "font-bold text-ink" : "text-muted"}`}>{today ? "오늘" : ["일", "월", "화", "수", "목", "금", "토"][new Date(`${h.dayKey}T00:00:00+09:00`).getDay()]}</span>
               </div>
