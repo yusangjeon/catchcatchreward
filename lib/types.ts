@@ -63,7 +63,7 @@ export interface UserBadge {
   earnedAt: string;
 }
 
-export type LedgerReason = "signup" | "quiz_answer" | "quiz_bonus" | "mission" | "rush" | "store_mission" | "roulette" | "redeem" | "admin_adjust" | "referral";
+export type LedgerReason = "signup" | "game" | "quiz_answer" | "quiz_bonus" | "mission" | "rush" | "store_mission" | "roulette" | "redeem" | "admin_adjust" | "referral";
 
 export interface LedgerEntry {
   id: string;
@@ -147,6 +147,17 @@ export interface StoreMissionCompletion {
   userId: string;
   missionId: string;
   completedAt: string;
+}
+
+/** 미니게임 플레이 기록(일일 한도·러쉬 집계·보상 감사) */
+export interface GamePlay {
+  id: string;
+  userId: string;
+  game: "spot" | "rsp" | "scratch" | "memory";
+  dayKey: string;
+  result: string; // win/draw/lose, found:5, prize:50 …
+  points: number;
+  createdAt: string;
 }
 
 /** 주간 러쉬 미션/스탬프 보상 수령 기록 */

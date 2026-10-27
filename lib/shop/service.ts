@@ -1,4 +1,5 @@
 import "server-only";
+import { outboundUrl, SHOP_CLICK_POINTS } from "./affiliate";
 import { DETAILS, MERCHANTS, NOTICES } from "./seed";
 import type { MerchantDetail, MerchantPayload, ShopPayload } from "./types";
 
@@ -35,5 +36,11 @@ export function getMerchant(id: string): MerchantPayload | null {
   // nudgeMerchantList(캡처): 롯데홈쇼핑, GS SHOP, 11번가, 옥션, 이마트몰, SSG, 오늘의집, 알리, G마켓, 쿠팡 순
   const order = ["woori", "gseshop", "11st", "auction", "emartmall", "ssg", "ohouse", "aliexpress", "gmarket", "coupang_pincrux_group"];
   const nudge = order.map((k) => MERCHANTS.find((m) => m.id === k)!).filter((m) => m && m.id !== id);
-  return { merchant, isFavorite: getShop().favorites.includes(id), detail: detailFor(id, merchant.rate), nudge, notices: NOTICES };
+  return { merchant, outHref: `/api/shop/out?merchant=${encodeURIComponent(merchant.id)}`, clickPoints: SHOP_CLICK_POINTS, isFavorite: getShop().favorites.includes(id), detail: detailFor(id, merchant.rate), nudge, notices: NOTICES };
+}
+
+/** 제휴 아웃링크 URL(서버 전용) */
+export function merchantOutUrl(id: string): string | null {
+  const m = MERCHANTS.find((x) => x.id === id);
+  return m ? outboundUrl(m.id, m.name, m.outUrl) : null;
 }

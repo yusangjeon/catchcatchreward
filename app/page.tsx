@@ -18,7 +18,7 @@ const BANNERS = ["/myb/up/2025-12-19T03_30_12.125Z_banner.webp", "/myb/up/2025-1
 /** 퀵메뉴 아이콘 — 앱스토어 스크린샷 원본 픽셀(꿀 충전은 툴팁에 가려져 꿀단지 아이콘으로 대체) */
 const QUICK: { icon: string; label: string; href?: string; tip?: string }[] = [
   { icon: "/myb/native/qm_attend.png", label: "출석체크" },
-  { icon: "/myb/native/qm_minigame.png", label: "미니게임", href: "/roulette" },
+  { icon: "/myb/native/qm_minigame.png", label: "미니게임", href: "/games" },
   { icon: "/myb/native/ic_honey_jar.png", label: "꿀 충전", tip: "매일 0시 충전" },
   { icon: "/myb/native/qm_invite.png", label: "친구초대", href: "/invite" },
 ];

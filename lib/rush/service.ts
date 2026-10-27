@@ -15,7 +15,7 @@ export const STAMP_REWARDS = [
   { key: "stamp8", stamps: 8, points: 500 },
 ] as const;
 
-type Metric = "attendance" | "quiz" | "roulette" | "badge" | "store" | "invite";
+type Metric = "attendance" | "quiz" | "roulette" | "game" | "store" | "invite";
 
 interface MissionDef {
   key: string;
@@ -37,7 +37,7 @@ export const RUSH_MISSIONS: MissionDef[] = [
   { key: "quiz5", metric: "quiz", title: "퀴즈", stepTitle: "퀴즈 5개 완료하기", hintLabel: "퀴즈 완료", value: 5, reward: 10, action: "link", href: "/quiz", icon: "/myb/bh/ic_bpointrush_cpx.webp" },
   { key: "quiz10", metric: "quiz", title: "퀴즈", stepTitle: "퀴즈 10개 완료하기", hintLabel: "퀴즈 완료", value: 10, reward: 20, action: "link", href: "/quiz", icon: "/myb/bh/ic_bpointrush_cpx.webp" },
   { key: "roulette1", metric: "roulette", title: "룰렛", stepTitle: "무료 룰렛 돌리기", hintLabel: "룰렛 참여", value: 1, reward: 20, action: "link", href: "/roulette", icon: "/myb/native/qm_minigame.png" },
-  { key: "badge1", metric: "badge", title: "취향배지", stepTitle: "취향배지 획득하기", hintLabel: "배지 획득", value: 1, reward: 20, action: "link", href: "/quiz", icon: "/myb/native/ic_basic_hex.png" },
+  { key: "game3", metric: "game", title: "미니게임", stepTitle: "미니게임 3회 하기", hintLabel: "게임 플레이", value: 3, reward: 20, action: "link", href: "/games", icon: "/myb/native/qm_minigame.png" },
   { key: "store1", metric: "store", title: "매장미션", stepTitle: "매장 미션 완료하기", hintLabel: "매장 미션", value: 1, reward: 30, action: "link", href: "/missions", icon: "/myb/bh/ic_bpointrush_cpa.webp" },
   { key: "invite1", metric: "invite", title: "친구초대", stepTitle: "친구 1명 초대하기", hintLabel: "초대 완료", value: 1, reward: 50, action: "link", href: "/invite", icon: "/myb/native/qm_invite.png" },
 ];
@@ -59,15 +59,15 @@ const inRange = (iso: string, w: KstWeek) => iso >= w.startsAt && iso <= w.endsA
 /** 이번 주 원천 지표 집계 */
 async function metrics(userId: string, w: KstWeek): Promise<Record<Metric, number>> {
   const repo = getRepo();
-  const [stamps, completions, spins, badges, store, invites] = await Promise.all([
-    repo.listStamps(userId), repo.listCompletions(userId), repo.listSpins(userId), repo.listUserBadges(userId), repo.listStoreCompletions(userId), repo.listReferralsByInviter(userId),
+  const [stamps, completions, spins, games, store, invites] = await Promise.all([
+    repo.listStamps(userId), repo.listCompletions(userId), repo.listSpins(userId), repo.listGamePlays(userId), repo.listStoreCompletions(userId), repo.listReferralsByInviter(userId),
   ]);
   const days = new Set(w.dayKeys);
   return {
     attendance: stamps.filter((s) => s.sourceType === "attendance" && s.sourceId && days.has(s.sourceId)).length,
     quiz: completions.filter((c) => inRange(c.completedAt, w)).length,
     roulette: spins.filter((s) => inRange(s.spunAt, w)).length,
-    badge: badges.filter((b) => inRange(b.earnedAt, w)).length,
+    game: games.filter((g) => inRange(g.createdAt, w)).length,
     store: store.filter((c) => inRange(c.completedAt, w)).length,
     invite: invites.filter((r) => inRange(r.createdAt, w)).length,
   };

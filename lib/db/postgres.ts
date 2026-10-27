@@ -1,6 +1,6 @@
 import postgres, { type Sql } from "postgres";
 import type { Repo } from "./repo";
-import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge } from "@/lib/types";
+import type { Badge, GamePlay, LedgerEntry, Profile, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge } from "@/lib/types";
 import { newInviteCode } from "@/lib/invite/code";
 
 /**
@@ -216,6 +216,15 @@ export function createPostgresRepo(url: string): Repo {
     async countStoreCompletionsByMission() {
       const rows = await sql<{ mission_id: string; n: string }[]>`select mission_id, count(*)::int as n from store_mission_completions group by mission_id`;
       return Object.fromEntries(rows.map((r) => [r.mission_id, Number(r.n)]));
+    },
+
+    async addGamePlay(input) {
+      const r = await sql<{ id: string; created_at: Date }[]>`insert into game_plays (user_id, game, day_key, result, points) values (${input.userId}, ${input.game}, ${input.dayKey}, ${input.result}, ${input.points}) returning id, created_at`;
+      return { ...input, id: r[0].id, createdAt: isoReq(r[0].created_at) };
+    },
+    async listGamePlays(userId) {
+      const rows = await sql<{ id: string; user_id: string; game: GamePlay["game"]; day_key: string; result: string; points: number; created_at: Date }[]>`select * from game_plays where user_id = ${userId} order by created_at desc limit 500`;
+      return rows.map((r) => ({ id: r.id, userId: r.user_id, game: r.game, dayKey: r.day_key, result: r.result, points: r.points, createdAt: isoReq(r.created_at) }));
     },
 
     async listRushClaims(userId, weekKey) {

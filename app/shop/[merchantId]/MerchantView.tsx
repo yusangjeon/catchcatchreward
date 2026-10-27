@@ -149,15 +149,15 @@ export function MerchantView({ merchantId }: { merchantId: string }) {
         {data?.detail.buttons.length ? (
           <div className="mx-5 mb-[41px] mt-[14px] flex w-full gap-[10px]">
             {data.detail.buttons.map((b) => (
-              <button key={b.id} type="button" onClick={() => show("쇼핑몰로 이동해요 (제휴 연동 예정)", "info")} className="myb-press flex h-[58px] flex-1 items-center justify-center rounded-[14px] bg-[#427cff] px-4 py-5 text-[16px] font-medium text-white">
+              <a key={b.id} href={data.outHref} target="_blank" rel="noopener noreferrer" onClick={() => show(`쇼핑몰로 이동해요 · 방문 적립 ${data.clickPoints}P`)} className="myb-press flex h-[58px] flex-1 items-center justify-center rounded-[14px] bg-[#427cff] px-4 py-5 text-[16px] font-medium text-white">
                 {b.label}
-              </button>
+              </a>
             ))}
           </div>
         ) : (
-          <button type="button" onClick={() => show("쇼핑몰로 이동해요 (제휴 연동 예정)", "info")} className="myb-press mx-5 mb-[41px] mt-[14px] flex h-[58px] w-full items-center justify-center gap-[10px] rounded-[14px] bg-[#427cff] px-4 py-5 text-[16px] font-medium text-white">
+          <a href={data?.outHref ?? "#"} target="_blank" rel="noopener noreferrer" onClick={() => show(`쇼핑몰로 이동해요 · 방문 적립 ${data?.clickPoints ?? 5}P`)} className="myb-press mx-5 mb-[41px] mt-[14px] flex h-[58px] w-full items-center justify-center gap-[10px] rounded-[14px] bg-[#427cff] px-4 py-5 text-[16px] font-medium text-white">
             쇼핑하러 가기
-          </button>
+          </a>
         )}
       </div>
     </div>

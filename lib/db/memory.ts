@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Repo } from "./repo";
-import type { Badge, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge } from "@/lib/types";
+import type { Badge, GamePlay, LedgerEntry, Profile, Quiz, QuizResponse, QuizSet, Redemption, Referral, RoulettePrize, RouletteSpin, RushClaim, SetCompletion, Stamp, StoreMission, StoreMissionCompletion, UserBadge } from "@/lib/types";
 import { SEED_STORE_MISSIONS } from "@/lib/missions/seed";
 import { newInviteCode } from "@/lib/invite/code";
 import { SEED_BADGES, SEED_QUIZZES, SEED_SETS } from "@/lib/quiz/seed";
@@ -24,6 +24,7 @@ interface Store {
   storeMissions: StoreMission[];
   storeCompletions: StoreMissionCompletion[];
   rushClaims: RushClaim[];
+  gamePlays: GamePlay[];
 }
 
 // dev 서버 HMR 때 모듈이 재평가돼도 데이터가 유지되도록 globalThis 에 붙인다.
@@ -49,6 +50,7 @@ function store(): Store {
       storeMissions: structuredClone(SEED_STORE_MISSIONS),
       storeCompletions: [],
       rushClaims: [],
+      gamePlays: [],
     };
   }
   return g.__ccrStore;
@@ -233,6 +235,15 @@ export const memoryRepo: Repo = {
     const out: Record<string, number> = {};
     for (const c of store().storeCompletions) out[c.missionId] = (out[c.missionId] ?? 0) + 1;
     return out;
+  },
+
+  async addGamePlay(input) {
+    const g: GamePlay = { ...input, id: randomUUID(), createdAt: now() };
+    store().gamePlays.push(g);
+    return g;
+  },
+  async listGamePlays(userId) {
+    return store().gamePlays.filter((g) => g.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   },
 
   async listRushClaims(userId, weekKey) {

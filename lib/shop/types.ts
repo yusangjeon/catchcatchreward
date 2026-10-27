@@ -6,6 +6,7 @@ export interface Merchant {
   rate: number; // 최대 적립률(%). 쿠팡은 0(정액 P)
   recommendIndex: number;
   isNew: boolean;
+  outUrl?: string; // 제휴(쿠팡 파트너스·네이버 등) 아웃링크. 없으면 검색 링크
 }
 
 export interface GuideToken {
@@ -33,6 +34,8 @@ export interface ShopPayload {
 
 export interface MerchantPayload {
   merchant: Merchant;
+  outHref: string; // /api/shop/out?merchant=… (클릭 적립 + 제휴 링크 리다이렉트)
+  clickPoints: number; // 하루 1회 방문 적립 P
   isFavorite: boolean; // 즐겨찾기(핀) 여부 → 별 노란색
   detail: MerchantDetail;
   nudge: Merchant[]; // 이 쇼핑몰도 추천해요!

@@ -1,6 +1,7 @@
 import type {
   AdminStats,
   Badge,
+  GamePlay,
   LedgerEntry,
   Profile,
   Quiz,
@@ -78,6 +79,10 @@ export interface Repo {
   listStoreCompletions(userId?: string): Promise<StoreMissionCompletion[]>;
   addStoreCompletion(input: Omit<StoreMissionCompletion, "id" | "completedAt">): Promise<StoreMissionCompletion>;
   countStoreCompletionsByMission(): Promise<Record<string, number>>;
+
+  // ── 미니게임 ──
+  addGamePlay(input: Omit<GamePlay, "id" | "createdAt">): Promise<GamePlay>;
+  listGamePlays(userId: string): Promise<GamePlay[]>;
 
   // ── 주간 러쉬 ──
   listRushClaims(userId: string, weekKey: string): Promise<RushClaim[]>;

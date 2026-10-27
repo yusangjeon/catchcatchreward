@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/admin/auth";
 import { getRepo } from "@/lib/db";
 import { PRODUCTS } from "@/lib/exchange/products";
 
-const REASON: Record<string, string> = { signup: "가입 보너스", quiz_answer: "퀴즈 보상", quiz_bonus: "보너스", mission: "미션", rush: "러쉬", store_mission: "매장 미션", roulette: "룰렛", redeem: "교환", admin_adjust: "운영 조정", referral: "친구초대" };
+const REASON: Record<string, string> = { signup: "가입 보너스", game: "미니게임", quiz_answer: "퀴즈 보상", quiz_bonus: "보너스", mission: "미션", rush: "러쉬", store_mission: "매장 미션", roulette: "룰렛", redeem: "교환", admin_adjust: "운영 조정", referral: "친구초대" };
 
 /** 유저 360 — 프로필·잔액·배지·태그 점수·원장·세트 완료·교환·초대 */
 export default async function AdminUserDetail({ params }: { params: Promise<{ id: string }> }) {
