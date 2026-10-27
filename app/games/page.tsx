@@ -8,7 +8,7 @@ import { NumberFlow } from "@/components/motion/NumberFlow";
 import { fmt } from "@/hooks/useHome";
 import type { GamesPayload } from "@/lib/games/service";
 
-const TILE_IMG: Record<string, string> = { spot: "/games/spot/park/a.webp", slide: "/games/art/tile_slide.webp", scratch: "/games/art/tile_scratch.webp", rsp: "/games/art/tile_rsp.webp", memory: "/games/art/tile_memory.webp" };
+const TILE_IMG: Record<string, string> = { spot: "/games/spot/photo_living/a.webp", slide: "/games/art/tile_slide.webp", scratch: "/games/art/tile_scratch.webp", rsp: "/games/art/tile_rsp.webp", memory: "/games/art/tile_memory.webp" };
 
 /** 미니게임 허브 — 매일 리셋되는 5가지. 결과·보상은 서버가 결정 */
 export default function GamesPage() {

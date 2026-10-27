@@ -52,7 +52,7 @@ export async function migrateAndSeed(sql: Sql): Promise<{ seeded: Record<string,
     const r = await sql`insert into quizzes (id, set_id, question, kind, active, sort) values (${q.id}, ${q.setId}, ${q.question}, ${q.kind}, ${q.active}, ${q.sort}) on conflict (id) do nothing`;
     seeded.quizzes = (seeded.quizzes ?? 0) + r.count;
     for (const o of q.options) {
-      const ro = await sql`insert into quiz_options (id, quiz_id, label, image_url, tags, sort) values (${o.id}, ${q.id}, ${o.label}, ${o.imageUrl ?? null}, ${sql.array(o.tags)}::text[], ${o.sort}) on conflict (id) do nothing`;
+      const ro = await sql`insert into quiz_options (id, quiz_id, label, image_url, tags, sort) values (${o.id}, ${q.id}, ${o.label}, ${o.imageUrl ?? null}, ${sql.array(o.tags)}::text[], ${o.sort}) on conflict (id) do update set image_url = excluded.image_url where quiz_options.image_url like 'https://picsum.photos/%'`;
       seeded.quiz_options = (seeded.quiz_options ?? 0) + ro.count;
     }
   }

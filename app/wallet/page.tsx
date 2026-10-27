@@ -25,14 +25,14 @@ const BRANDS = [
 const PRODUCTS = [
   // grid-flow-col(2행) 이므로 [1행, 2행] 쌍 순서로 나열
   { name: "한국거래소 금 투자", p: null, cx: null, img: "/myb/native/tile_gold.png" },
-  { name: "현금 15,000원", p: 18000, cx: 903, emoji: "💵", bg: "bg-[#fff8e6]" },
+  { name: "현금 15,000원", p: 18000, cx: 903, img: "/products/cash_15000.webp" },
   { name: "마이비 포인트적금", p: null, cx: null, img: "/myb/native/tile_savings.png" },
   { name: "아이스 카페 아메리카노 T", p: 6956, cx: 349.11, img: "/myb/native/tile_americano.png" },
   { name: "네이버페이 포인트 10,000원", p: 12000, cx: 602, img: "/myb/native/tile_npay.png" },
   { name: "신세계 상품권 10,000원", p: 14900, cx: 787.9, img: "/myb/native/tile_ssg.png" },
-  { name: "포테이토 피자 스몰 세트", p: 9900, cx: 497, emoji: "🍕", bg: "bg-[#f6f7fb]" },
-  { name: "빙그레 바나나우유 240ML", p: 1900, cx: 95.3, emoji: "🍌", bg: "bg-[#f6f7fb]" },
-  { name: "뿌링클+콜라 1.25L", p: 24900, cx: 1249, emoji: "🍗", bg: "bg-[#f6f7fb]" },
+  { name: "포테이토 피자 스몰 세트", p: 9900, cx: 497, img: "/products/pizza_small_set.webp" },
+  { name: "빙그레 바나나우유 240ML", p: 1900, cx: 95.3, img: "/products/banana_milk.webp" },
+  { name: "뿌링클+콜라 1.25L", p: 24900, cx: 1249, img: "/products/bburinkle_cola.webp" },
 ];
 
 export default function WalletPage() {
@@ -116,7 +116,7 @@ export default function WalletPage() {
           <div className="no-scrollbar mt-[22px] grid grid-flow-col grid-rows-2 gap-x-[10px] gap-y-6 overflow-x-auto [grid-auto-columns:100px]">
             {PRODUCTS.map((p) => (
               <Link key={p.name} href={p.p === null ? "/wallet" : "/exchange"} className="block w-[100px]">
-                {"img" in p && p.img ? <img src={p.img} alt="" className="aspect-square w-full rounded-xl object-cover" /> : <div className={`flex aspect-square items-center justify-center rounded-xl text-[40px] ${"bg" in p ? p.bg : ""}`} aria-hidden>{"emoji" in p ? p.emoji : ""}</div>}
+                {"img" in p && p.img ? <img src={p.img} alt="" className="aspect-square w-full rounded-xl object-cover" /> : <div className={`flex aspect-square items-center justify-center rounded-xl text-[40px] ${"bg" in p ? p.bg : ""}`} aria-hidden>{"emoji" in p ? String(p.emoji) : ""}</div>}
                 <p className="mt-2.5 line-clamp-2 text-[12px] leading-snug">{p.name}</p>
                 {p.p === null ? (
                   <p className="mt-1.5 flex items-center gap-1 text-[13px] font-bold"><PCoin size={14} />무제한</p>

@@ -29,8 +29,8 @@ const QUICK: { key: string; icon?: string; label: string; href?: string; tip?: s
 
 /** 포인트 모아서 살 수 있어요 — 지갑 상품 타일(원본 픽셀) */
 const PRODUCTS: { brand: string; name: string; points: number; img?: string; emoji?: string; bg: string }[] = [
-  { brand: "GS25", name: "빙그레)바나나우유240ML", points: 1900, emoji: "🍌", bg: "#f6f7fb" },
-  { brand: "스타벅스", name: "아이스 카페 아메리카노T", points: 6956, img: "/myb/native/tile_americano.png", bg: "#dff3ea" },
+  { brand: "GS25", name: "빙그레)바나나우유240ML", points: 1900, img: "/products/banana_milk.webp", bg: "#f6f7fb" },
+  { brand: "스타벅스", name: "아이스 카페 아메리카노T", points: 6956, img: "/products/americano_tall.webp", bg: "#dff3ea" },
   { brand: "네이버페이", name: "네이버페이 포인트 10,000원", points: 12000, img: "/myb/native/tile_npay.png", bg: "#f6f7fb" },
   { brand: "신세계", name: "신세계 상품권 10,000원", points: 14900, img: "/myb/native/tile_ssg.png", bg: "#f6f7fb" },
 ];
@@ -192,7 +192,7 @@ export default function HomePage() {
           {PRODUCTS.map((p) => (
             <Link key={p.name} href="/exchange" className="block">
               <div className="flex h-[170px] items-center justify-center rounded-[18px]" style={{ background: p.bg }}>
-                {p.img ? <img src={p.img} alt="" className="h-[150px] w-[150px] object-contain" /> : <span className="text-[72px] leading-none">{p.emoji}</span>}
+                {p.img ? <img src={p.img} alt="" className={p.img.startsWith("/products/") ? "h-full w-full rounded-[18px] object-cover" : "h-[150px] w-[150px] object-contain"} /> : <span className="text-[72px] leading-none">{p.emoji}</span>}
               </div>
               <p className="mt-2.5 text-[12px] text-muted">{p.brand}</p>
               <p className="mt-0.5 truncate text-[15px] font-medium">{p.name}</p>

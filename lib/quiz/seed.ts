@@ -18,7 +18,6 @@ export const SEED_BADGES: Badge[] = [
   { code: "wellness", name: "건강러", description: "건강 관리 선택지를 3번 이상 골랐어요", emoji: "🥗", rule: { tag: "health", min: 3 } },
 ];
 
-const img = (seed: string, w = 600, h = 600) => `https://picsum.photos/seed/${seed}/${w}/${h}`;
 
 type SeedOption = [label: string, tags: string[], imageSeed?: string];
 
@@ -35,7 +34,7 @@ function q(setId: string, n: number, question: string, options: SeedOption[]): Q
       id: `${id}-${String.fromCharCode(97 + i)}`,
       label,
       tags,
-      imageUrl: seed ? (seed.startsWith("/") ? seed : img(seed, 400, 400)) : undefined,
+      imageUrl: seed ? (seed.startsWith("/") ? seed : `/quiz/options/${seed}.webp`) : undefined,
       sort: i,
     })),
   };

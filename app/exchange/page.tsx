@@ -76,7 +76,7 @@ export default function ExchangePage() {
               const can = balance >= p.points;
               return (
                 <button key={p.kind} type="button" onClick={() => setPick(p)} className="text-left">
-                  <div className={`flex aspect-square items-center justify-center rounded-xl text-[40px] ${can ? "" : "opacity-50 grayscale"}`} style={{ background: p.bg }} aria-hidden>{p.emoji}</div>
+                  <div className={`flex aspect-square items-center justify-center overflow-hidden rounded-xl text-[40px] ${can ? "" : "opacity-50 grayscale"}`} style={{ background: p.bg }} aria-hidden>{p.img ? <img src={p.img} alt="" className="h-full w-full object-cover" /> : p.emoji}</div>
                   <p className="mt-2.5 line-clamp-2 text-[12px] leading-snug">{p.name}</p>
                   <p className="mt-1.5 flex items-center gap-1 text-[13px] font-bold"><PCoin size={14} />{fmt(p.points)}</p>
                 </button>

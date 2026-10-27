@@ -38,7 +38,7 @@ export async function createSetAction(fd: FormData) {
   const set: QuizSet = {
     id: `s-${randomUUID().slice(0, 8)}`,
     title,
-    imageUrl: str(fd, "imageUrl") || `https://picsum.photos/seed/${encodeURIComponent(title)}/600/600`,
+    imageUrl: str(fd, "imageUrl") || "/quiz/covers/default.webp",
     rewardPoints: num(fd, "rewardPoints", 100),
     capacity: num(fd, "capacity", 5000),
     baseParticipants: num(fd, "baseParticipants", 0),

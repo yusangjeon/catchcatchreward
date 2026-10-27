@@ -43,7 +43,7 @@ export interface GamesPayload {
 }
 
 const META: Record<GamePlay["game"], { title: string; desc: string; icon: string }> = {
-  spot: { title: "틀린그림 찾기", desc: "두 그림에서 다른 5곳, 하루 3레벨 · 최대 75P", icon: "spot" },
+  spot: { title: "틀린그림 찾기", desc: "실사·일러스트 16장면, 하루 3레벨 · 최대 75P", icon: "spot" },
   slide: { title: "2048 퍼즐", desc: "타일을 합쳐 2048에 도전, 최대 50P", icon: "slide" },
   scratch: { title: "복권 긁기", desc: "같은 그림 3개면 당첨, 최대 500P", icon: "scratch" },
   rsp: { title: "가위바위보", desc: "승 10P · 3연승 보너스 +20P · 하루 3판", icon: "rsp" },

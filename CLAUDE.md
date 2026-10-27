@@ -144,3 +144,7 @@
   - 갤러리 아티팩트 v6(61장): https://claude.ai/artifact/HqaGWbStnGYAuyZc4ZJXF9 — `qa/gallery.js`(틀린그림 v3 플로우는 `spotgen/levels.json` 좌표로 탭, 인자 2개) + `qa/make_gallery.py`.
   - 이미지 생성 크레딧 사용 합계(이 세션): 장면 8 + 커버 16 + 아트 13 = 37장 ≈ 9.25크레딧(잔액 1,000 중).
   - 남은 것(대표님 입력 필요): Supabase `DATABASE_URL` → `/admin/db` · 카카오 `KAKAO_REST_API_KEY` · VAPID 키·`CRON_SECRET`. 코드 측 남은 것: 비플레이 웹뷰(mock 없음), 실기기 캡처 기반 아이콘 재보정.
+- 2026-10-27(18차): **실사진 전면 교체("그림도 실제 사진 위주로").** 같은 이미지 MCP(gpt_image_2_5) 36장 ≈ 9크레딧.
+  - 틀린그림 실사 8장면(거실·부엌·시장·책상·베이커리·해변 피크닉·놀이방·가을 공원) → `spotgen/levels2.json` + `gen.py`(4번째 인자로 레벨 파일) → `public/games/spot/photo_*/{a,b}.webp`. `SPOT_LEVELS` = 실사 8 → 일러스트 8(총 16, 날짜×회차 순환). 실사 편집 팁: hue 는 `from/tol` 을 좁게(책상 나무 hue≈30 이 노란 포스트잇 tol 25 에 걸림 → scale 로 대체), 흰 벽 제거는 액자 테두리 잔상 → hue/scale 로 대체, 바다 제거는 수평선 y 유지한 수평 src.
+  - 퀴즈 선택지 이미지 20장(`public/quiz/options/<seed>.webp`, seed.ts 의 imageSeed 가 그대로 파일명) · 상품 사진 8장(`public/products/<kind>.webp`, `Product.img`, 교환·지갑·홈 타일 사용) · picsum 의존 제거(관리자 세트 기본 커버 `/quiz/covers/default.webp`). DB 시드는 picsum URL 인 quiz_options/quiz_sets 행만 image_url 갱신.
+  - 갤러리 v7(61장) 재발행. QA: 전 화면 콘솔 에러 0, 실사 레벨 완주 e2e(책상 5/5 +25P).
