@@ -19,7 +19,18 @@ export default function ShopPage() {
   const [data, setData] = useState<ShopPayload | null>(null);
   const [sort, setSort] = useState<"recommend" | "rate" | "name">("recommend");
   const [noticeOpen, setNoticeOpen] = useState(false);
-  useEffect(() => { fetch("/api/shop", { cache: "no-store" }).then((r) => r.json()).then(setData).catch(() => {}); }, []);
+  const [popup, setPopup] = useState(false);
+  useEffect(() => {
+    fetch("/api/shop", { cache: "no-store" }).then((r) => r.json()).then((j: ShopPayload) => {
+      setData(j);
+      try { if (j.firstPurchaseTarget && !sessionStorage.getItem("ccr_shop_popup")) setPopup(true); } catch { setPopup(j.firstPurchaseTarget); }
+    }).catch(() => {});
+  }, []);
+  const closePopup = (goHot = false) => {
+    setPopup(false);
+    try { sessionStorage.setItem("ccr_shop_popup", "1"); } catch {}
+    if (goHot) document.getElementById("hot")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const byId = (id: string) => data?.merchants.find((m) => m.id === id);
   const top = data ? byId(data.topBanner.merchantId) : undefined;
@@ -91,7 +102,7 @@ export default function ShopPage() {
       </section>
 
       {/* 적립률 높은 곳 */}
-      <section className="mt-7 px-5">
+      <section id="hot" className="mt-7 scroll-mt-16 px-5">
         <h2 className="text-[18px] font-bold text-ink">지금 적립률 높은 곳</h2>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {recommended.map((m, i) => <MerchantCard key={m.id} m={m} hot={i === 0} />)}
@@ -126,6 +137,33 @@ export default function ShopPage() {
         <IconTile name="coin" tone="amber" size={40} />
         <p className="text-[12px] leading-[17px] text-ink-2">쇼핑몰로 이동만 해도 <b className="text-ink">하루 1회 5P</b>가 적립돼요. 구매 적립은 구매 확정 후 들어와요.</p>
       </div>
+
+      {/* 첫 구매 2배 팝업 — 세션당 1회 */}
+      {popup && (
+        <>
+          <div className="myb-fade-in fixed inset-0 z-[999] bg-black/60" onClick={() => closePopup()} />
+          <div className="pointer-events-none fixed inset-0 z-[1000] flex items-center justify-center px-7">
+            <div className="myb-modal-in pointer-events-auto relative w-full max-w-[330px] overflow-hidden rounded-[26px] bg-white text-center" style={{ boxShadow: "0 24px 60px rgba(0,0,0,.25)" }}>
+              <div className="relative px-6 pb-5 pt-7" style={{ background: "linear-gradient(180deg,#fff3cc 0%,#ffe4d3 100%)" }}>
+                <span className="inline-flex h-[26px] items-center gap-1 rounded-full bg-ink px-3 text-[12px] font-bold text-white"><DuoIcon name="bag" size={13} /> 쇼핑 적립 혜택</span>
+                <p className="mt-3 text-[24px] font-bold leading-[31px] text-ink">첫 쇼핑이면<br /><span className="text-myb">적립 두 배!</span></p>
+                <p className="mt-1.5 flex items-center justify-center gap-1 text-[15px] font-semibold text-ink-2">최대 <PCoin size={16} /><b className="text-ink">5,000</b> 즉시 지급</p>
+                <img src="/brand/mascot_2.webp" alt="" width={168} height={168} className="myb-float mx-auto mt-2 h-[168px] w-[168px] object-contain" draggable={false} />
+                <span className="absolute left-5 top-[150px] rounded-full bg-white px-2.5 py-1 text-[11px] font-bold text-myb-dark shadow-sm">2X</span>
+                <span className="absolute right-5 top-[190px] rounded-full bg-white px-2.5 py-1 text-[11px] font-bold text-[#9a5b00] shadow-sm">이번 달까지</span>
+              </div>
+              <div className="px-5 pb-5 pt-4">
+                <p className="text-[12px] text-muted">지금 보이는 적립률의 두 배로 드려요. 쇼핑몰 어디든 첫 구매 1회.</p>
+                <button type="button" onClick={() => closePopup(true)} className="myb-press mt-3 h-[52px] w-full rounded-[14px] bg-myb text-[16px] font-bold text-white shadow-[0_6px_18px_rgba(255,90,45,.35)]">첫 구매 혜택 받기</button>
+                <button type="button" onClick={() => closePopup()} className="mt-2 h-10 w-full text-[13px] font-semibold text-muted">오늘은 그만 보기</button>
+              </div>
+              <button type="button" onClick={() => closePopup()} aria-label="닫기" className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/70 text-ink-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" /></svg>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
