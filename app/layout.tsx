@@ -3,6 +3,7 @@ import "./globals.css";
 import { Shell } from "@/components/Shell";
 import { ToastProvider } from "@/components/motion/Toast";
 import { FxLayer } from "@/components/motion/FxLayer";
+import { BuildGuard } from "@/components/BuildGuard";
 import { RewardLayer } from "@/components/motion/RewardLayer";
 
 export const metadata: Metadata = {
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastProvider>
           <Shell>{children}</Shell>
           <FxLayer />
+          <BuildGuard />
           <RewardLayer />
         </ToastProvider>
       </body>
