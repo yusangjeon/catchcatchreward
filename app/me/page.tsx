@@ -19,7 +19,7 @@ export default function MePage() {
 }
 
 const MENU = [
-  { href: "/history", label: "포인트 내역", name: "coin", tone: "amber" },
+  { href: "/history", label: "포인트 내역", name: "clock", tone: "amber" },
   { href: "/exchange", label: "포인트 교환", name: "ticket", tone: "blue" },
   { href: "/gifts", label: "선물함", name: "gift", tone: "pink" },
   { href: "/attendance", label: "출석 달력", name: "calendar", tone: "green" },
