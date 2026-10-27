@@ -253,6 +253,12 @@ export function createPostgresRepo(url: string): Repo {
       return Object.fromEntries(rows.map((r) => [r.mission_id, Number(r.n)]));
     },
 
+    async countHoneyTopups(userId, dayKey) {
+      return count(sql`select count(*)::int as n from honey_topups where user_id = ${userId} and day_key = ${dayKey}`);
+    },
+    async addHoneyTopup(userId, dayKey) {
+      await sql`insert into honey_topups (user_id, day_key) values (${userId}, ${dayKey})`;
+    },
     async addGamePlay(input) {
       const r = await sql<{ id: string; created_at: Date }[]>`insert into game_plays (user_id, game, day_key, result, points) values (${input.userId}, ${input.game}, ${input.dayKey}, ${input.result}, ${input.points}) returning id, created_at`;
       return { ...input, id: r[0].id, createdAt: isoReq(r[0].created_at) };

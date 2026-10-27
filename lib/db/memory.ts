@@ -25,6 +25,7 @@ interface Store {
   storeCompletions: StoreMissionCompletion[];
   rushClaims: RushClaim[];
   gamePlays: GamePlay[];
+  honeyTopups: { userId: string; dayKey: string }[];
 }
 
 // dev 서버 HMR 때 모듈이 재평가돼도 데이터가 유지되도록 globalThis 에 붙인다.
@@ -51,6 +52,7 @@ function store(): Store {
       storeCompletions: [],
       rushClaims: [],
       gamePlays: [],
+      honeyTopups: [],
     };
   }
   return g.__ccrStore;
@@ -265,6 +267,12 @@ export const memoryRepo: Repo = {
     return out;
   },
 
+  async countHoneyTopups(userId, dayKey) {
+    return store().honeyTopups.filter((t) => t.userId === userId && t.dayKey === dayKey).length;
+  },
+  async addHoneyTopup(userId, dayKey) {
+    store().honeyTopups.push({ userId, dayKey });
+  },
   async addGamePlay(input) {
     const g: GamePlay = { ...input, id: randomUUID(), createdAt: now() };
     store().gamePlays.push(g);

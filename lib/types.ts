@@ -202,6 +202,7 @@ export interface HomePayload {
   wallet: Wallet;
   honey: number; // 보유 꿀 = 오늘 남은 퀴즈 횟수(일 HONEY_PER_DAY, KST 0시 충전)
   honeyMax: number;
+  honeyTopups: { used: number; max: number }; // 광고 시청 충전
   rush: { stamps: number; total: number; claimable: number }; // 주간 러쉬 요약
   persona: Persona;
   badges: (Badge & { earnedAt: string })[];

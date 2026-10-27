@@ -11,6 +11,7 @@ const RANDOM_BONUS = [0, 0, 0, 10, 10, 20, 30];
 
 /** 꿀 = 하루 퀴즈 세트 참여 횟수(마이비 "보유 꿀 8"). KST 0시에 충전. 광고 시청 충전은 오퍼월 연동 후. */
 export const HONEY_PER_DAY = 8;
+export const HONEY_TOPUP_MAX = 3; // 광고 시청 충전 하루 한도
 
 /** 스타터팩(마이비 isEnableStarterPack · beginnerEndAt = 가입일+3일 23:59 KST): 기간 내 퀴즈 세트 보상 2배 */
 export const SIGNUP_POINTS = 300; // 첫 방문 가입 보너스(마이비 welcomePopup 구조)
@@ -97,9 +98,20 @@ async function setCards(userId: string): Promise<SetCard[]> {
   return visibleSets(sets, mine).map((s) => toCard(s, counts, doneIds));
 }
 
-function honeyLeft(done: { dayKey: string }[]): number {
+function honeyLeft(done: { dayKey: string }[], topups = 0): number {
   const today = kstDayKey();
-  return Math.max(0, HONEY_PER_DAY - done.filter((d) => d.dayKey === today).length);
+  return Math.max(0, HONEY_PER_DAY + topups - done.filter((d) => d.dayKey === today).length);
+}
+
+/** 꿀 충전(광고 시청 모의): 하루 HONEY_TOPUP_MAX 회 +1 */
+export async function topupHoney(userId: string): Promise<{ ok: true; honey: number; topups: number; max: number }> {
+  const repo = getRepo();
+  const day = kstDayKey();
+  const n = await repo.countHoneyTopups(userId, day);
+  if (n >= HONEY_TOPUP_MAX) throw new QuizError("NO_HONEY", `오늘 충전은 ${HONEY_TOPUP_MAX}번까지예요`);
+  await repo.addHoneyTopup(userId, day);
+  const done = await repo.listCompletions(userId);
+  return { ok: true, honey: honeyLeft(done, n + 1), topups: n + 1, max: HONEY_TOPUP_MAX };
 }
 
 async function earnedBadges(userId: string) {
@@ -123,14 +135,14 @@ export async function getHome(userId: string): Promise<HomePayload> {
   const ledger = await repo.listLedger(userId, 200);
   const justNow = !ledger.some((e) => e.reason === "signup");
   if (justNow) await repo.addLedger({ userId, delta: SIGNUP_POINTS, reason: "signup", refType: "signup", memo: "가입 보너스" });
-  const [sets, w, badges, scores, done, rush, profile] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId), repo.listCompletions(userId), rushSummary(userId), repo.findProfile(userId)]);
+  const [sets, w, badges, scores, done, rush, profile, topups] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId), repo.listCompletions(userId), rushSummary(userId), repo.findProfile(userId), repo.countHoneyTopups(userId, kstDayKey())]);
   const attendedToday = await repo.hasStamp(userId, "attendance", kstDayKey());
   const earned = new Set(badges.map((b) => b.code));
   const badgeProgress = (await repo.listBadges()).map((b) => ({
     code: b.code, name: b.name, emoji: b.emoji, description: b.description, current: Math.min(scores[b.rule.tag] ?? 0, b.rule.min), min: b.rule.min, earned: earned.has(b.code),
   }));
   return {
-    wallet: w, honey: honeyLeft(done), honeyMax: HONEY_PER_DAY, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday,
+    wallet: w, honey: honeyLeft(done, topups), honeyMax: HONEY_PER_DAY + topups, honeyTopups: { used: topups, max: HONEY_TOPUP_MAX }, rush, persona: persona(scores), badges, sets, rushEndsAt: rushEndsAt(), attendedToday,
     starter: starterOf(profile?.createdAt ?? new Date(0).toISOString()), badgeProgress, welcome: { justNow, points: SIGNUP_POINTS },
     me: { loggedIn: !!profile?.provider, nickname: profile?.nickname, avatarUrl: profile?.avatarUrl, provider: profile?.provider },
   };
@@ -156,7 +168,7 @@ export async function submitSet(userId: string, setId: string, answers: { quizId
   if (!set || !set.active) throw new QuizError("NOT_FOUND", "퀴즈를 찾을 수 없어요");
   const done = await repo.listCompletions(userId);
   if (done.some((d) => d.setId === setId)) throw new QuizError("ALREADY_DONE", "이미 참여한 퀴즈예요");
-  if (honeyLeft(done) <= 0) throw new QuizError("NO_HONEY", `꿀을 모두 썼어요. 내일 0시에 ${HONEY_PER_DAY}개 충전돼요`);
+  if (honeyLeft(done, await repo.countHoneyTopups(userId, dayKey)) <= 0) throw new QuizError("NO_HONEY", `꿀을 모두 썼어요. 광고를 보고 충전하거나 내일 0시에 ${HONEY_PER_DAY}개 충전돼요`);
   if (set.targetBadges?.length) {
     const owned = new Set((await repo.listUserBadges(userId)).map((b) => b.badgeCode));
     if (!set.targetBadges.some((c) => owned.has(c))) throw new QuizError("NOT_FOUND", "참여 대상이 아닌 퀴즈예요");

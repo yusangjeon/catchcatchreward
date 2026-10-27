@@ -19,7 +19,7 @@ const BANNERS = ["/myb/up/2025-12-19T03_30_12.125Z_banner.webp", "/myb/up/2025-1
 const QUICK: { icon: string; label: string; href?: string; tip?: string }[] = [
   { icon: "/myb/native/qm_attend.png", label: "출석체크" },
   { icon: "/myb/native/qm_minigame.png", label: "미니게임", href: "/games" },
-  { icon: "/myb/native/ic_honey_jar.png", label: "꿀 충전", tip: "매일 0시 충전" },
+  { icon: "/myb/native/ic_honey_jar.png", label: "꿀 충전", tip: "광고 보고 +1" },
   { icon: "/myb/native/qm_invite.png", label: "친구초대", href: "/invite" },
 ];
 
@@ -30,6 +30,21 @@ export default function HomePage() {
   const sets = data?.sets ?? [];
   const [welcome, setWelcome] = useState(false);
   const [installHint, setInstallHint] = useState(false);
+  const [ad, setAd] = useState<{ left: number } | null>(null); // 꿀 충전 모의 광고
+
+  useEffect(() => {
+    if (!ad || ad.left <= 0) return;
+    const id = setTimeout(() => setAd((a) => (a ? { left: a.left - 1 } : a)), 1000);
+    return () => clearTimeout(id);
+  }, [ad]);
+  async function finishAd() {
+    const res = await fetch("/api/honey", { method: "POST" });
+    const j = await res.json();
+    setAd(null);
+    if (!res.ok) return show(j.message ?? "충전 실패", "info");
+    show(`꿀 1개 충전! 오늘 ${j.topups}/${j.max}회`);
+    await reload();
+  }
 
   // 가입 보너스 웰컴 시트(1회) · PWA 설치 힌트(모바일 브라우저, 닫으면 다시 안 띄움)
   useEffect(() => {
@@ -152,7 +167,7 @@ export default function HomePage() {
               key={qk.label}
               className="relative flex cursor-pointer flex-col items-center gap-1"
               role="button"
-              onClick={qk.label === "출석체크" ? () => void attend() : qk.href ? () => router.push(qk.href!) : () => show(`꿀은 매일 0시에 ${data?.honeyMax ?? 8}개 충전돼요`, "info")}
+              onClick={qk.label === "출석체크" ? () => void attend() : qk.href ? () => router.push(qk.href!) : () => (data && data.honeyTopups.used >= data.honeyTopups.max ? show(`오늘 충전은 ${data.honeyTopups.max}번까지예요. 내일 0시에 8개 충전`, "info") : setAd({ left: 15 }))}
             >
               {qk.label === "출석체크" && data?.attendedToday && <span className="absolute -top-1 right-3 flex h-4 w-4 items-center justify-center rounded-full bg-myb text-[10px] text-white">✓</span>}
               {qk.tip && (
@@ -180,6 +195,22 @@ export default function HomePage() {
         </div>
       )}
 
+      {ad && (
+        <>
+          <div className="fixed inset-0 z-[999] bg-black/80" />
+          <div className="fixed left-1/2 top-1/2 z-[1000] w-[calc(100%-48px)] max-w-[382px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[20px] bg-[#191f28] text-white">
+            <div className="flex h-[200px] flex-col items-center justify-center bg-gradient-to-br from-[#427cff] to-[#6d4cf2]">
+              <img src="/myb/bh/img_bpointrush_visual.webp" alt="" className="h-24 w-24" />
+              <p className="mt-2 text-[14px] font-bold">광고 영상 자리 (리워드 SDK 연동 예정)</p>
+            </div>
+            <div className="p-5 text-center">
+              <p className="text-[13px] text-white/70">{ad.left > 0 ? `${ad.left}초 후 꿀 1개가 충전돼요` : "시청 완료!"}</p>
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-[#fde047] transition-all duration-1000" style={{ width: `${((15 - ad.left) / 15) * 100}%` }} /></div>
+              {ad.left > 0 ? <button type="button" onClick={() => setAd(null)} className="mt-4 text-[12px] text-white/50">그만 보기</button> : <button type="button" onClick={() => void finishAd()} className="myb-press mt-4 h-11 w-full rounded-xl bg-[#fde047] text-[14px] font-bold text-[#191f28]">꿀 받기</button>}
+            </div>
+          </div>
+        </>
+      )}
       {welcome && data && (
         <>
           <div className="myb-fade-in fixed inset-0 z-[999] bg-black/60" onClick={() => setWelcome(false)} />

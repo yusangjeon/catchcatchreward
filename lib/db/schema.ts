@@ -209,6 +209,14 @@ create table if not exists game_plays (
 create index if not exists game_plays_user_idx on game_plays(user_id, day_key);
 alter table game_plays drop constraint if exists game_plays_game_check;
 
+create table if not exists honey_topups (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references profiles(id) on delete cascade,
+  day_key    text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists honey_topups_user_idx on honey_topups(user_id, day_key);
+
 alter table profiles                 enable row level security;
 alter table quiz_sets                enable row level security;
 alter table quizzes                  enable row level security;
@@ -228,9 +236,10 @@ alter table store_missions           enable row level security;
 alter table store_mission_completions enable row level security;
 alter table rush_claims              enable row level security;
 alter table game_plays               enable row level security;
+alter table honey_topups             enable row level security;
 `;
 
 export const SCHEMA_TABLES = [
   "profiles", "quiz_sets", "quizzes", "quiz_options", "quiz_responses", "set_completions", "user_tag_scores", "badges", "user_badges",
-  "stamps", "roulette_prizes", "roulette_spins", "point_ledger", "redemptions", "referrals", "store_missions", "store_mission_completions", "rush_claims", "game_plays",
+  "stamps", "roulette_prizes", "roulette_spins", "point_ledger", "redemptions", "referrals", "store_missions", "store_mission_completions", "rush_claims", "game_plays", "honey_topups",
 ] as const;

@@ -86,6 +86,10 @@ export interface Repo {
   addStoreCompletion(input: Omit<StoreMissionCompletion, "id" | "completedAt">): Promise<StoreMissionCompletion>;
   countStoreCompletionsByMission(): Promise<Record<string, number>>;
 
+  // ── 꿀 충전(광고 시청) ──
+  countHoneyTopups(userId: string, dayKey: string): Promise<number>;
+  addHoneyTopup(userId: string, dayKey: string): Promise<void>;
+
   // ── 미니게임 ──
   addGamePlay(input: Omit<GamePlay, "id" | "createdAt">): Promise<GamePlay>;
   listGamePlays(userId: string): Promise<GamePlay[]>;
