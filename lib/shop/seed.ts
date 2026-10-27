@@ -1,28 +1,28 @@
-/** 쇼핑적립 시드 — 마이비 shop.myb.im 캡처(2026-10-25) /v1/api/cps/* 응답값. 로고는 resource.myb.im 원본을 public/myb/res 에 보관 */
+/** 쇼핑적립 시드 — 마이비 shop.myb.im 캡처(2026-10-25) /v1/api/cps/* 응답값. 아이콘은 각 쇼핑몰 공식 파비콘(public/shop/icons, 96px) */
 import type { Merchant, MerchantDetail } from "./types";
 
 /** 전체 쇼핑몰(인기 쇼핑몰 순 = API 응답 순서). 쿠팡은 "오늘 여기서 쇼핑 어때요?"에만 노출 */
 export const MERCHANTS: Merchant[] = [
-  { id: "coupang_pincrux_group", name: "쿠팡", logo: "/myb/res/img_shopping_coupang.webp", logoCircle: "/myb/res/img_shopping_round_coupang.png", rate: 0, recommendIndex: 2, isNew: false },
-  { id: "naver_plus_store_adbc", name: "네이버+스토어", logo: "/myb/res/naverpay_text_logo.png", logoCircle: "/myb/res/naverpay_circle.png", rate: 1.2, recommendIndex: 3, isNew: true },
-  { id: "gmarket", name: "G마켓", logo: "/myb/res/img_shopping_gmarket.png", logoCircle: "/myb/res/img_shopping_round_gmarket.png", rate: 1.7, recommendIndex: 6, isNew: false },
-  { id: "aliexpress", name: "알리익스프레스", logo: "/myb/res/img_shopping_ali.png", logoCircle: "/myb/res/img_shopping_round_ali.png", rate: 6.3, recommendIndex: 0, isNew: false },
-  { id: "ohouse", name: "오늘의집", logo: "/myb/res/img_shopping_house.webp", logoCircle: "/myb/res/img_shopping_round_house.webp", rate: 3.6, recommendIndex: 0, isNew: false },
-  { id: "ssg", name: "SSG", logo: "/myb/res/img_shopping_ssg.png", logoCircle: "/myb/res/img_shopping_round_ssg.png", rate: 3, recommendIndex: 0, isNew: false },
-  { id: "emartmall", name: "이마트몰", logo: "/myb/res/img_shopping_emart.png", logoCircle: "/myb/res/img_shopping_round_emart.png", rate: 3, recommendIndex: 0, isNew: false },
-  { id: "ctrip", name: "트립닷컴", logo: "/myb/res/img_shopping_trip.png", logoCircle: "/myb/res/img_shopping_round_trip.png", rate: 3.85, recommendIndex: 0, isNew: false },
-  { id: "agoda", name: "아고다", logo: "/myb/res/img_shopping_agoda.png", logoCircle: "/myb/res/img_shopping_round_agoda.png", rate: 5.6, recommendIndex: 0, isNew: false },
-  { id: "yanolja", name: "NOL", logo: "/myb/res/img_shopping_yanolja.png", logoCircle: "/myb/res/img_shopping_round_yanolja.png", rate: 2.8, recommendIndex: 10, isNew: false },
-  { id: "hotelskr", name: "호텔스닷컴", logo: "/myb/res/img_shopping_hotelscom.webp", logoCircle: "/myb/res/img_shopping_round_hotelscom.webp", rate: 4.4, recommendIndex: 0, isNew: false },
-  { id: "expedia", name: "익스피디아", logo: "/myb/res/img_shopping_expedia.webp", logoCircle: "/myb/res/img_shopping_round_expedia.webp", rate: 3.5, recommendIndex: 0, isNew: false },
-  { id: "himart", name: "롯데하이마트", logo: "/myb/res/img_shopping_himart.webp", logoCircle: "/myb/res/img_shopping_round_himart.webp", rate: 1.26, recommendIndex: 0, isNew: false },
-  { id: "auction", name: "옥션", logo: "/myb/res/img_shopping_auction.png", logoCircle: "/myb/res/img_shopping_round_auction.png", rate: 0.6, recommendIndex: 6, isNew: false },
-  { id: "wconcept", name: "W컨셉", logo: "/myb/res/img_shopping_wconcept.webp", logoCircle: "/myb/res/img_shopping_round_wconcept.webp", rate: 2.1, recommendIndex: 0, isNew: false },
-  { id: "11st", name: "11번가", logo: "/myb/res/img_shopping_11street.png", logoCircle: "/myb/res/img_shopping_round_11street.png", rate: 0.7, recommendIndex: 0, isNew: false },
-  { id: "kbbook", name: "인터넷교보문고", logo: "/myb/res/img_shopping_kyobo.png", logoCircle: "/myb/res/img_shopping_round_kyobo.png", rate: 2.1, recommendIndex: 0, isNew: false },
-  { id: "gseshop", name: "GS SHOP", logo: "/myb/res/img_shopping_gsshop.png", logoCircle: "/myb/res/img_shopping_round_gsshop.png", rate: 1.6, recommendIndex: 0, isNew: false },
-  { id: "woori", name: "롯데홈쇼핑", logo: "/myb/res/img_shopping_lotteshopping.png", logoCircle: "/myb/res/img_shopping_round_lotteshopping.png", rate: 1.2, recommendIndex: 0, isNew: false },
-  { id: "cjbrand", name: "CJ더마켓", logo: "/myb/res/img_shopping_cjthemarket.webp", logoCircle: "/myb/res/img_shopping_round_cjthemarket.webp", rate: 2.1, recommendIndex: 0, isNew: false },
+  { id: "coupang_pincrux_group", name: "쿠팡", logo: "/shop/icons/coupang_pincrux_group.png", logoCircle: "/shop/icons/coupang_pincrux_group.png", rate: 0, recommendIndex: 2, isNew: false },
+  { id: "naver_plus_store_adbc", name: "네이버+스토어", logo: "/shop/icons/naver_plus_store_adbc.png", logoCircle: "/shop/icons/naver_plus_store_adbc.png", rate: 1.2, recommendIndex: 3, isNew: true },
+  { id: "gmarket", name: "G마켓", logo: "/shop/icons/gmarket.png", logoCircle: "/shop/icons/gmarket.png", rate: 1.7, recommendIndex: 6, isNew: false },
+  { id: "aliexpress", name: "알리익스프레스", logo: "/shop/icons/aliexpress.png", logoCircle: "/shop/icons/aliexpress.png", rate: 6.3, recommendIndex: 0, isNew: false },
+  { id: "ohouse", name: "오늘의집", logo: "/shop/icons/ohouse.png", logoCircle: "/shop/icons/ohouse.png", rate: 3.6, recommendIndex: 0, isNew: false },
+  { id: "ssg", name: "SSG", logo: "/shop/icons/ssg.png", logoCircle: "/shop/icons/ssg.png", rate: 3, recommendIndex: 0, isNew: false },
+  { id: "emartmall", name: "이마트몰", logo: "/shop/icons/emartmall.png", logoCircle: "/shop/icons/emartmall.png", rate: 3, recommendIndex: 0, isNew: false },
+  { id: "ctrip", name: "트립닷컴", logo: "/shop/icons/ctrip.png", logoCircle: "/shop/icons/ctrip.png", rate: 3.85, recommendIndex: 0, isNew: false },
+  { id: "agoda", name: "아고다", logo: "/shop/icons/agoda.png", logoCircle: "/shop/icons/agoda.png", rate: 5.6, recommendIndex: 0, isNew: false },
+  { id: "yanolja", name: "NOL", logo: "/shop/icons/yanolja.png", logoCircle: "/shop/icons/yanolja.png", rate: 2.8, recommendIndex: 10, isNew: false },
+  { id: "hotelskr", name: "호텔스닷컴", logo: "/shop/icons/hotelskr.png", logoCircle: "/shop/icons/hotelskr.png", rate: 4.4, recommendIndex: 0, isNew: false },
+  { id: "expedia", name: "익스피디아", logo: "/shop/icons/expedia.png", logoCircle: "/shop/icons/expedia.png", rate: 3.5, recommendIndex: 0, isNew: false },
+  { id: "himart", name: "롯데하이마트", logo: "/shop/icons/himart.png", logoCircle: "/shop/icons/himart.png", rate: 1.26, recommendIndex: 0, isNew: false },
+  { id: "auction", name: "옥션", logo: "/shop/icons/auction.png", logoCircle: "/shop/icons/auction.png", rate: 0.6, recommendIndex: 6, isNew: false },
+  { id: "wconcept", name: "W컨셉", logo: "/shop/icons/wconcept.png", logoCircle: "/shop/icons/wconcept.png", rate: 2.1, recommendIndex: 0, isNew: false },
+  { id: "11st", name: "11번가", logo: "/shop/icons/11st.png", logoCircle: "/shop/icons/11st.png", rate: 0.7, recommendIndex: 0, isNew: false },
+  { id: "kbbook", name: "인터넷교보문고", logo: "/shop/icons/kbbook.png", logoCircle: "/shop/icons/kbbook.png", rate: 2.1, recommendIndex: 0, isNew: false },
+  { id: "gseshop", name: "GS SHOP", logo: "/shop/icons/gseshop.png", logoCircle: "/shop/icons/gseshop.png", rate: 1.6, recommendIndex: 0, isNew: false },
+  { id: "woori", name: "롯데홈쇼핑", logo: "/shop/icons/woori.png", logoCircle: "/shop/icons/woori.png", rate: 1.2, recommendIndex: 0, isNew: false },
+  { id: "cjbrand", name: "CJ더마켓", logo: "/shop/icons/cjbrand.png", logoCircle: "/shop/icons/cjbrand.png", rate: 2.1, recommendIndex: 0, isNew: false },
 ];
 
 /** 쇼핑적립 유의사항(메인 하단 19항목, DOM 원문) */

@@ -49,10 +49,10 @@ export function MerchantView({ merchantId }: { merchantId: string }) {
 
       <section className="mx-5 mt-2 rounded-[22px] bg-white p-5" style={{ boxShadow: SHADOW }}>
         <div className="flex items-center gap-4">
-          {m ? <img src={m.logoCircle} width={64} height={64} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover shadow-[0_3px_10px_rgba(0,0,0,.08)]" /> : <div className="h-16 w-16 animate-pulse rounded-full bg-bg-2" />}
+          {m ? <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-[#eceff4] shadow-[0_3px_10px_rgba(0,0,0,.06)]"><img src={m.logoCircle} width={36} height={36} alt="" className="h-9 w-9 object-contain" /></span> : <div className="h-16 w-16 animate-pulse rounded-full bg-bg-2" />}
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-ink-2">{m?.name ?? "…"}에서 쇼핑하면</p>
-            <p className="mt-0.5 flex items-center gap-1.5 text-[24px] font-bold leading-[30px] text-ink">최대 <span className="flex items-center gap-1 text-myb-dark"><PCoin size={22} />{isCoupang ? "1,100P" : `${m?.rate ?? "—"}%`}</span></p>
+            <p className="mt-0.5 flex items-center gap-1.5 text-[24px] font-bold leading-[30px] text-ink">최대 <span className="flex items-center gap-1"><PCoin size={22} />{isCoupang ? "1,100P" : `${m?.rate ?? "—"}%`}</span></p>
           </div>
         </div>
         <div className="mt-4 flex gap-2">

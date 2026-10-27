@@ -51,7 +51,7 @@ export default function ShopPage() {
       {/* 오늘의 추천 */}
       {data && top && (
         <Link href={`/shop/${top.id}`} className="mx-5 mt-2 flex items-center gap-3.5 rounded-[20px] px-4 py-3.5" style={{ background: "linear-gradient(135deg,#fff3cc 0%,#ffe7d6 100%)" }}>
-          <img src={top.logoCircle} alt="" width={48} height={48} className="h-12 w-12 rounded-full bg-white object-cover" />
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white shadow-sm"><img src={top.logoCircle} alt="" width={28} height={28} className="h-7 w-7 object-contain" /></span>
           <span className="min-w-0 flex-1">
             <span className="block text-[12px] font-semibold text-[#9a5b00]">{data.topBanner.title}</span>
             <span className="block truncate text-[16px] font-bold text-ink">{data.topBanner.description}</span>
@@ -78,9 +78,9 @@ export default function ShopPage() {
         <div className="no-scrollbar -mx-5 mt-3 flex gap-4 overflow-x-auto px-5">
           {favorites.map((m) => (
             <Link key={m.id} href={`/shop/${m.id}`} className="flex w-[72px] shrink-0 flex-col items-center text-center">
-              <img src={m.logoCircle} alt="" width={64} height={64} className="h-16 w-16 rounded-full bg-white object-cover shadow-[0_3px_10px_rgba(0,0,0,.08)]" />
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white ring-1 ring-[#eceff4] shadow-[0_3px_10px_rgba(0,0,0,.06)]"><img src={m.logoCircle} alt="" width={34} height={34} className="h-[34px] w-[34px] object-contain" /></span>
               <span className="mt-2 w-full truncate text-[12px] text-ink-2">{m.name}</span>
-              <span className="text-[12px] font-bold text-myb-dark">{m.rate === 0 ? "1,100P" : `${m.rate}%`}</span>
+              <span className="text-[12px] font-bold text-ink">{m.rate === 0 ? "1,100P" : `${m.rate}%`}</span>
             </Link>
           ))}
           <Link href="#all" className="flex w-[72px] shrink-0 flex-col items-center text-center">

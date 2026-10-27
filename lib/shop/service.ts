@@ -14,7 +14,7 @@ export function getShop(): ShopPayload {
   return {
     pendingPoint: 0,
     asOf: asOfKst(),
-    topBanner: { image: "/myb/res/img_shopping_round_coupang.png", title: "오늘의 쇼핑 추천", description: "쿠팡 최대 1,100P 적립", merchantId: "coupang_pincrux_group" },
+    topBanner: { image: "/shop/icons/coupang_pincrux_group.png", title: "오늘의 쇼핑 추천", description: "쿠팡 최대 1,100P 적립", merchantId: "coupang_pincrux_group" },
     favorites: ["naver_plus_store_adbc"],
     recommended: ["coupang_pincrux_group", "naver_plus_store_adbc", "gmarket", "auction"],
     merchants: MERCHANTS,
