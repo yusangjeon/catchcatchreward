@@ -35,8 +35,8 @@ export default function MonthlyPage() {
   const daysLeft = data ? Math.max(0, Math.ceil((new Date(data.endsAt).getTime() - Date.now()) / 86400_000)) : 0;
 
   return (
-    <div className="min-h-dvh bg-[#191f28] pb-10 text-[#191f28]">
-      <GameHeader dark title="월간 도전 과제" right={<Link href="/wallet" className="flex items-center gap-1 text-[16px] text-white"><PCoin size={16} />{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</Link>} />
+    <div className="min-h-dvh bg-[#f8f9fc] pb-10 text-[#191f28]">
+      <GameHeader title="월간 도전 과제" right={<Link href="/wallet" className="flex items-center gap-1 text-[16px]"><PCoin size={16} />{data ? <NumberFlow value={data.wallet.balance} /> : "—"}</Link>} />
       <div className="px-4 pt-[60px]">
         <section className="relative overflow-hidden rounded-[24px] px-6 pb-6 pt-6 text-white" style={{ background: "linear-gradient(135deg,#ff8a3d 0%,#ff3e9a 50%,#8e3cff 100%)" }}>
           <span className="inline-flex h-6 items-center rounded-full bg-white/20 px-2.5 text-[12px] font-bold">{data ? `${data.monthLabel} · D-${daysLeft}` : "—"}</span>
@@ -49,7 +49,7 @@ export default function MonthlyPage() {
           {(data?.missions ?? []).map((m) => {
             const pct = Math.round((m.current / m.value) * 100);
             return (
-              <li key={m.key} className="rounded-[20px] bg-white p-5">
+              <li key={m.key} className="rounded-[20px] bg-white p-5" style={{ boxShadow: "0 2px 10px 0 rgba(0, 43, 141, 0.06)" }}>
                 <div className="flex items-center gap-3">
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#f3f0ff] text-[26px]">{m.emoji}</span>
                   <div className="min-w-0 flex-1">
@@ -74,9 +74,9 @@ export default function MonthlyPage() {
               </li>
             );
           })}
-          {!data && [0, 1, 2].map((i) => <li key={i} className="h-[150px] animate-pulse rounded-[20px] bg-white/10" />)}
+          {!data && [0, 1, 2].map((i) => <li key={i} className="h-[150px] animate-pulse rounded-[20px] bg-white" />)}
         </ul>
-        <p className="mt-4 px-1 text-[11px] leading-[16px] text-white/40">· 집계는 KST 기준 이번 달 활동만. 매달 1일 0시에 새 과제가 시작되고 받지 않은 보상은 사라져요.</p>
+        <p className="mt-4 px-1 text-[11px] leading-[16px] text-[#b0b8c1]">· 집계는 KST 기준 이번 달 활동만. 매달 1일 0시에 새 과제가 시작되고 받지 않은 보상은 사라져요.</p>
       </div>
     </div>
   );

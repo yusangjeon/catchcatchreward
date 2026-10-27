@@ -136,7 +136,7 @@ export default function SpotPage() {
   const found = tokens.length;
   const pct = data ? (left / data.limitSec) * 100 : 100;
   const renderImage = (src: string, label: string, blur: boolean, top: boolean) => (
-    <div className="relative overflow-hidden rounded-[14px] bg-[#e5e8ee]" style={{ aspectRatio: "1024 / 688" }} onClick={tap}>
+    <div className="relative overflow-hidden rounded-[14px] bg-[#e5e8ee]" style={{ aspectRatio: "1024 / 688", boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }} onClick={tap}>
       <img src={src} alt={label} draggable={false} onLoad={() => setImgReady((n) => n + 1)} className={`block h-full w-full select-none transition-[filter] duration-300 ${blur ? "blur-[6px]" : ""}`} />
       {marks.map((m) => (
         <span key={m.kind + m.id} className={`spot-mark pointer-events-none absolute rounded-full border-[3px] ${m.kind === "found" ? "border-[#22c55e] shadow-[0_0_0_2px_rgba(255,255,255,.9)]" : m.kind === "missed" ? "border-dashed border-[#ff3b6b]" : "border-dashed border-[#ffb400] spot-hint"}`} style={{ left: `${(m.x - m.r) * 100}%`, top: `${(m.y - m.r * 1024 / 688) * 100}%`, width: `${m.r * 2 * 100}%`, aspectRatio: "1" }} />
@@ -149,17 +149,17 @@ export default function SpotPage() {
   );
 
   return (
-    <div className="min-h-dvh bg-[#0f172a] pb-8 text-white">
-      <GameHeader dark title="틀린그림 찾기" right={phase === "play" ? <span className={`text-[20px] font-extrabold tabular-nums ${left <= 10 ? "text-[#ff5c7a]" : "text-[#9fb6ff]"}`}>{left}s</span> : data ? <span className="text-[13px] text-white/60">{data.left}회 남음</span> : null} />
+    <div className="min-h-dvh bg-[#f8f9fc] pb-8 text-[#191f28]">
+      <GameHeader title="틀린그림 찾기" right={phase === "play" ? <span className={`text-[20px] font-extrabold tabular-nums ${left <= 10 ? "text-[#ff3939]" : "text-[#427cff]"}`}>{left}s</span> : data ? <span className="text-[13px] text-[#8b94a0]">{data.left}회 남음</span> : null} />
       <div className="flex flex-col gap-2.5 px-3 pt-[56px]">
         <div className="flex items-center justify-between px-1">
           <div className="min-w-0">
-            <p className="truncate text-[15px] font-bold">{data ? `${data.level.name}` : "불러오는 중…"} <span className="text-[12px] font-semibold text-white/50">LEVEL {data ? data.level.index + 1 : "-"}/3</span></p>
-            <p className="text-[11px] text-white/50">다른 곳 {total}개 · 차이당 {data?.pointPerDiff ?? 3}P · 전부 찾으면 +{data?.completeBonus ?? 10}P</p>
+            <p className="truncate text-[15px] font-bold">{data ? `${data.level.name}` : "불러오는 중…"} <span className="text-[12px] font-semibold text-[#8b94a0]">LEVEL {data ? data.level.index + 1 : "-"}/3</span></p>
+            <p className="text-[11px] text-[#8b94a0]">다른 곳 {total}개 · 차이당 {data?.pointPerDiff ?? 3}P · 전부 찾으면 +{data?.completeBonus ?? 10}P</p>
           </div>
-          <div className="flex items-center gap-1.5">{Array.from({ length: total }).map((_, i) => <span key={i} className={`h-3 w-3 rounded-full transition-colors ${i < found ? "bg-[#22c55e] shadow-[0_0_8px_#22c55e]" : "bg-white/20"}`} />)}</div>
+          <div className="flex items-center gap-1.5">{Array.from({ length: total }).map((_, i) => <span key={i} className={`h-3 w-3 rounded-full transition-colors ${i < found ? "bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,.5)]" : "bg-[#dee2e9]"}`} />)}</div>
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%`, background: left <= 10 ? "#ff5c7a" : "linear-gradient(90deg,#427cff,#22d3ee)" }} /></div>
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#e5e8ee]"><div className="h-full rounded-full transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%`, background: left <= 10 ? "#ff3939" : "linear-gradient(90deg,#427cff,#22d3ee)" }} /></div>
         {data ? (
           <div className="relative flex flex-col gap-2">
             {renderImage(data.level.a, "원본", false, true)}
@@ -167,27 +167,27 @@ export default function SpotPage() {
             {phase === "idle" && (
               <div className="absolute inset-0 flex items-center justify-center rounded-[14px]">
                 {data.left > 0 ? (
-                  <button type="button" onClick={start} disabled={imgReady < 2} className="myb-press flex h-14 items-center gap-2 rounded-full bg-white px-7 text-[16px] font-extrabold text-[#191f28] shadow-[0_8px_30px_rgba(0,0,0,.4)] disabled:opacity-60">
+                  <button type="button" onClick={start} disabled={imgReady < 2} className="myb-press flex h-14 items-center gap-2 rounded-full bg-[#427cff] px-7 text-[16px] font-extrabold text-white shadow-[0_8px_30px_rgba(66,124,255,.45)] disabled:opacity-60">
                     {imgReady < 2 ? "그림 준비 중…" : `▶ 시작하기 · ${data.limitSec}초`}
                   </button>
                 ) : (
-                  <div className="rounded-2xl bg-black/70 px-5 py-4 text-center text-[14px]">오늘 3레벨을 모두 풀었어요<br /><span className="text-[12px] text-white/60">내일 0시에 새 그림 3장이 열려요</span></div>
+                  <div className="rounded-2xl bg-white/95 px-5 py-4 text-center text-[14px] font-semibold shadow-lg">오늘 3레벨을 모두 풀었어요<br /><span className="text-[12px] font-normal text-[#8b94a0]">내일 0시에 새 그림 3장이 열려요</span></div>
                 )}
               </div>
             )}
             {result?.all && <div className="pointer-events-none absolute inset-0 flex items-center justify-center"><Lottie src="/myb/lottie_confetti_pop.json" className="h-[300px] w-[300px]" /></div>}
           </div>
         ) : (
-          <div className="flex flex-col gap-2"><div className="animate-pulse rounded-[14px] bg-white/10" style={{ aspectRatio: "1024 / 688" }} /><div className="animate-pulse rounded-[14px] bg-white/10" style={{ aspectRatio: "1024 / 688" }} /></div>
+          <div className="flex flex-col gap-2"><div className="animate-pulse rounded-[14px] bg-[#e5e8ee]" style={{ aspectRatio: "1024 / 688" }} /><div className="animate-pulse rounded-[14px] bg-[#e5e8ee]" style={{ aspectRatio: "1024 / 688" }} /></div>
         )}
         {phase === "play" && (
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" disabled={hintUsed} onClick={() => void hint()} className="myb-press h-12 rounded-xl bg-white/10 text-[14px] font-bold disabled:opacity-40">💡 힌트 {hintUsed ? "사용함" : `(−${MISS_PENALTY}초)`}</button>
-            <button type="button" disabled={busy} onClick={() => void submit()} className="myb-press h-12 rounded-xl bg-white text-[14px] font-bold text-[#191f28] disabled:opacity-40">그만 찾기 ({found}/{total})</button>
+            <button type="button" disabled={hintUsed} onClick={() => void hint()} className="myb-press h-12 rounded-xl border border-[#dee2e9] bg-white text-[14px] font-bold disabled:opacity-40">💡 힌트 {hintUsed ? "사용함" : `(−${MISS_PENALTY}초)`}</button>
+            <button type="button" disabled={busy} onClick={() => void submit()} className="myb-press h-12 rounded-xl bg-[#191f28] text-[14px] font-bold text-white disabled:opacity-40">그만 찾기 ({found}/{total})</button>
           </div>
         )}
         {phase === "done" && result && (
-          <div className="rounded-[20px] bg-white p-5 text-center text-[#191f28]">
+          <div className="rounded-[20px] bg-white p-5 text-center text-[#191f28]" style={{ boxShadow: "0 5px 16px 0 rgba(0, 43, 141, 0.1)" }}>
             <p className="text-[22px] font-extrabold">{result.all ? "완벽해요! 🎉" : `${result.found}/${result.total} 찾았어요`}</p>
             <p className="mt-1 text-[16px] font-bold text-[#427cff]">+{fmt(result.points)}P 적립</p>
             {!result.all && <p className="mt-1 text-[12px] text-[#8b94a0]">분홍 점선이 놓친 곳이에요</p>}
@@ -201,7 +201,7 @@ export default function SpotPage() {
             </div>
           </div>
         )}
-        <p className="px-1 text-[11px] text-white/40">위·아래 그림 아무 데나 탭하면 돼요. 틀리면 {MISS_PENALTY}초가 줄어요. 매일 0시에 새 그림 3장.</p>
+        <p className="px-1 text-[11px] text-[#b0b8c1]">위·아래 그림 아무 데나 탭하면 돼요. 틀리면 {MISS_PENALTY}초가 줄어요. 매일 0시에 새 그림 3장.</p>
       </div>
     </div>
   );
