@@ -325,6 +325,9 @@ export const memoryRepo: Repo = {
   async listLedger(userId, limit = 100) {
     return store().ledger.filter((e) => e.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, limit);
   },
+  async listRecentLedger(limit = 20) {
+    return store().ledger.filter((e) => e.delta > 0 && e.reason !== "signup" && e.reason !== "admin_adjust").sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, limit);
+  },
 
   async addRedemption(input) {
     const r: Redemption = { ...input, id: randomUUID(), status: "requested", requestedAt: now() };

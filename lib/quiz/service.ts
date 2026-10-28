@@ -5,6 +5,7 @@ import { kstDayKey } from "@/lib/time";
 import { onFirstQuizCompletion } from "@/lib/invite/service";
 import { rushSummary } from "@/lib/rush/service";
 import { getNewbie, NEWBIE_GOAL } from "./newbie";
+import type { LedgerEntry, RecentWin, TierSummary } from "@/lib/types";
 import type { Badge, HomePayload, Persona, PublicQuestion, Quiz, QuizSet, SetCard, SetPayload, SubmitResult, UserBadge, Wallet } from "@/lib/types";
 
 /** 세트 완료 시 랜덤 보너스 후보(가중치 = 등장 횟수). 운영값은 추후 DB로. */
@@ -129,17 +130,45 @@ function toPublic(q: Quiz): PublicQuestion {
   return { id: q.id, question: q.question, kind: q.kind, options: q.options.map((o) => ({ id: o.id, label: o.label, imageUrl: o.imageUrl })) };
 }
 
+/** 등급표: 누적 적립 + 월간 도전 과제 달성 횟수. 마이비 "내 등급은 베이직 → B플러스 승격" 구조 */
+const TIERS = [
+  { name: "베이직", earned: 0, monthly: 0, perk: "" },
+  { name: "플러스", earned: 3000, monthly: 1, perk: "등급 전용 교환 상품 할인" },
+  { name: "골드", earned: 20000, monthly: 4, perk: "룰렛 무료 2회·교환 수수료 0" },
+  { name: "다이아", earned: 100000, monthly: 12, perk: "전용 고보상 미션 우선 배정" },
+];
+function tierOf(ledger: LedgerEntry[]): TierSummary {
+  const earned = ledger.filter((e) => e.delta > 0 && e.reason !== "admin_adjust").reduce((s, e) => s + e.delta, 0);
+  const monthlyDone = ledger.filter((e) => e.reason === "monthly").length;
+  let i = 0;
+  while (i + 1 < TIERS.length && earned >= TIERS[i + 1].earned && monthlyDone >= TIERS[i + 1].monthly) i++;
+  const next = TIERS[i + 1] ?? null;
+  return { name: TIERS[i].name, next: next?.name ?? null, earned, needEarned: next?.earned ?? TIERS[i].earned, monthlyDone, needMonthly: next?.monthly ?? TIERS[i].monthly, perk: next?.perk ?? "최고 등급이에요" };
+}
+const WIN_TEXT: Partial<Record<LedgerEntry["reason"], string>> = {
+  quiz_answer: "퀴즈 풀고", quiz_bonus: "랜덤 보너스로", game: "미니게임으로", roulette: "룰렛에서", mission: "미션 완료하고", store_mission: "플레이스 방문하고",
+  rush: "러쉬 보상으로", newbie: "3일 혜택으로", monthly: "월간 과제로", referral: "친구 초대로",
+};
+function winsOf(entries: LedgerEntry[]): RecentWin[] {
+  return entries.flatMap((e) => {
+    const text = WIN_TEXT[e.reason];
+    if (!text) return [];
+    return [{ who: `${e.userId.replace(/-/g, "").slice(0, 4).toUpperCase()}****`, text, points: e.delta, at: e.createdAt }];
+  }).slice(0, 10);
+}
+
 // ───────── 조회 ─────────
 export async function getHome(userId: string): Promise<HomePayload> {
   const repo = getRepo();
   // 가입 보너스: 원장에 signup 이 없으면 1회 지급
-  const ledger = await repo.listLedger(userId, 200);
+  const ledger = await repo.listLedger(userId, 1000);
   const justNow = !ledger.some((e) => e.reason === "signup");
   if (justNow) await repo.addLedger({ userId, delta: SIGNUP_POINTS, reason: "signup", refType: "signup", memo: "가입 보너스" });
   const [sets, w, badges, scores, done, rush, profile, topups] = await Promise.all([setCards(userId), wallet(userId), earnedBadges(userId), repo.getTagScores(userId), repo.listCompletions(userId), rushSummary(userId), repo.findProfile(userId), repo.countHoneyTopups(userId, kstDayKey())]);
   const attendedToday = await repo.hasStamp(userId, "attendance", kstDayKey());
   const rouletteFree = !(await repo.listGamePlays(userId)).some((p) => p.game === "roulette" && p.dayKey === kstDayKey());
   const nb = await getNewbie(userId);
+  const recent = await repo.listRecentLedger(30);
   const earned = new Set(badges.map((b) => b.code));
   const badgeProgress = (await repo.listBadges()).map((b) => ({
     code: b.code, name: b.name, emoji: b.emoji, description: b.description, current: Math.min(scores[b.rule.tag] ?? 0, b.rule.min), min: b.rule.min, earned: earned.has(b.code),
@@ -150,6 +179,7 @@ export async function getHome(userId: string): Promise<HomePayload> {
     me: { loggedIn: !!profile?.provider, nickname: profile?.nickname, avatarUrl: profile?.avatarUrl, provider: profile?.provider },
     newbie: { active: nb.active, dayNo: nb.dayNo, doneToday: nb.days.find((d) => d.today)?.done ?? 0, goal: NEWBIE_GOAL, claimableCount: nb.claimableCount, totalMax: nb.totalMax },
     todayDone: done.filter((d) => d.dayKey === kstDayKey()).length,
+    tier: tierOf(ledger), recentWins: winsOf(recent),
   };
 }
 

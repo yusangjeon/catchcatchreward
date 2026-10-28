@@ -305,6 +305,9 @@ export function createPostgresRepo(url: string): Repo {
     async listLedger(userId, limit = 100) {
       return (await sql<LedgerRow[]>`select * from point_ledger where user_id = ${userId} order by created_at desc, id desc limit ${limit}`).map(toLedger);
     },
+    async listRecentLedger(limit = 20) {
+      return (await sql<LedgerRow[]>`select * from point_ledger where delta > 0 and reason not in ('signup', 'admin_adjust') order by created_at desc, id desc limit ${limit}`).map(toLedger);
+    },
 
     async addRedemption(input) {
       const r = await sql<RedRow[]>`insert into redemptions (user_id, kind, amount_points, memo) values (${input.userId}, ${input.kind}, ${input.amountPoints}, ${input.memo ?? null}) returning *`;

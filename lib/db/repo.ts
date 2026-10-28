@@ -108,6 +108,8 @@ export interface Repo {
   addRushClaim(input: Omit<RushClaim, "id" | "claimedAt">): Promise<RushClaim>;
 
   listLedger(userId: string, limit?: number): Promise<LedgerEntry[]>;
+  /** 전체 유저 최근 적립(양수, 가입 보너스 제외) — 홈 실시간 티커용 */
+  listRecentLedger(limit?: number): Promise<LedgerEntry[]>;
 
   addRedemption(input: Omit<Redemption, "id" | "requestedAt" | "status">): Promise<Redemption>;
   listRedemptions(userId?: string): Promise<Redemption[]>;

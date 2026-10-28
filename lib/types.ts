@@ -217,6 +217,25 @@ export interface HomePayload {
   me: { loggedIn: boolean; nickname?: string; avatarUrl?: string; provider?: string }; // 로그인 상태
   newbie: { active: boolean; dayNo: number; doneToday: number; goal: number; claimableCount: number; totalMax: number }; // 3일 혜택 요약
   todayDone: number; // 오늘 완료한 퀴즈 세트 수(KST)
+  tier: TierSummary; // 내 등급(누적 적립·월간 과제 달성으로 승격)
+  recentWins: RecentWin[]; // 실시간 적립 티커(다른 유저, 마스킹)
+}
+
+export interface TierSummary {
+  name: string; // 베이직 · 플러스 · 골드 · 다이아
+  next: string | null;
+  earned: number; // 누적 적립(양수 합)
+  needEarned: number;
+  monthlyDone: number; // 월간 도전 과제 달성 횟수(누적)
+  needMonthly: number;
+  perk: string; // 다음 등급 혜택 문구
+}
+
+export interface RecentWin {
+  who: string; // "AB12****"
+  text: string; // "퀴즈 풀고"
+  points: number;
+  at: string;
 }
 
 export interface PublicQuestion {

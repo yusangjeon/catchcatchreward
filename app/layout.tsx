@@ -5,6 +5,7 @@ import { ToastProvider } from "@/components/motion/Toast";
 import { FxLayer } from "@/components/motion/FxLayer";
 import { BuildGuard } from "@/components/BuildGuard";
 import { RewardLayer } from "@/components/motion/RewardLayer";
+import { Onboarding } from "@/components/Onboarding";
 
 export const metadata: Metadata = {
   title: "캐치캐치리워드",
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <FxLayer />
           <BuildGuard />
           <RewardLayer />
+          <Onboarding />
         </ToastProvider>
       </body>
     </html>
