@@ -353,7 +353,7 @@ export default function HomePage() {
           <div className="fixed inset-0 z-[999] bg-black/80" />
           <div className="fixed left-1/2 top-1/2 z-[1000] w-[calc(100%-48px)] max-w-[382px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[20px] bg-[#191f28] text-white">
             <div className="flex h-[200px] flex-col items-center justify-center bg-gradient-to-br from-[var(--color-myb)] to-[#ff8a5c]">
-              <img src="/brand/coins.webp" alt="" className="h-24 w-24" />
+              <img src="/brand/coins_flat.webp" alt="" className="h-24 w-24 object-contain" />
               <p className="mt-2 text-[14px] font-bold">광고 영상 자리 (리워드 SDK 연동 예정)</p>
             </div>
             <div className="p-5 text-center">
@@ -368,7 +368,7 @@ export default function HomePage() {
         <>
           <div className="myb-fade-in fixed inset-0 z-[999] bg-black/60" onClick={() => setWelcome(false)} />
           <div className="myb-modal-in fixed bottom-0 left-1/2 z-[1000] w-full max-w-[430px] -translate-x-1/2 rounded-t-[24px] bg-white px-6 pb-8 pt-7 text-center">
-            <img src="/brand/coins.webp" alt="" className="mx-auto h-[120px] w-[120px]" />
+            <img src="/brand/gift_burst.webp" alt="" className="mx-auto h-[140px] w-[140px] object-contain" />
             <p className="mt-2 text-[22px] font-bold">환영해요! 가입 보너스 <span className="text-myb">{fmt(data.welcome.points)}P</span></p>
             <p className="mt-2 text-[13px] leading-[19px] text-muted">
               {data.starter.active ? `지금부터 ${Math.max(1, Math.ceil((new Date(data.starter.endsAt).getTime() - Date.now()) / 86400_000))}일 동안 퀴즈 보상이 2배예요.` : "취향 퀴즈 풀고 포인트 받아보세요."}<br />

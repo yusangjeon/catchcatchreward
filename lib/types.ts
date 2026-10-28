@@ -156,7 +156,7 @@ export interface StoreMissionCompletion {
 export interface GamePlay {
   id: string;
   userId: string;
-  game: "spot" | "rsp" | "scratch" | "memory" | "slide" | "walk" | "roulette"; // roulette = 일일 무료 스핀 사용 기록
+  game: "spot" | "rsp" | "scratch" | "memory" | "slide" | "walk" | "roulette" | "lotto"; // roulette = 일일 무료 스핀 사용 기록, lotto = 응모/당첨 수령
   dayKey: string;
   result: string; // win/draw/lose, found:5, prize:50 …
   points: number;

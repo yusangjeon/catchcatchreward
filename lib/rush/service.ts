@@ -67,7 +67,7 @@ async function metrics(userId: string, w: KstWeek): Promise<Record<Metric, numbe
     attendance: stamps.filter((s) => s.sourceType === "attendance" && s.sourceId && days.has(s.sourceId)).length,
     quiz: completions.filter((c) => inRange(c.completedAt, w)).length,
     roulette: spins.filter((s) => inRange(s.spunAt, w)).length,
-    game: games.filter((g) => g.game !== "walk" && g.game !== "roulette" && inRange(g.createdAt, w)).length,
+    game: games.filter((g) => g.game !== "walk" && g.game !== "roulette" && g.game !== "lotto" && inRange(g.createdAt, w)).length,
     store: store.filter((c) => inRange(c.completedAt, w)).length,
     invite: invites.filter((r) => inRange(r.createdAt, w)).length,
   };

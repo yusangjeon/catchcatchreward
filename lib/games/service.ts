@@ -12,7 +12,7 @@ import { SPOT_LEVELS, type SpotDiff } from "./spotLevels";
  *  - scratch(복권 긁기): 하루 1장. 0P 50% · 5P 25% · 10P 15% · 50P 8% · 500P 2% (기대값 ≈16.8P)
  *  - memory(카드 뒤집기): 4×4 8쌍. 클라이언트 플레이, 완료 시 시도 수로 보상(≤16회 15P · ≤24회 10P · 그 외 5P). 하루 1회, 서버는 타당성(시도≥8·시간≥5s)만 검사
  */
-export type MiniGame = Exclude<GamePlay["game"], "walk" | "roulette">;
+export type MiniGame = Exclude<GamePlay["game"], "walk" | "roulette" | "lotto">;
 export const GAME_LIMITS: Record<MiniGame, number> = { spot: 3, rsp: 3, scratch: 1, memory: 1, slide: 1 };
 export const SPOT_DIFFS = 5;
 /** 레벨(오늘 n번째 판)별 난이도: 시간은 줄고 감점·보상은 커진다. 장면도 차이 크기(r) 기준으로 쉬운 것부터 배치 */
@@ -69,7 +69,7 @@ export async function getGames(userId: string): Promise<GamesPayload> {
     const mine = today.filter((p) => p.game === key);
     return { key, ...META[key], href: `/games/${key}`, limit: GAME_LIMITS[key], played: mine.length, left: Math.max(0, GAME_LIMITS[key] - mine.length), todayPoints: mine.reduce((a, p) => a + p.points, 0) };
   });
-  return { dayKey: day, games, weekPlays: plays.filter((p) => p.createdAt >= weekStart).length, recent: plays.filter((p): p is GamePlay & { game: MiniGame | "walk" } => p.game !== "roulette").slice(0, 10).map((p) => ({ game: p.game === "walk" ? "만보기" : META[p.game].title, result: p.result, points: p.points, createdAt: p.createdAt })), wallet: w };
+  return { dayKey: day, games, weekPlays: plays.filter((p) => p.createdAt >= weekStart).length, recent: plays.filter((p): p is GamePlay & { game: MiniGame | "walk" } => p.game !== "roulette" && p.game !== "lotto").slice(0, 10).map((p) => ({ game: p.game === "walk" ? "만보기" : META[p.game].title, result: p.result, points: p.points, createdAt: p.createdAt })), wallet: w };
 }
 
 async function assertLimit(userId: string, game: MiniGame, day: string) {

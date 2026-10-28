@@ -4,11 +4,11 @@ import { BadgeTile } from "@/components/icons/badge";
 
 /* eslint-disable @next/next/no-img-element */
 
-import { DuoIcon, IconTile, type DuoName, type Tone } from "@/components/icons/duo";
+import { DuoIcon, type DuoName, type Tone, FLAT, FlatIcon } from "@/components/icons/duo";
 import Link from "next/link";
 import { useState } from "react";
 import { useHome, fmt } from "@/hooks/useHome";
-import { ChevronRight, CXCoin, PCoin, PCoinPink, PXCoin } from "@/components/icons";
+import { ChevronRight, PCoin } from "@/components/icons";
 
 import { NumberFlow } from "@/components/motion/NumberFlow";
 import { PRODUCTS as EX } from "@/lib/exchange/products";
@@ -18,12 +18,12 @@ const TABS = ["자산", "상품 구매", "뱃지"] as const;
 
 /** 상품 카테고리 원형 */
 const BRANDS: { name: string; img?: string; icon?: DuoName; tone?: Tone; label?: string; bg?: string; pad?: boolean }[] = [
-  { name: "전체", icon: "gift", tone: "orange" },
-  { name: "카페", img: "/products/americano_tall.webp" },
-  { name: "편의점", img: "/products/cu_5000.webp" },
-  { name: "상품권", icon: "ticket", tone: "blue" },
-  { name: "포인트", icon: "coin", tone: "amber" },
-  { name: "금", icon: "star", tone: "amber" },
+  { name: "전체", icon: "gift", tone: "orange", bg: "#fff0ea" },
+  { name: "카페", icon: "bag", tone: "blue", bg: "#e8f1ff" },
+  { name: "편의점", icon: "store", tone: "teal", bg: "#e6f7f1" },
+  { name: "상품권", icon: "ticket", tone: "blue", bg: "#fff3d6" },
+  { name: "포인트", icon: "coin", tone: "amber", bg: "#fff8e3" },
+  { name: "금", icon: "trophy", tone: "amber", bg: "#eeeaff" },
 ];
 const PRODUCTS = EX.map((p) => ({ name: p.name, p: p.points as number | null, img: p.img }));
 
@@ -54,23 +54,30 @@ export default function WalletPage() {
 
       {tab === "자산" && (
         <section className="animate-pop">
-          <h2 className="mt-[36px] flex items-center gap-1.5 text-[17px] font-bold">총 보상 잔액 <Info /></h2>
-          <div className="mt-[18px] flex items-center justify-between">
-            <p className="flex items-center gap-2"><PXCoin size={30} /><span className="text-[26px] font-bold tabular-nums"><NumberFlow value={balance} /> 원</span></p>
-            <Link href="/history" className="flex items-center text-[13px] text-muted">내역 <ChevronRight size={15} /></Link>
+          <div className="mt-[22px] rounded-[22px] p-5 text-white" style={{ background: "linear-gradient(135deg,#ff7a45 0%,#ff5a2d 60%,#e0441a 100%)", boxShadow: "0 12px 28px rgba(255,90,45,.28)" }}>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[13px] font-semibold text-white/80">내 포인트</p>
+                <p className="mt-1 flex items-center gap-2 text-[34px] font-bold leading-none tabular-nums"><NumberFlow value={balance} /><span className="text-[20px] font-bold text-white/85">P</span></p>
+                <p className="mt-2 text-[12px] text-white/75">1P = 1원 · 1,000P부터 상품 교환</p>
+              </div>
+              <FlatIcon file="coin" size={64} />
+            </div>
+            <div className="mt-4 flex gap-2">
+              <Link href="/history" className="myb-press flex h-10 flex-1 items-center justify-center gap-1 rounded-[12px] bg-white/18 text-[13px] font-bold">내역 보기</Link>
+              <Link href="/exchange" className="myb-press flex h-10 flex-1 items-center justify-center gap-1 rounded-[12px] bg-white text-[13px] font-bold text-myb-dark">상품 교환</Link>
+            </div>
           </div>
-          <Link href="/roulette" className="mt-[14px] flex h-[42px] items-center justify-between rounded-xl border border-line px-3 text-[12px]">
-            <span className="flex items-center gap-2"><CXCoin size={18} /> 스탬프 <b className="text-myb-dark">{stampCount}개</b> · 10개 모으면 무료 룰렛 1회</span>
-            <span className="flex items-center gap-1 text-[11px] text-muted">룰렛 <ChevronRight size={14} /></span>
-          </Link>
 
-          <h2 className="mt-[46px] flex items-center gap-1.5 text-[17px] font-bold">내 자산 <Info /></h2>
+          <h2 className="mt-[34px] flex items-center gap-1.5 text-[17px] font-bold">내 자산 <Info /></h2>
           <AssetRow icon={<PCoin size={22} />} name="포인트" value={fmt(balance)} />
-          <AssetRow icon={<CXCoin size={22} />} name="룰렛 스탬프" value={`${stampCount}개`} />
+          <AssetRow icon={<FlatIcon file="stamp" size={24} />} name="룰렛 스탬프" value={`${stampCount}개`} />
+          <AssetRow icon={<FlatIcon file="honey" size={24} />} name="꿀(오늘 퀴즈)" value={`${data?.honey ?? 0}개`} />
+          <AssetRow icon={<FlatIcon file="trophy" size={24} />} name="등급" value={data?.tier.name ?? "베이직"} />
 
           <Link href="/shop" className="mt-[30px] flex h-[46px] items-center justify-between rounded-xl bg-[#e8f1ff] px-4 text-[13px]">
             <span className="flex items-center gap-1.5"><DuoIcon name="bag" size={18} className="text-[#2f6fed]" /> 쇼핑 방문 적립</span>
-            <span className="flex items-center gap-1 text-[14px] font-bold"><PCoinPink size={16} />하루 5P <ChevronRight size={15} className="text-muted" /></span>
+            <span className="flex items-center gap-1 text-[14px] font-bold"><PCoin size={16} />하루 5P <ChevronRight size={15} className="text-muted" /></span>
           </Link>
 
           <Link href="/exchange" className="mt-2 flex h-[84px] items-center justify-between rounded-2xl border border-line px-4">
@@ -82,15 +89,15 @@ export default function WalletPage() {
             </div>
             <ChevronRight className="text-muted" />
           </Link>
-          <Link href="/roulette" className="mt-3 flex items-center justify-between rounded-2xl border border-myb-line px-4 py-4">
+          <Link href="/roulette" className="mt-3 flex items-center justify-between rounded-2xl bg-white px-4 py-4" style={{ boxShadow: "0 5px 16px rgba(40,24,14,.07)" }}>
             <div>
               <p className="flex items-center gap-2 text-[14px] font-bold text-myb-dark">
-                <span className="rounded-full border border-myb-dark px-2 py-0.5 text-[11px]">모으는 중</span> 스탬프 적금
+                <span className="rounded-full bg-myb-soft px-2 py-0.5 text-[11px]">모으는 중</span> 룰렛 스탬프
               </p>
               <p className="mt-1.5 text-[13px] text-muted">스탬프 {data?.wallet.stamps ?? 0}개 · 10개 모으면 룰렛 1회 <ChevronRight size={12} className="inline text-muted" /></p>
               <div className="mt-2 h-1.5 w-40 overflow-hidden rounded-full bg-line"><div className="myb-progress h-full rounded-full bg-myb" style={{ width: `${Math.min(100, ((data?.wallet.stamps ?? 0) % 10) * 10)}%` }} /></div>
             </div>
-            <IconTile name="stamp" tone="orange" size={56} round />
+            <FlatIcon file="roulette" size={56} />
           </Link>
         </section>
       )}
@@ -101,7 +108,7 @@ export default function WalletPage() {
           <div className="no-scrollbar mt-[18px] flex gap-[14px] overflow-x-auto">
             {BRANDS.map((b, i) => (
               <span key={b.name} className={`flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-white text-center text-[9px] font-bold shadow-sm ${b.bg ?? ""} ${i === 0 ? "ring-2 ring-myb ring-offset-2" : ""}`}>
-                {b.icon ? <IconTile name={b.icon} tone={b.tone ?? "gray"} size={58} round /> : b.img ? <img src={b.img} alt={b.name} className="h-full w-full object-cover" /> : <span className="text-[24px]">{b.label}</span>}
+                {b.icon ? <span className="flex h-full w-full items-center justify-center rounded-full" style={{ background: b.bg }}><FlatIcon file={FLAT[b.icon] ?? "gift"} size={34} /></span> : b.img ? <img src={b.img} alt={b.name} className="h-full w-full object-cover" /> : <span className="text-[24px]">{b.label}</span>}
               </span>
             ))}
           </div>

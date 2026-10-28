@@ -101,7 +101,7 @@ export default function RushPage() {
             <h2 className="mt-2 text-[22px] font-bold leading-[30px]">미션 완료하고<br />스탬프 모으면 최대 <b className="text-[var(--color-gold)]">500P</b></h2>
             <p className="mt-1 text-[13px] text-white/80">매주 일요일 0시에 새로 시작해요</p>
           </div>
-          <img src="/brand/coins.webp" width={110} height={110} alt="" className="h-[110px] w-[110px] shrink-0" draggable={false} />
+          <img src="/brand/coins_flat.webp" width={120} height={120} alt="" className="h-[120px] w-[120px] shrink-0 object-contain" draggable={false} />
         </div>
         {data && <Countdown endsAt={data.endsAt} />}
       </section>

@@ -26,6 +26,8 @@ const EARN: { name: DuoName; tone: Tone; title: string; sub: string; href: strin
   { name: "people", tone: "pink", title: "친구 초대", sub: "친구 300P · 친구가 첫 퀴즈 완료하면 나는 500P", href: "/invite", chip: "500P" },
   { name: "pin", tone: "teal", title: "플레이스 방문하기", sub: "동네 플레이스 방문·저장·리뷰 인증하고 포인트 + 스탬프", href: "/missions" },
   { name: "bag", tone: "blue", title: "쇼핑 방문 적립", sub: "제휴 쇼핑몰 방문만 해도 하루 5P", href: "/shop" },
+  { name: "megaphone", tone: "green", title: "고보상 참여", sub: "가입·팔로우·구독하고 최대 3,000P", href: "/cpa", chip: "HOT" },
+  { name: "ticket", tone: "navy", title: "캐치 로또", sub: "매일 무료 1장 · 21:00 추첨 · 6개 일치 50,000P", href: "/games/lotto", chip: "NEW" },
 ];
 
 interface Offers { hero: BenefitGame; games: BenefitGame[]; surveys: BenefitSurvey[]; surveyTotal: number; cpq: CpqItem[]; rushEndsAt: string }

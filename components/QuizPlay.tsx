@@ -96,18 +96,9 @@ export function QuizPlay({ setId }: { setId: string }) {
 
       {/* 하단 파란 영역 */}
       <div className="flex flex-1 flex-col bg-myb px-[40px] pt-[38px] pb-28">
-        <div className="flex items-center gap-3">
-          <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-white text-[15px] font-extrabold tracking-wide text-myb ring-[3px] ring-white/60">{data.persona.code.replace(/\?/g, "").slice(0, 2) || "NEW"}</span>
-          <div>
-            <p className="text-[13px] font-medium text-white">
-              {data.persona.title} · <b className="font-bold">{data.persona.code}</b>
-            </p>
-            <div className="mt-1.5 flex gap-2">
-              <span className="flex h-[26px] items-center rounded-full bg-white px-3.5 text-[12px] tracking-widest text-ink-2">•••</span>
-              <span className="flex h-[26px] items-center gap-1 rounded-full bg-white px-2.5 text-[12px] font-semibold text-ink-2"><BadgeIcon code={data.persona.tag} size={14} />{data.persona.tag ? "취향 분석" : "분석 중"}</span>
-              <span className="h-[26px] w-10 rounded-full bg-white/35" />
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="flex h-[30px] items-center gap-1.5 rounded-full bg-white px-3 text-[12px] font-bold text-myb-dark shadow-[0_3px_10px_rgba(0,0,0,.08)]"><BadgeIcon code={data.persona.tag} size={14} />{data.persona.tag ? data.persona.title : "취향 분석 중"}</span>
+          <span className="flex h-[30px] items-center rounded-full bg-white/20 px-3 text-[12px] font-semibold text-white">답할수록 보상이 커져요</span>
         </div>
 
         <Options q={q} picked={picked} onPick={(oid) => { haptic("tap"); sfx("pop"); setAnswers({ ...answers, [q.id]: oid }); }} />
@@ -196,7 +187,7 @@ function RewardScreen({ result }: { result: SubmitResult }) {
           
         </div>
         {/* 원본 보상 일러스트(코인 스택 + 뱃지 + 색종이) — 앱스토어 스크린샷 픽셀, 레퍼런스 약 150×235 */}
-        <img src="/brand/coins_hero.webp" alt="" className="myb-pop-in myb-float relative h-[160px] w-[260px] object-contain" draggable={false} />
+        <img src="/brand/coins_flat.webp" alt="" className="myb-pop-in myb-float relative h-[170px] w-[170px] object-contain" draggable={false} />
       </div>
       <ToastOnMount text="포인트를 받았어요!" />
 

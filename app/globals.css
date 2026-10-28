@@ -332,3 +332,6 @@ body {
 .routine-pulse { animation: routinePulse 2s ease-out infinite }
 @keyframes onbPiece { 0% { transform: translateY(-40px) rotate(0); opacity: 0 } 8% { opacity: 1 } 100% { transform: translateY(105vh) rotate(720deg); opacity: .2 } }
 .onb-piece { top: -40px; animation: onbPiece 3.5s linear infinite }
+/* 캐치 로또: 공 떨어지는 연출 */
+@keyframes lottoDrop { 0% { transform: translateY(-70px) scale(.6); opacity: 0 } 55% { transform: translateY(6px) scale(1.08); opacity: 1 } 75% { transform: translateY(-4px) scale(.98) } 100% { transform: translateY(0) scale(1) } }
+.lotto-drop { animation: lottoDrop .7s cubic-bezier(.22,1,.36,1) both }

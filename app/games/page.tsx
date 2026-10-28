@@ -52,6 +52,12 @@ export default function GamesPage() {
           ))}
           {!data && [0, 1, 2, 3].map((i) => <li key={i} className="h-[190px] animate-pulse rounded-[20px] bg-white" />)}
         </ul>
+        {/* 캐치 로또(매일 21:00 추첨) */}
+        <Link href="/games/lotto" className="myb-press relative flex items-center gap-4 overflow-hidden rounded-[20px] p-4 text-white" style={{ background: "linear-gradient(135deg,#2b3a67 0%,#4257a3 60%,#5b6fd1 100%)", boxShadow: "0 8px 22px rgba(43,58,103,.25)" }}>
+          <span className="flex -space-x-2">{[7, 19, 33].map((n, i) => <i key={n} className="flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-bold not-italic text-white shadow-[inset_-3px_-4px_8px_rgba(0,0,0,.18)]" style={{ background: ["#f5b400", "#2f6fed", "#ff5a2d"][i] }}>{n}</i>)}</span>
+          <span className="min-w-0 flex-1"><span className="block text-[16px] font-bold">캐치 로또</span><span className="block text-[12px] text-white/75">매일 무료 1장 · 21:00 추첨 · 6개 일치 50,000P</span></span>
+          <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-bold">NEW</span>
+        </Link>
         {data && data.recent.length > 0 && (
           <section className="rounded-[16px] bg-white p-4" style={{ boxShadow: "0 2px 10px 0 rgba(40, 24, 14, 0.06)" }}>
             <p className="text-[14px] font-semibold">최근 기록</p>

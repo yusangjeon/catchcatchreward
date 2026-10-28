@@ -63,12 +63,12 @@ export default function ShopPage() {
       {/* 적립 예정 */}
       <section className="mx-5 mt-4 rounded-[20px] bg-white p-5" style={{ boxShadow: "0 5px 16px rgba(40,24,14,.07)" }}>
         <div className="flex items-center justify-between">
-          <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink">적립 예정 포인트 <DuoIcon name="doc" size={14} className="text-muted" /></p>
-          <span className="text-[11px] text-muted">{data?.asOf ?? "—"} 기준</span>
+          <p className="text-[15px] font-bold text-ink">적립 예정 포인트</p>
+          <Link href="/history" className="text-[12px] font-semibold text-muted">내역 ›</Link>
         </div>
-        <div className="mt-3 flex items-end justify-between">
+        <div className="mt-3 flex items-center justify-between">
           <p className="flex items-center gap-2 text-[30px] font-bold leading-none text-ink"><PCoin size={30} />{fmt(data?.pendingPoint ?? 0)}</p>
-          <span className="rounded-full bg-bg-2 px-3 py-1.5 text-[12px] font-semibold text-ink-2">구매 확정 후 적립</span>
+          <span className="text-[12px] text-ink-2">{(data?.pendingPoint ?? 0) > 0 ? "구매 확정 후 적립돼요" : "쇼핑몰 방문만 해도 하루 5P"}</span>
         </div>
       </section>
 
